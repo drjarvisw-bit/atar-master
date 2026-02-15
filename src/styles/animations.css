@@ -1,0 +1,100 @@
+/* ── Page transitions ── */
+@keyframes page-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.page-transition {
+  animation: page-fade-in 0.3s ease-out;
+}
+
+/* ── Loading spinner ── */
+@keyframes spinner-rotate {
+  to { transform: rotate(360deg); }
+}
+@keyframes spinner-dash {
+  0% { stroke-dasharray: 1, 150; stroke-dashoffset: 0; }
+  50% { stroke-dasharray: 90, 150; stroke-dashoffset: -35; }
+  100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; }
+}
+.spinner-svg {
+  animation: spinner-rotate 1.4s linear infinite;
+}
+.spinner-circle {
+  animation: spinner-dash 1.4s ease-in-out infinite;
+  stroke-linecap: round;
+}
+
+/* ── Toast slide-in ── */
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-12px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toast-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(-12px) scale(0.95); }
+}
+.toast-enter {
+  animation: toast-in 0.25s ease-out forwards;
+}
+.toast-exit {
+  animation: toast-out 0.2s ease-in forwards;
+}
+
+/* ── Micro-interactions ── */
+
+/* Button hover: subtle scale + glow */
+.btn-hover {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-hover:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 12px rgba(88, 166, 255, 0.25);
+}
+.btn-hover:active {
+  transform: scale(0.98);
+}
+
+/* Card hover lift */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Input focus ring */
+.input-focus {
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.input-focus:focus {
+  outline: none;
+  border-color: var(--color-gh-accent-blue);
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+}
+
+/* Mobile menu slide */
+@keyframes mobile-menu-in {
+  from { opacity: 0; max-height: 0; }
+  to { opacity: 1; max-height: 400px; }
+}
+.mobile-menu-enter {
+  animation: mobile-menu-in 0.2s ease-out forwards;
+  overflow: hidden;
+}
+
+/* Navbar link underline effect */
+.nav-link-active {
+  position: relative;
+}
+.nav-link-active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2px;
+  background: var(--color-gh-accent-blue);
+  border-radius: 1px;
+}
