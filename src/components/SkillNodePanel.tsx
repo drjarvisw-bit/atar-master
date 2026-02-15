@@ -12,6 +12,7 @@ import { getNodeQuestionCounts } from '../data/questionMatcher';
 import { getTrainingForNode } from '../data/training';
 import type { UserProgress } from '../lib/progress';
 import { getNodeProgress, computeNodeStatus } from '../lib/progress';
+import { formatEstimatedTime } from '../lib/utils';
 
 interface Props {
   nodeId: string;
@@ -151,6 +152,11 @@ export default function SkillNodePanel({ nodeId, progress, onClose, onEnter }: P
               <div className="text-center">
                 <div className="text-2xl font-bold text-white">{np.score}<span className="text-base text-gray-500">%</span></div>
                 <div className="text-[10px] text-gray-500 mt-0.5 uppercase tracking-wider">Best</div>
+              </div>
+              <div className="w-px h-8 bg-gray-700/50" />
+              <div className="text-center">
+                <div className="text-lg font-bold text-white">⏱</div>
+                <div className="text-[10px] text-gray-500 mt-0.5 uppercase tracking-wider">{formatEstimatedTime(qCount * 1.5)}</div>
               </div>
             </div>
 

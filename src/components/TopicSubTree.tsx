@@ -7,6 +7,7 @@ import { SKILL_TOPIC_COLORS, type Topic } from '../types';
 import type { UserProgress } from '../lib/progress';
 import { getNodeProgress } from '../lib/progress';
 import MathText from './MathText';
+import { formatEstimatedTime } from '../lib/utils';
 
 interface Props {
   nodeId: string;
@@ -129,7 +130,7 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
                       )}
                     </div>
                     <p className={`text-xs mt-0.5 ${isLocked ? 'text-gray-700' : 'text-gray-400'}`}>
-                      {LEVEL_DESCRIPTIONS[i]} • {qCount} question{qCount !== 1 ? 's' : ''}
+                      {LEVEL_DESCRIPTIONS[i]} • {qCount} question{qCount !== 1 ? 's' : ''} • ⏱ {formatEstimatedTime(qCount * 1.5)}
                     </p>
                   </div>
                 </div>

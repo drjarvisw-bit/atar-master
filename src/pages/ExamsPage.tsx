@@ -6,6 +6,7 @@ import AuthModal from '../components/AuthModal'
 import { getAllExams } from '../data/exams'
 import type { ExamPaper, ExamQuestion } from '../types'
 import { SKILL_TOPIC_COLORS } from '../types'
+import { formatEstimatedTime } from '../lib/utils'
 
 const ALL_YEARS = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016]
 const FREE_YEARS = new Set([2018, 2019, 2020])
@@ -180,6 +181,9 @@ export default function ExamsPage() {
                     </span>
                     <span className="flex items-center gap-1.5">
                       📝 {data.totalQuestions} questions · {data.totalMarks} marks
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      ⏱ {formatEstimatedTime(data.totalMarks * 1.5)}
                     </span>
                     <span className="flex items-center gap-1.5">
                       <CheckCircle size={12} className="text-green-400" /> Includes marking guide

@@ -10,6 +10,7 @@ import { recordActivity } from '../lib/streak';
 import type { TrainingQuestion } from '../data/training/types';
 import MathText from '../components/MathText';
 import { Link } from 'react-router-dom';
+import { formatEstimatedTime } from '../lib/utils';
 
 function formatCountdown(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -125,6 +126,8 @@ export default function DailyChallengePage() {
       <h1 className="text-2xl font-bold text-white mb-1">{todayStr}</h1>
       <p className="text-sm text-gray-400 flex items-center justify-center gap-2">
         <Clock size={14} /> Refreshes in {formatCountdown(countdown)}
+        <span className="text-gray-600">·</span>
+        ⏱ {formatEstimatedTime(total * 1.5)}
       </p>
     </div>
   );
