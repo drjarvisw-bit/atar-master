@@ -1,5 +1,6 @@
-import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { supabase } from '../lib/supabase'
+import { syncFromCloud, scheduleSyncToCloud } from '../lib/cloudSync'
 import type { User, AuthError } from '@supabase/supabase-js'
 
 interface AuthContextType {
@@ -51,14 +52,32 @@ export function useAuthProvider(): AuthContextType {
       setLoading(false)
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-      checkPro(session?.user ?? null)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const u = session?.user ?? null
+      setUser(u)
+      checkPro(u)
       setLoading(false)
+
+      // Sync from cloud on sign-in
+      if (u && (_event === 'SIGNED_IN' || _event === 'TOKEN_REFRESHED')) {
+        try { await syncFromCloud(u.id) } catch (e) { console.error('[auth] cloud sync failed:', e) }
+      }
     })
 
     return () => subscription.unsubscribe()
   }, [checkPro])
+
+  // Listen for progress changes and debounced-sync to cloud
+  const userRef = useRef(user)
+  userRef.current = user
+
+  useEffect(() => {
+    const handler = () => {
+      if (userRef.current) scheduleSyncToCloud(userRef.current.id)
+    }
+    window.addEventListener('progress-change', handler)
+    return () => window.removeEventListener('progress-change', handler)
+  }, [])
 
   const signUp = useCallback(async (email: string, password: string) => {
     const { error } = await supabase.auth.signUp({ email, password })

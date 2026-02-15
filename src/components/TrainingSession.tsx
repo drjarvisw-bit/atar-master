@@ -3,6 +3,10 @@ import { ArrowLeft, ArrowRight, Check, X, RotateCcw, Trophy, Lightbulb, ChevronD
 import { getTrainingByDifficulty, type TrainingQuestion } from '../data/training';
 import { getQuestionsForNode } from '../data/questionMatcher';
 import MathText from './MathText';
+import { checkAchievements, type Achievement } from '../lib/achievements';
+import { loadProgress } from '../lib/progress';
+import { getStreak } from '../lib/streak';
+import AchievementToast from './AchievementToast';
 
 interface Props {
   nodeId: string;
@@ -45,6 +49,8 @@ export default function TrainingSession({ nodeId, level, onComplete, onBack }: P
   const [showHint, setShowHint] = useState(false);
   const [results, setResults] = useState<Record<number, boolean>>({});
   const [feedbackVisible, setFeedbackVisible] = useState(false);
+  const [achievementQueue, setAchievementQueue] = useState<Achievement[]>([]);
+  const [questionStartTime, setQuestionStartTime] = useState<number>(Date.now());
 
   const current = questions[currentIdx] as TrainingQuestion | undefined;
   const total = questions.length;
@@ -56,13 +62,19 @@ export default function TrainingSession({ nodeId, level, onComplete, onBack }: P
     setSelectedOption(label);
   }, [isAnswered]);
 
+  const [speedAnswerThisSession, setSpeedAnswerThisSession] = useState(false);
+
   const handleSubmit = useCallback(() => {
     if (!current || !selectedOption) return;
     const correct = current.options?.find(o => o.label === selectedOption)?.correct ?? false;
     setResults(prev => ({ ...prev, [currentIdx]: correct }));
     setIsAnswered(true);
     setTimeout(() => setFeedbackVisible(true), 50);
-  }, [current, selectedOption, currentIdx]);
+    // Check speed
+    if (correct && (Date.now() - questionStartTime) < 10000) {
+      setSpeedAnswerThisSession(true);
+    }
+  }, [current, selectedOption, currentIdx, questionStartTime]);
 
   const handleNext = useCallback(() => {
     if (currentIdx + 1 >= total) {
@@ -74,6 +86,7 @@ export default function TrainingSession({ nodeId, level, onComplete, onBack }: P
     setSelectedOption(null);
     setIsAnswered(false);
     setShowHint(false);
+    setQuestionStartTime(Date.now());
   }, [currentIdx, total]);
 
   const handleFinish = useCallback(() => {

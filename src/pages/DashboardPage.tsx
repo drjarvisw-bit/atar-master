@@ -9,6 +9,7 @@ import {
   User as UserIcon, Mail, School, GraduationCap,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import AchievementPanel from '../components/AchievementPanel';
 
 const TOPICS = Object.values(Topic);
 const YEAR_LEVELS = ['Year 8', 'Year 9', 'Year 10', 'Year 11', 'Year 12'];
@@ -263,6 +264,11 @@ export default function DashboardPage() {
             <Play size={16} /> Start Practice
           </Link>
         </div>
+      </div>
+
+      {/* Achievements */}
+      <div className="mb-8">
+        <AchievementPanel />
       </div>
 
       {/* Exam progress */}
