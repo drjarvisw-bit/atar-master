@@ -80,10 +80,10 @@ function computePathLayout() {
   const tiers = getNodesByTier();
   const positions: Record<string, { x: number; y: number; tier: number }> = {};
   
-  const V_SPACING = 110;
-  const TIER_GAP = 70;
+  const V_SPACING = 130;
+  const TIER_GAP = 80;
   const CENTER_X = 400;
-  const SWING = 120; // How far nodes swing left/right from center
+  const SWING = 140; // How far nodes swing left/right from center
   
   let currentY = 80;
   let globalNodeIdx = 0;
@@ -259,10 +259,10 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
                   <path
                     d={`M ${from.x} ${from.y + 36} C ${from.x + controlOffset} ${midY}, ${to.x - controlOffset} ${midY}, ${to.x} ${to.y - 36}`}
                     fill="none"
-                    stroke={isActive ? '#3B82F6' : '#1E293B'}
+                    stroke={isActive ? '#3B82F6' : '#334155'}
                     strokeWidth={isActive ? 3 : 2}
                     strokeDasharray={isActive ? 'none' : '8 6'}
-                    opacity={isActive ? 0.7 : 0.3}
+                    opacity={isActive ? 0.8 : 0.5}
                     style={isActive ? {} : { animation: 'dashFlow 1.5s linear infinite' }}
                   />
                   {isActive && (
@@ -319,7 +319,7 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
           const isHovered = hoveredNode === node.id;
           const isCurrent = findCurrentNode(progress) === node.id;
           const topicColor = SKILL_TOPIC_COLORS[node.topic as Topic];
-          const nodeSize = 72;
+          const nodeSize = 80;
           const icon = NODE_ICONS[node.id] ?? TOPIC_ICONS[node.topic] ?? '📐';
           
           const progressPct = levelsCompleted / 4;
@@ -407,14 +407,14 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
                   `}
                   style={{
                     background: isLocked
-                      ? '#0F172A'
+                      ? '#1E293B'
                       : isCompleted
                         ? `linear-gradient(135deg, ${topicColor?.primary ?? '#22C55E'}, ${topicColor?.bg ?? '#16A34A'})`
                         : isInProgress
                           ? `linear-gradient(135deg, #1E40AF, #3B82F6)`
                           : `linear-gradient(135deg, #1E293B, #334155)`,
                     border: isLocked
-                      ? '2px solid #1E293B'
+                      ? '2px solid #475569'
                       : isCompleted
                         ? `2px solid ${topicColor?.primary ?? '#22C55E'}`
                         : isInProgress
@@ -425,7 +425,7 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
                       : isCompleted
                         ? `0 0 12px ${topicColor?.glow ?? '#22C55E30'}`
                         : 'none',
-                    opacity: isLocked ? 0.5 : 1,
+                    opacity: isLocked ? 0.7 : 1,
                   }}
                 >
                   {/* Shine effect for completed */}
@@ -441,7 +441,7 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
                   )}
                   
                   {/* Icon */}
-                  <span className="text-2xl relative z-10" style={{ filter: isLocked ? 'grayscale(1)' : 'none' }}>
+                  <span className="text-3xl relative z-10" style={{ filter: isLocked ? 'grayscale(1) brightness(0.6)' : 'none' }}>
                     {isLocked ? '🔒' : icon}
                   </span>
                 </div>
@@ -450,7 +450,7 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
               {/* Title */}
               <div className="mt-2 text-center">
                 <span 
-                  className={`text-[11px] font-medium leading-tight block ${
+                  className={`text-xs font-semibold leading-tight block ${
                     isLocked ? 'text-gray-600' : isCompleted ? 'text-gray-200' : 'text-gray-400'
                   }`}
                   style={{ 
