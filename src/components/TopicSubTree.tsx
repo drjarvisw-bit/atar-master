@@ -53,8 +53,8 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
     });
   }, [nodeId, examQuestions]);
 
-  const totalTraining = levels.reduce((sum, l) => sum + l.training.length, 0);
-  const totalQuestions = totalTraining + examQuestions.length;
+  
+  
 
   return (
     <div className="min-h-full bg-gray-900 p-4 sm:p-6 animate-fade-in">
