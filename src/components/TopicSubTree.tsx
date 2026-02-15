@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
-import { ArrowLeft, Lock, Play, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Lock, Play, CheckCircle2, Flame } from 'lucide-react';
 import { ALL_NODES } from '../data/skillTreeData';
 import { getQuestionsForNode } from '../data/questionMatcher';
+import { getTrainingByLevel, type TrainingQuestion } from '../data/training';
 import { SKILL_TOPIC_COLORS, type Topic } from '../types';
 import type { UserProgress } from '../lib/progress';
 import { getNodeProgress } from '../lib/progress';
+import MathText from './MathText';
 
 interface Props {
   nodeId: string;
@@ -13,32 +15,45 @@ interface Props {
   onStartLevel: (nodeId: string, level: number) => void;
 }
 
-const LEVEL_NAMES = ['Warm-up', 'Foundation', 'Developing', 'Proficient', 'Challenge + Exam'];
+const LEVEL_NAMES = ['Warm-up', 'Foundation', 'Developing', 'Proficient', 'Exam Challenge'];
 const LEVEL_DESCRIPTIONS = [
   'Basic concept check — get started!',
   'Build core understanding',
   'Apply knowledge to standard problems',
   'Tackle complex multi-step problems',
-  'Real VCE exam questions & challenge problems',
+  'Real VCE exam questions — prove your mastery!',
 ];
+
+interface LevelData {
+  training: TrainingQuestion[];
+  examCount: number;
+  isExamLevel: boolean;
+}
 
 export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }: Props) {
   const node = useMemo(() => ALL_NODES.find(n => n.id === nodeId), [nodeId]);
   const np = getNodeProgress(progress, nodeId);
-  const questions = useMemo(() => getQuestionsForNode(nodeId), [nodeId]);
+  const examQuestions = useMemo(() => getQuestionsForNode(nodeId), [nodeId]);
   const topicColor = node ? SKILL_TOPIC_COLORS[node.topic as Topic] : null;
 
   if (!node) return null;
 
-  // Split questions into 5 levels by difficulty/marks
-  const levels = useMemo(() => {
-    const sorted = [...questions].sort((a, b) => a.question.marks - b.question.marks);
-    const perLevel = Math.max(1, Math.ceil(sorted.length / 5));
-    return Array.from({ length: 5 }, (_, i) => {
-      const start = i * perLevel;
-      return sorted.slice(start, start + perLevel);
+  // Levels 1-4: training MC questions, Level 5: real exam questions
+  const levels: LevelData[] = useMemo(() => {
+    return [1, 2, 3, 4, 5].map(level => {
+      if (level === 5) {
+        return { training: [], examCount: examQuestions.length, isExamLevel: true };
+      }
+      return {
+        training: getTrainingByLevel(nodeId, level as 1 | 2 | 3 | 4),
+        examCount: 0,
+        isExamLevel: false,
+      };
     });
-  }, [questions]);
+  }, [nodeId, examQuestions]);
+
+  const totalTraining = levels.reduce((sum, l) => sum + l.training.length, 0);
+  const totalQuestions = totalTraining + examQuestions.length;
 
   return (
     <div className="min-h-full bg-gray-900 p-4 sm:p-6 animate-fade-in">
@@ -63,17 +78,18 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
         </div>
         <div className="text-right">
           <div className="text-2xl font-bold text-white">{np.score}%</div>
-          <div className="text-xs text-gray-500">mastery</div>
+          <div className="text-xs text-gray-500">{totalQuestions} questions</div>
         </div>
       </div>
 
       {/* Levels */}
       <div className="space-y-4">
-        {levels.map((levelQuestions, i) => {
+        {levels.map((levelData, i) => {
           const levelNum = i + 1;
           const isCompleted = np.levelsCompleted.includes(levelNum);
           const isUnlocked = levelNum === 1 || np.levelsCompleted.includes(levelNum - 1);
           const isLocked = !isUnlocked;
+          const qCount = levelData.isExamLevel ? levelData.examCount : levelData.training.length;
           const stars = levelNum;
 
           return (
@@ -91,12 +107,14 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
                 <div className="flex items-center gap-3">
                   {/* Status icon */}
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    isLocked ? 'bg-gray-800' : isCompleted ? 'bg-green-900/50' : 'bg-blue-900/30'
+                    isLocked ? 'bg-gray-800' : isCompleted ? 'bg-green-900/50' : levelData.isExamLevel ? 'bg-orange-900/30' : 'bg-blue-900/30'
                   }`}>
                     {isLocked ? (
                       <Lock size={18} className="text-gray-600" />
                     ) : isCompleted ? (
                       <CheckCircle2 size={18} className="text-green-400" />
+                    ) : levelData.isExamLevel ? (
+                      <Flame size={18} className="text-orange-400" />
                     ) : (
                       <Play size={18} className="text-blue-400" />
                     )}
@@ -110,23 +128,37 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
                       <span className="text-yellow-400 text-sm">
                         {'⭐'.repeat(stars)}
                       </span>
+                      {levelData.isExamLevel && !isLocked && (
+                        <span className="px-1.5 py-0.5 text-[10px] font-bold bg-orange-500/20 text-orange-400 rounded-full">
+                          REAL EXAMS
+                        </span>
+                      )}
+                      {!levelData.isExamLevel && qCount > 0 && !isLocked && (
+                        <span className="px-1.5 py-0.5 text-[10px] font-bold bg-blue-500/20 text-blue-400 rounded-full">
+                          MC
+                        </span>
+                      )}
                     </div>
                     <p className={`text-xs mt-0.5 ${isLocked ? 'text-gray-700' : 'text-gray-400'}`}>
-                      {LEVEL_DESCRIPTIONS[i]} • {levelQuestions.length} question{levelQuestions.length !== 1 ? 's' : ''}
+                      {LEVEL_DESCRIPTIONS[i]} • {qCount} question{qCount !== 1 ? 's' : ''}
                     </p>
                   </div>
                 </div>
 
                 {/* Action */}
-                {!isLocked && !isCompleted && (
+                {!isLocked && qCount > 0 && !isCompleted && (
                   <button
                     onClick={() => onStartLevel(nodeId, levelNum)}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors"
+                    className={`px-4 py-2 text-white text-sm font-medium rounded-lg transition-colors ${
+                      levelData.isExamLevel
+                        ? 'bg-orange-600 hover:bg-orange-500'
+                        : 'bg-blue-600 hover:bg-blue-500'
+                    }`}
                   >
                     Start
                   </button>
                 )}
-                {isCompleted && (
+                {!isLocked && qCount > 0 && isCompleted && (
                   <button
                     onClick={() => onStartLevel(nodeId, levelNum)}
                     className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm font-medium rounded-lg transition-colors"
@@ -134,12 +166,15 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
                     Redo
                   </button>
                 )}
+                {!isLocked && qCount === 0 && (
+                  <span className="text-xs text-gray-600 italic">Coming soon</span>
+                )}
               </div>
 
-              {/* Question cards preview (collapsed for locked) */}
-              {!isLocked && levelQuestions.length > 0 && (
+              {/* Question cards preview (training MC) */}
+              {!isLocked && !levelData.isExamLevel && levelData.training.length > 0 && (
                 <div className="px-4 pb-4 flex gap-2 overflow-x-auto">
-                  {levelQuestions.map((mq, qi) => (
+                  {levelData.training.slice(0, 6).map((tq, qi) => (
                     <div
                       key={qi}
                       className={`flex-shrink-0 w-48 p-3 rounded-lg border text-xs ${
@@ -149,6 +184,34 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
                       }`}
                     >
                       <div className="font-mono text-[10px] text-gray-500 mb-1">
+                        MC • {tq.marks}mk
+                      </div>
+                      <div className="line-clamp-2">
+                        <MathText text={tq.text.slice(0, 80) + (tq.text.length > 80 ? '…' : '')} />
+                      </div>
+                    </div>
+                  ))}
+                  {levelData.training.length > 6 && (
+                    <div className="flex-shrink-0 w-24 p-3 rounded-lg border border-gray-700 bg-gray-900 flex items-center justify-center text-xs text-gray-500">
+                      +{levelData.training.length - 6} more
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Exam question preview */}
+              {!isLocked && levelData.isExamLevel && examQuestions.length > 0 && (
+                <div className="px-4 pb-4 flex gap-2 overflow-x-auto">
+                  {examQuestions.slice(0, 6).map((mq, qi) => (
+                    <div
+                      key={qi}
+                      className={`flex-shrink-0 w-48 p-3 rounded-lg border text-xs ${
+                        isCompleted
+                          ? 'bg-green-900/20 border-green-800/30 text-green-300'
+                          : 'bg-gray-900 border-orange-800/30 text-gray-400'
+                      }`}
+                    >
+                      <div className="font-mono text-[10px] text-orange-500/70 mb-1">
                         {mq.examTitle} • {mq.question.marks}mk
                       </div>
                       <div className="line-clamp-2">
@@ -156,6 +219,11 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
                       </div>
                     </div>
                   ))}
+                  {examQuestions.length > 6 && (
+                    <div className="flex-shrink-0 w-24 p-3 rounded-lg border border-orange-800/30 bg-gray-900 flex items-center justify-center text-xs text-orange-500/50">
+                      +{examQuestions.length - 6} more
+                    </div>
+                  )}
                 </div>
               )}
             </div>

@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { X, ArrowRight } from 'lucide-react';
 import { ALL_NODES } from '../data/skillTreeData';
 import { getNodeQuestionCounts } from '../data/questionMatcher';
+import { getTrainingForNode } from '../data/training';
 import { SKILL_TOPIC_COLORS, type Topic } from '../types';
 import type { UserProgress } from '../lib/progress';
 import { getNodeProgress } from '../lib/progress';
@@ -16,7 +17,9 @@ interface Props {
 export default function SkillNodePanel({ nodeId, progress, onClose, onEnter }: Props) {
   const node = useMemo(() => ALL_NODES.find(n => n.id === nodeId), [nodeId]);
   const np = getNodeProgress(progress, nodeId);
-  const qCount = useMemo(() => getNodeQuestionCounts()[nodeId] ?? 0, [nodeId]);
+  const examCount = useMemo(() => getNodeQuestionCounts()[nodeId] ?? 0, [nodeId]);
+  const trainingCount = useMemo(() => getTrainingForNode(nodeId).length, [nodeId]);
+  const qCount = trainingCount + examCount;
   const topicColor = node ? SKILL_TOPIC_COLORS[node.topic as Topic] : null;
 
   if (!node) return null;
