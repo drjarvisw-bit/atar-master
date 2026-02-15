@@ -33,14 +33,14 @@ export default function PricingSection({ currentPlan = 'free' }: PricingSectionP
     <section className="py-16 px-4">
       <div className="max-w-5xl mx-auto text-center mb-12">
         <h2 className="text-3xl font-bold text-white mb-4">Choose Your Plan</h2>
-        <p className="text-gray-400 mb-8">Unlock your full ATAR potential</p>
+        <p className="text-gh-text-secondary mb-8">Unlock your full ATAR potential</p>
 
         {/* Billing toggle */}
-        <div className="inline-flex items-center gap-3 rounded-full bg-gray-800 p-1">
+        <div className="inline-flex items-center gap-3 rounded-full bg-gh-surface p-1 border border-gh-border">
           <button
             onClick={() => setBillingCycle('monthly')}
             className={`px-5 py-2 rounded-full text-sm font-medium transition ${
-              isMonthly ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:text-white'
+              isMonthly ? 'bg-blue-600 text-white' : 'text-gh-text-secondary hover:text-white'
             }`}
           >
             Monthly
@@ -48,33 +48,33 @@ export default function PricingSection({ currentPlan = 'free' }: PricingSectionP
           <button
             onClick={() => setBillingCycle('yearly')}
             className={`px-5 py-2 rounded-full text-sm font-medium transition ${
-              !isMonthly ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:text-white'
+              !isMonthly ? 'bg-blue-600 text-white' : 'text-gh-text-secondary hover:text-white'
             }`}
           >
-            Yearly {savings && <span className="ml-1 text-emerald-400 text-xs">{savings}</span>}
+            Yearly {savings && <span className="ml-1 text-green-400 text-xs">{savings}</span>}
           </button>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
+      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Free Plan */}
-        <div className="rounded-2xl border border-gray-700 bg-gray-900 p-8 flex flex-col">
+        <div className="rounded-2xl border border-gh-border bg-gh-surface p-6 sm:p-8 flex flex-col">
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-2">
-              <BookOpen className="w-5 h-5 text-gray-400" />
+              <BookOpen className="w-5 h-5 text-gh-text-secondary" />
               <h3 className="text-xl font-semibold text-white">Free</h3>
             </div>
             <div className="flex items-baseline gap-1">
               <span className="text-4xl font-bold text-white">$0</span>
-              <span className="text-gray-400">/forever</span>
+              <span className="text-gh-text-secondary">/forever</span>
             </div>
-            <p className="text-gray-400 mt-2 text-sm">Get started with the basics</p>
+            <p className="text-gh-text-secondary mt-2 text-sm">Get started with the basics</p>
           </div>
 
           <ul className="space-y-3 mb-8 flex-1">
             {['3 exam papers', 'Basic practice mode', 'Progress tracking'].map((f) => (
-              <li key={f} className="flex items-center gap-2 text-gray-300 text-sm">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+              <li key={f} className="flex items-center gap-2 text-gh-text-secondary text-sm">
+                <Check className="w-4 h-4 text-green-400 shrink-0" />
                 {f}
               </li>
             ))}
@@ -82,28 +82,28 @@ export default function PricingSection({ currentPlan = 'free' }: PricingSectionP
 
           <button
             disabled={currentPlan === 'free'}
-            className="w-full py-3 rounded-xl font-medium text-sm border border-gray-600 text-gray-300 hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-default"
+            className="w-full py-3 rounded-xl font-medium text-sm border border-gh-border text-gh-text-secondary hover:bg-gh-overlay transition disabled:opacity-50 disabled:cursor-default"
           >
             {currentPlan === 'free' ? 'Current Plan' : 'Downgrade'}
           </button>
         </div>
 
         {/* Pro Plan */}
-        <div className="relative rounded-2xl border-2 border-indigo-500 bg-gray-900 p-8 flex flex-col">
-          <div className="absolute -top-3 right-6 flex items-center gap-1 bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+        <div className="relative rounded-2xl border-2 border-blue-600 bg-gh-surface p-6 sm:p-8 flex flex-col">
+          <div className="absolute -top-3 right-6 flex items-center gap-1 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">
             <Star className="w-3 h-3" /> RECOMMENDED
           </div>
 
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-2">
-              <Crown className="w-5 h-5 text-indigo-400" />
+              <Crown className="w-5 h-5 text-gh-accent-blue" />
               <h3 className="text-xl font-semibold text-white">Pro</h3>
             </div>
             <div className="flex items-baseline gap-1">
               <span className="text-4xl font-bold text-white">{proPrice}</span>
-              <span className="text-gray-400">{proPeriod}</span>
+              <span className="text-gh-text-secondary">{proPeriod}</span>
             </div>
-            <p className="text-gray-400 mt-2 text-sm">Everything you need to ace your ATAR</p>
+            <p className="text-gh-text-secondary mt-2 text-sm">Everything you need to ace your ATAR</p>
           </div>
 
           <ul className="space-y-3 mb-8 flex-1">
@@ -114,8 +114,8 @@ export default function PricingSection({ currentPlan = 'free' }: PricingSectionP
               'Advanced practice modes',
               'Everything in Free',
             ].map((f) => (
-              <li key={f} className="flex items-center gap-2 text-gray-300 text-sm">
-                <Zap className="w-4 h-4 text-indigo-400 shrink-0" />
+              <li key={f} className="flex items-center gap-2 text-gh-text-secondary text-sm">
+                <Zap className="w-4 h-4 text-gh-accent-blue shrink-0" />
                 {f}
               </li>
             ))}
@@ -124,7 +124,7 @@ export default function PricingSection({ currentPlan = 'free' }: PricingSectionP
           <button
             disabled={currentPlan === 'pro' || loading}
             onClick={handleCheckout}
-            className="w-full py-3 rounded-xl font-medium text-sm bg-indigo-600 text-white hover:bg-indigo-500 transition disabled:opacity-50 disabled:cursor-default"
+            className="w-full py-3 rounded-xl font-medium text-sm bg-blue-600 text-white hover:bg-blue-500 transition disabled:opacity-50 disabled:cursor-default"
           >
             {currentPlan === 'pro' ? 'Current Plan' : loading ? 'Redirecting…' : 'Upgrade to Pro'}
           </button>

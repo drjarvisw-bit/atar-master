@@ -40,7 +40,7 @@ export default function DashboardPage() {
       <p className="text-gh-text-secondary mb-8">Track your progress and stay on top</p>
 
       {/* Stats row */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {([
           { icon: <CheckCircle2 size={20} className="text-green-400" />, value: `${overall.completed}/${overall.total}`, label: 'Questions Done' },
           { icon: <Flame size={20} className="text-orange-400" />, value: `${streak}`, label: 'Day Streak 🔥' },
@@ -78,7 +78,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent sessions */}
-      <div className="grid grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <div className="bg-gh-surface border border-gh-border rounded-xl p-6">
           <h2 className="text-lg font-semibold mb-4">Recent Practice</h2>
           {sessions.length === 0 ? (
@@ -121,7 +121,7 @@ export default function DashboardPage() {
       {/* Exam progress */}
       <div className="bg-gh-surface border border-gh-border rounded-xl p-6">
         <h2 className="text-lg font-semibold mb-4">Exam Completion</h2>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {allExams.map(exam => {
             const ep = progress.getExamProgress(exam.id);
             return (

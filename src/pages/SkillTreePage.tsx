@@ -39,7 +39,7 @@ export default function SkillTreePage() {
         <p className="text-gh-text-secondary text-sm">{tree.description}</p>
       </div>
 
-      <div className="flex gap-6">
+      <div className="flex flex-col lg:flex-row gap-6">
         {/* Tree canvas */}
         <div className="flex-1 border border-gh-border rounded-xl bg-gh-inset overflow-auto">
           <svg viewBox={`0 0 ${maxX} ${maxY}`} className="w-full" style={{ minHeight: 500 }}>
@@ -129,7 +129,7 @@ export default function SkillTreePage() {
         </div>
 
         {/* Side panel */}
-        <div className="w-80 shrink-0">
+        <div className="w-full lg:w-80 shrink-0">
           {selectedNode ? (
             <SkillNodePanel
               node={selectedNode}
@@ -149,7 +149,7 @@ export default function SkillTreePage() {
       </div>
 
       {/* Legend */}
-      <div className="mt-6 flex gap-6 text-xs text-gh-text-muted">
+      <div className="mt-6 flex flex-wrap gap-4 sm:gap-6 text-xs text-gh-text-muted">
         <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full border-2 border-gh-border bg-gh-canvas inline-block" /> Locked</span>
         <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full border-2 border-gh-accent-blue bg-gh-canvas inline-block" /> Unlocked</span>
         <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full border-2 border-gh-success-fg bg-green-900/30 inline-block" /> Completed</span>

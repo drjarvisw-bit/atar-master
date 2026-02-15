@@ -111,7 +111,7 @@ export default function PracticePage() {
         <h1 className="text-3xl font-bold mb-2">🏋️ Practice Mode</h1>
         <p className="text-gh-text-secondary mb-8">Choose how you want to practice</p>
 
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
           {([
             { m: 'topic' as Mode, icon: <Target size={20} />, label: 'By Topic', desc: 'Focus on one topic' },
             { m: 'exam' as Mode, icon: <BarChart3 size={20} />, label: 'By Exam', desc: 'Practice a full exam' },

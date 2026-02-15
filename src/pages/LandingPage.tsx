@@ -116,11 +116,11 @@ export default function LandingPage() {
     <div className="min-h-screen">
       {/* Hero */}
       <section className="relative">
-        <div className="mx-auto max-w-4xl px-6 pt-24 pb-20 text-center">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 pt-16 sm:pt-24 pb-14 sm:pb-20 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gh-border bg-gh-surface text-sm text-gh-text-secondary mb-8">
             📐 2021–2025 VCE Methods Exams Now Available
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white leading-tight tracking-tight">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-6 text-white leading-tight tracking-tight">
             ATAR Master
           </h1>
           <p className="text-xl text-gh-text-secondary mb-3">
