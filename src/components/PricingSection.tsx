@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Check, Crown, Zap, BookOpen, Star } from 'lucide-react'
 import { createCheckoutSession, PRICE_PRO_MONTHLY, PRICE_PRO_YEARLY } from '../lib/stripe'
+import { useAuth } from '../hooks/useAuth'
+import AuthModal from './AuthModal'
 
 interface PricingSectionProps {
   currentPlan?: 'free' | 'pro'
@@ -9,13 +11,16 @@ interface PricingSectionProps {
 export default function PricingSection({ currentPlan = 'free' }: PricingSectionProps) {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly')
   const [loading, setLoading] = useState(false)
+  const [showAuth, setShowAuth] = useState(false)
+  const [pendingCheckout, setPendingCheckout] = useState(false)
+  const { user } = useAuth()
 
   const isMonthly = billingCycle === 'monthly'
   const proPrice = isMonthly ? '$9.99' : '$89.99'
   const proPeriod = isMonthly ? '/mo' : '/yr'
   const savings = isMonthly ? null : 'Save ~25%'
 
-  async function handleCheckout() {
+  async function doCheckout() {
     setLoading(true)
     try {
       const priceId = isMonthly ? PRICE_PRO_MONTHLY : PRICE_PRO_YEARLY
@@ -26,6 +31,23 @@ export default function PricingSection({ currentPlan = 'free' }: PricingSectionP
       alert('Failed to start checkout. Please try again.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  function handleCheckout() {
+    if (!user) {
+      setPendingCheckout(true)
+      setShowAuth(true)
+      return
+    }
+    doCheckout()
+  }
+
+  function handleAuthSuccess() {
+    setShowAuth(false)
+    if (pendingCheckout) {
+      setPendingCheckout(false)
+      doCheckout()
     }
   }
 
@@ -130,6 +152,14 @@ export default function PricingSection({ currentPlan = 'free' }: PricingSectionP
           </button>
         </div>
       </div>
+
+      {showAuth && (
+        <AuthModal
+          onClose={() => { setShowAuth(false); setPendingCheckout(false) }}
+          onSuccess={handleAuthSuccess}
+          message="Sign in to upgrade to Pro"
+        />
+      )}
     </section>
   )
 }

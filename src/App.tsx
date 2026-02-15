@@ -2,13 +2,14 @@ import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-do
 import { Home, GitBranch, FileText, Dumbbell, BarChart3, DollarSign, LogIn, LogOut, User, Menu, X } from 'lucide-react';
 import { useState, lazy, Suspense } from 'react';
 import { AuthContext, useAuth, useAuthProvider } from './hooks/useAuth';
-import ProtectedRoute from './components/ProtectedRoute';
+import AuthGuard from './components/AuthGuard';
 import './index.css';
 
 // Lazy-loaded pages for code splitting
 const LandingPage = lazy(() => import('./pages/LandingPage'));
 const SkillTreePage = lazy(() => import('./pages/SkillTreePage'));
 const ExamViewerPage = lazy(() => import('./pages/ExamViewerPage'));
+const ExamsPage = lazy(() => import('./pages/ExamsPage'));
 const PracticePage = lazy(() => import('./pages/PracticePage'));
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const AuthPage = lazy(() => import('./pages/AuthPage'));
@@ -135,18 +136,11 @@ function AppRoutes() {
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/success" element={<SuccessPage />} />
-          <Route path="/skill-tree" element={<SkillTreePage />} />
-          <Route path="/exams" element={<ExamViewerPage />} />
-          <Route path="/practice" element={
-            <ProtectedRoute>
-              <PracticePage />
-            </ProtectedRoute>
-          } />
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          } />
+          <Route path="/skill-tree" element={<AuthGuard><SkillTreePage /></AuthGuard>} />
+          <Route path="/exams" element={<AuthGuard><ExamsPage /></AuthGuard>} />
+          <Route path="/exam-viewer" element={<AuthGuard><ExamViewerPage /></AuthGuard>} />
+          <Route path="/practice" element={<AuthGuard><PracticePage /></AuthGuard>} />
+          <Route path="/dashboard" element={<AuthGuard><DashboardPage /></AuthGuard>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
