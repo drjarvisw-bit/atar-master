@@ -1,6 +1,6 @@
 import type { TrainingQuestion } from './types';
 
-// Import all training question files (keyed by old node IDs)
+// Import all training question files
 import basicAlgebra from './basic-algebra';
 import numberOps from './number-ops';
 import basicTrig from './basic-trig';
@@ -70,39 +70,33 @@ const oldTraining: Record<string, TrainingQuestion[]> = {
  */
 const NODE_TO_TRAINING: Record<string, string[]> = {
   // Year 8
+  'y8-number': ['number-ops'],
   'y8-algebra': ['basic-algebra'],
-  'y8-linear-eq': ['basic-algebra'],
-  'y8-number-ops': ['number-ops'],
+  'y8-statistics': ['graphing-basics'],
   'y8-probability': ['basic-prob'],
-  'y8-graphing': ['graphing-basics'],
   // Year 9
-  'y9-non-linear': ['polynomial-fn'],
-  'y9-index-laws': ['number-ops'],
-  'y9-trigonometry': ['basic-trig'],
+  'y9-number': [],
+  'y9-algebra': ['polynomial-fn', 'simult-eq'],
+  'y9-statistics': ['graphing-basics'],
   'y9-probability': ['basic-prob'],
-  'y9-statistics': ['basic-prob'],
   // Year 10
-  'y10-quadratics': ['polynomial-fn'],
-  'y10-polynomials': ['polynomial-fn'],
-  'y10-exponential': ['exponential-fn'],
-  'y10-trig-unit-circle': ['basic-trig', 'circular-fn'],
-  'y10-rates-change': ['derivatives'],
-  'y10-cond-probability': ['cond-prob'],
+  'y10-number': [],
+  'y10-algebra': ['exponential-fn', 'domain-range'],
+  'y10-statistics': [],
+  'y10-probability': ['cond-prob'],
+  // Year 10A
+  'y10a-algebra': ['composite-fn', 'inverse-fn', 'logarithmic-fn'],
+  'y10a-probability': [],
   // Year 11
-  'y11-functions': ['domain-range', 'composite-fn', 'inverse-fn'],
-  'y11-transformations': ['transformations'],
-  'y11-log-functions': ['logarithmic-fn'],
-  'y11-circular-fn': ['circular-fn'],
-  'y11-intro-calculus': ['derivatives'],
-  'y11-counting': ['basic-prob'],
+  'y11-functions': ['transformations', 'circular-fn', 'domain-range'],
+  'y11-algebra': ['exponential-fn', 'logarithmic-fn'],
+  'y11-calculus': ['derivatives', 'diff-rules'],
+  'y11-probability': ['binomial-dist', 'cond-prob'],
   // Year 12
-  'y12-diff-rules': ['diff-rules'],
-  'y12-applications-diff': ['tangent-lines', 'stationary-pts', 'optimisation', 'simult-eq'],
-  'y12-antidiff': ['anti-diff'],
-  'y12-definite-int': ['definite-int', 'area-curves', 'avg-rate'],
-  'y12-continuous-pdf': ['continuous-pdf'],
-  'y12-normal-dist': ['normal-dist', 'binomial-dist'],
-  'y12-confidence': ['confidence-int', 'sample-prop'],
+  'y12-functions': ['circular-fn', 'exponential-fn'],
+  'y12-algebra': ['polynomial-fn'],
+  'y12-calculus': ['tangent-lines', 'stationary-pts', 'optimisation', 'anti-diff', 'definite-int', 'area-curves', 'avg-rate'],
+  'y12-probability': ['continuous-pdf', 'normal-dist', 'confidence-int', 'sample-prop'],
   // VCE Exam — no training, exam questions only
   'vce-exam1': [],
   'vce-exam2': [],

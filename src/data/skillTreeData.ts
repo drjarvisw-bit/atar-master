@@ -1,59 +1,59 @@
 /**
- * VCE Mathematical Methods Skill Tree — Year Level Structure
+ * VCE Mathematical Methods Skill Tree — VCAA Victorian Curriculum V2.0
  *
  * Columns represent Year Levels (Year 8 → VCE Exam).
- * Each node is a topic taught at that year level per VCAA curriculum.
+ * Each node is a VCAA strand at that year level.
  */
 
 import { Topic, Subject, type SkillTreeData, type SkillTreeNode } from '../types';
 
-export const TIER_LABELS = ['Year 8', 'Year 9', 'Year 10', 'Year 11', 'Year 12', 'VCE Exam'];
+export const TIER_LABELS = ['Year 8', 'Year 9', 'Year 10 / 10A', 'Year 11 (U1&2)', 'Year 12 (U3&4)', 'VCE Exam'];
 
 // ── Year 8 (tier: 0) ────────────────────────────────────────────
 
-const Y8_ALGEBRA: SkillTreeNode = {
-  id: 'y8-algebra',
-  title: 'Basic Algebra',
-  description: 'Simplifying, expanding, factoring linear expressions.',
+const Y8_NUMBER: SkillTreeNode = {
+  id: 'y8-number',
+  title: 'Number',
+  description: 'Integers, rationals, irrationals, exponent laws with positive integers, ratios, percentages, rates.',
   prerequisites: [],
   topic: Topic.FUNCTIONS,
   difficulty: 1,
   tier: 0,
   position: { x: 0, y: 0 },
   questions: [],
-  questionTypes: ['Algebra', 'Solving Equations', 'Linear Equations', 'Linear Functions'],
+  questionTypes: ['Algorithms'],
 };
 
-const Y8_LINEAR_EQ: SkillTreeNode = {
-  id: 'y8-linear-eq',
-  title: 'Linear Equations',
-  description: 'Solving linear equations and inequalities.',
+const Y8_ALGEBRA: SkillTreeNode = {
+  id: 'y8-algebra',
+  title: 'Algebra',
+  description: 'Simplify/expand/factorise linear expressions, linear equations & inequalities, graph linear relations, Cartesian plane.',
   prerequisites: [],
   topic: Topic.FUNCTIONS,
   difficulty: 1,
   tier: 0,
   position: { x: 0, y: 1 },
   questions: [],
-  questionTypes: ['Inequalities', 'Simultaneous Equations'],
+  questionTypes: ['Algebra', 'Solving Equations', 'Linear Equations', 'Linear Functions', 'Inequalities', 'Simultaneous Equations', 'Coordinate Geometry', 'Graphing', 'Graph Sketching'],
 };
 
-const Y8_NUMBER_OPS: SkillTreeNode = {
-  id: 'y8-number-ops',
-  title: 'Number Operations',
-  description: 'Indices, rationals, irrationals, basic arithmetic properties.',
+const Y8_STATISTICS: SkillTreeNode = {
+  id: 'y8-statistics',
+  title: 'Statistics',
+  description: 'Data displays, measures of centre and spread, comparing data sets.',
   prerequisites: [],
-  topic: Topic.FUNCTIONS,
+  topic: Topic.PROBABILITY,
   difficulty: 1,
   tier: 0,
   position: { x: 0, y: 2 },
   questions: [],
-  questionTypes: ['Algorithms'],
+  questionTypes: ['Median', 'Mean Calculation', 'Variance'],
 };
 
 const Y8_PROBABILITY: SkillTreeNode = {
   id: 'y8-probability',
-  title: 'Basic Probability',
-  description: 'Experiments, relative frequency, sample spaces.',
+  title: 'Probability',
+  description: 'Experiments, outcomes, sample spaces, relative frequency.',
   prerequisites: [],
   topic: Topic.PROBABILITY,
   difficulty: 1,
@@ -63,64 +63,51 @@ const Y8_PROBABILITY: SkillTreeNode = {
   questionTypes: ['Probability', 'Complementary Events'],
 };
 
-const Y8_GRAPHING: SkillTreeNode = {
-  id: 'y8-graphing',
-  title: 'Graphing',
-  description: 'Cartesian plane, plotting linear relations.',
-  prerequisites: [],
-  topic: Topic.FUNCTIONS,
-  difficulty: 1,
-  tier: 0,
-  position: { x: 0, y: 4 },
-  questions: [],
-  questionTypes: ['Coordinate Geometry', 'Graphing', 'Graph Sketching'],
-};
-
 // ── Year 9 (tier: 1) ────────────────────────────────────────────
 
-const Y9_NON_LINEAR: SkillTreeNode = {
-  id: 'y9-non-linear',
-  title: 'Non-linear Relations',
-  description: 'Quadratics intro, simple curves, parabolas.',
-  prerequisites: ['y8-algebra', 'y8-graphing'],
+const Y9_NUMBER: SkillTreeNode = {
+  id: 'y9-number',
+  title: 'Number',
+  description: 'Index laws extended (zero/negative exponents), surds, scientific notation, simple interest.',
+  prerequisites: ['y8-number'],
   topic: Topic.FUNCTIONS,
   difficulty: 2,
   tier: 1,
   position: { x: 1, y: 0 },
   questions: [],
-  questionTypes: ['Quadratics', 'Power Functions'],
+  questionTypes: [],
 };
 
-const Y9_INDEX_LAWS: SkillTreeNode = {
-  id: 'y9-index-laws',
-  title: 'Index Laws',
-  description: 'Negative & fractional exponents, surds.',
-  prerequisites: ['y8-number-ops'],
+const Y9_ALGEBRA: SkillTreeNode = {
+  id: 'y9-algebra',
+  title: 'Algebra',
+  description: 'Expand binomial products, factorise monic quadratics, sketch linear graphs, gradient, midpoint, distance, non-linear relations intro.',
+  prerequisites: ['y8-algebra'],
   topic: Topic.FUNCTIONS,
   difficulty: 2,
   tier: 1,
   position: { x: 1, y: 1 },
   questions: [],
-  questionTypes: [],
+  questionTypes: ['Quadratics', 'Power Functions'],
 };
 
-const Y9_TRIGONOMETRY: SkillTreeNode = {
-  id: 'y9-trigonometry',
-  title: 'Trigonometry',
-  description: 'Pythagoras, sin/cos/tan ratios.',
-  prerequisites: ['y8-algebra', 'y8-graphing'],
-  topic: Topic.FUNCTIONS,
+const Y9_STATISTICS: SkillTreeNode = {
+  id: 'y9-statistics',
+  title: 'Statistics',
+  description: 'Comparative data displays, scatter plots, back-to-back stem plots.',
+  prerequisites: ['y8-statistics'],
+  topic: Topic.PROBABILITY,
   difficulty: 2,
   tier: 1,
   position: { x: 1, y: 2 },
   questions: [],
-  questionTypes: ['Trigonometry', 'Trigonometric Identities'],
+  questionTypes: [],
 };
 
 const Y9_PROBABILITY: SkillTreeNode = {
   id: 'y9-probability',
   title: 'Probability',
-  description: 'Two-step experiments, Venn diagrams, tree diagrams.',
+  description: 'Two-step experiments, Venn diagrams, tree diagrams, relative frequency from experiments.',
   prerequisites: ['y8-probability'],
   topic: Topic.PROBABILITY,
   difficulty: 2,
@@ -130,106 +117,106 @@ const Y9_PROBABILITY: SkillTreeNode = {
   questionTypes: ['Probability Rules', 'Combinatorics'],
 };
 
-const Y9_STATISTICS: SkillTreeNode = {
-  id: 'y9-statistics',
-  title: 'Statistics',
-  description: 'Mean, median, mode, data displays.',
-  prerequisites: ['y8-probability'],
-  topic: Topic.PROBABILITY,
-  difficulty: 2,
-  tier: 1,
-  position: { x: 1, y: 4 },
-  questions: [],
-  questionTypes: ['Median', 'Mean Calculation', 'Variance'],
-};
-
 // ── Year 10 (tier: 2) ───────────────────────────────────────────
 
-const Y10_QUADRATICS: SkillTreeNode = {
-  id: 'y10-quadratics',
-  title: 'Quadratic Functions',
-  description: 'Factoring, quadratic formula, parabolas, discriminant.',
-  prerequisites: ['y9-non-linear'],
+const Y10_NUMBER: SkillTreeNode = {
+  id: 'y10-number',
+  title: 'Number',
+  description: 'Surds and irrational numbers, financial maths (compound interest, depreciation).',
+  prerequisites: ['y9-number'],
   topic: Topic.FUNCTIONS,
   difficulty: 2,
   tier: 2,
   position: { x: 2, y: 0 },
   questions: [],
-  questionTypes: ['Polynomials', 'Polynomial Equations', 'Discriminant', 'Polynomial Graphs'],
+  questionTypes: [],
 };
 
-const Y10_POLYNOMIALS: SkillTreeNode = {
-  id: 'y10-polynomials',
-  title: 'Polynomial Functions',
-  description: 'Zeros, factor theorem, remainder theorem.',
-  prerequisites: ['y9-non-linear'],
+const Y10_ALGEBRA: SkillTreeNode = {
+  id: 'y10-algebra',
+  title: 'Algebra',
+  description: 'Quadratic equations (null factor, quadratic formula), polynomial functions, exponential functions, simultaneous equations, parabola features.',
+  prerequisites: ['y9-algebra'],
   topic: Topic.FUNCTIONS,
-  difficulty: 3,
+  difficulty: 2,
   tier: 2,
   position: { x: 2, y: 1 },
   questions: [],
-  questionTypes: ['Cubic Equations', 'Cubic Functions', 'Cubic Polynomials', 'Polynomial Expansion', 'Polynomial Approximation', 'Remainder Theorem'],
+  questionTypes: [
+    'Polynomials', 'Polynomial Equations', 'Discriminant', 'Polynomial Graphs',
+    'Exponential Functions', 'Exponentials', 'Exponential Equations',
+    'Exponential and Logarithmic Functions',
+  ],
 };
 
-const Y10_EXPONENTIAL: SkillTreeNode = {
-  id: 'y10-exponential',
-  title: 'Exponential Functions',
-  description: 'Growth/decay, transformations of exponentials.',
-  prerequisites: ['y9-index-laws'],
-  topic: Topic.FUNCTIONS,
+const Y10_STATISTICS: SkillTreeNode = {
+  id: 'y10-statistics',
+  title: 'Statistics',
+  description: 'Bivariate data, line of best fit, correlation, time series.',
+  prerequisites: ['y9-statistics'],
+  topic: Topic.PROBABILITY,
   difficulty: 2,
   tier: 2,
   position: { x: 2, y: 2 },
   questions: [],
-  questionTypes: ['Exponential Functions', 'Exponentials', 'Exponential Equations', 'Exponential and Logarithmic Functions'],
+  questionTypes: [],
 };
 
-const Y10_TRIG_UNIT_CIRCLE: SkillTreeNode = {
-  id: 'y10-trig-unit-circle',
-  title: 'Trig & Unit Circle',
-  description: 'Radians, exact values, unit circle.',
-  prerequisites: ['y9-trigonometry'],
-  topic: Topic.FUNCTIONS,
+const Y10_PROBABILITY: SkillTreeNode = {
+  id: 'y10-probability',
+  title: 'Probability',
+  description: 'Conditional probability, independence, combinations and counting.',
+  prerequisites: ['y9-probability'],
+  topic: Topic.PROBABILITY,
   difficulty: 3,
   tier: 2,
   position: { x: 2, y: 3 },
   questions: [],
-  questionTypes: ['Trigonometric Equations', 'Periodicity'],
+  questionTypes: ['Conditional Probability', 'Independent Events', 'Bayes\' Theorem', 'Bayes Theorem', 'Bayes'],
 };
 
-const Y10_RATES_CHANGE: SkillTreeNode = {
-  id: 'y10-rates-change',
-  title: 'Rates of Change',
-  description: 'Average rate of change, secant lines (pre-calculus).',
-  prerequisites: ['y9-non-linear'],
-  topic: Topic.CALCULUS,
+// ── Year 10A (tier: 2, below Year 10) ───────────────────────────
+
+const Y10A_ALGEBRA: SkillTreeNode = {
+  id: 'y10a-algebra',
+  title: 'Algebra (Extension)',
+  description: 'Composite & inverse functions, logarithms introduction, sequences & series, circle equations.',
+  prerequisites: ['y10-algebra'],
+  topic: Topic.FUNCTIONS,
   difficulty: 3,
   tier: 2,
   position: { x: 2, y: 4 },
   questions: [],
-  questionTypes: ['Average Rate of Change', 'Rates of Change'],
+  questionTypes: [
+    'Composite Functions', 'Domain of Composite Functions', 'Composite Graphs',
+    'Composite Inequalities', 'Function Operations', 'Function Addition', 'Functional Equations',
+    'Inverse Functions',
+    'Logarithmic Functions', 'Logarithms', 'Logarithmic Equations', 'Domain of Logarithmic Functions',
+    'Cubic Equations', 'Cubic Functions', 'Cubic Polynomials', 'Polynomial Expansion',
+    'Polynomial Approximation', 'Remainder Theorem',
+  ],
 };
 
-const Y10_COND_PROBABILITY: SkillTreeNode = {
-  id: 'y10-cond-probability',
-  title: 'Conditional Probability',
-  description: 'Conditional probability and independence.',
-  prerequisites: ['y9-probability'],
+const Y10A_PROBABILITY: SkillTreeNode = {
+  id: 'y10a-probability',
+  title: 'Probability (Extension)',
+  description: 'Permutations, combinations (nCr), binomial coefficients.',
+  prerequisites: ['y10-probability'],
   topic: Topic.PROBABILITY,
   difficulty: 3,
   tier: 2,
   position: { x: 2, y: 5 },
   questions: [],
-  questionTypes: ['Conditional Probability', 'Independent Events', 'Bayes\' Theorem', 'Bayes Theorem', 'Bayes'],
+  questionTypes: [],
 };
 
 // ── Year 11 — Methods Units 1&2 (tier: 3) ──────────────────────
 
 const Y11_FUNCTIONS: SkillTreeNode = {
   id: 'y11-functions',
-  title: 'Functions & Relations',
-  description: 'Domain, range, inverse, composite functions.',
-  prerequisites: ['y10-quadratics', 'y10-polynomials'],
+  title: 'Functions & Graphs',
+  description: 'Polynomial (up to degree 4), power functions, domain/range, transformations, inverse functions.',
+  prerequisites: ['y10-algebra', 'y10a-algebra'],
   topic: Topic.FUNCTIONS,
   difficulty: 3,
   tier: 3,
@@ -240,60 +227,34 @@ const Y11_FUNCTIONS: SkillTreeNode = {
     'Functions', 'Functions and Relations', 'Properties of Functions', 'Piecewise Functions',
     'Rational Functions', 'Graphing Rationals', 'Rectangular Hyperbola', 'Asymptotes',
     'Limiting Behaviour', 'Intercepts', 'Modelling', 'Undefined Expressions',
-    'Composite Functions', 'Domain of Composite Functions', 'Composite Graphs',
-    'Composite Inequalities', 'Function Operations', 'Function Addition', 'Functional Equations',
-    'Inverse Functions',
+    'Transformations', 'Perpendicular Lines',
+    'Circular Functions', 'Trig Functions', 'Trig Asymptotes', 'Periodic Functions',
+    'Trigonometry', 'Trigonometric Identities', 'Trigonometric Equations', 'Periodicity',
   ],
 };
 
-const Y11_TRANSFORMATIONS: SkillTreeNode = {
-  id: 'y11-transformations',
-  title: 'Transformations',
-  description: 'Dilations, reflections, translations of functions.',
-  prerequisites: ['y10-quadratics'],
+const Y11_ALGEBRA: SkillTreeNode = {
+  id: 'y11-algebra',
+  title: 'Algebra & Structure',
+  description: 'Index/log laws, exponential & log equations, simultaneous equations, algorithms.',
+  prerequisites: ['y10-algebra', 'y10a-algebra'],
   topic: Topic.FUNCTIONS,
   difficulty: 3,
   tier: 3,
   position: { x: 3, y: 1 },
   questions: [],
-  questionTypes: ['Transformations', 'Perpendicular Lines'],
+  questionTypes: [],
 };
 
-const Y11_LOG_FUNCTIONS: SkillTreeNode = {
-  id: 'y11-log-functions',
-  title: 'Logarithmic Functions',
-  description: 'Log laws, log equations, natural log, change of base.',
-  prerequisites: ['y10-exponential'],
-  topic: Topic.FUNCTIONS,
-  difficulty: 3,
-  tier: 3,
-  position: { x: 3, y: 2 },
-  questions: [],
-  questionTypes: ['Logarithmic Functions', 'Logarithms', 'Logarithmic Equations', 'Domain of Logarithmic Functions'],
-};
-
-const Y11_CIRCULAR_FN: SkillTreeNode = {
-  id: 'y11-circular-fn',
-  title: 'Circular Functions',
-  description: 'Sin/cos/tan graphs, amplitude, period, phase shift.',
-  prerequisites: ['y10-trig-unit-circle'],
-  topic: Topic.FUNCTIONS,
-  difficulty: 3,
-  tier: 3,
-  position: { x: 3, y: 3 },
-  questions: [],
-  questionTypes: ['Circular Functions', 'Trig Functions', 'Trig Asymptotes', 'Periodic Functions'],
-};
-
-const Y11_INTRO_CALCULUS: SkillTreeNode = {
-  id: 'y11-intro-calculus',
-  title: 'Intro to Calculus',
-  description: 'Limits, first principles, basic derivatives.',
-  prerequisites: ['y10-rates-change', 'y10-polynomials'],
+const Y11_CALCULUS: SkillTreeNode = {
+  id: 'y11-calculus',
+  title: 'Calculus',
+  description: 'Rate of change, limits, differentiation from first principles, basic derivative rules (power rule), anti-differentiation intro.',
+  prerequisites: ['y10-algebra'],
   topic: Topic.CALCULUS,
   difficulty: 3,
   tier: 3,
-  position: { x: 3, y: 4 },
+  position: { x: 3, y: 2 },
   questions: [],
   questionTypes: [
     'Derivatives', 'Differentiation', 'Gradient',
@@ -302,79 +263,68 @@ const Y11_INTRO_CALCULUS: SkillTreeNode = {
     'Graph of Derivative', 'Graphing Derivatives', 'Second Derivative',
     'Differentiability', 'Continuity and Differentiability', 'Continuity',
     'Function Analysis', 'Increasing Functions', 'Increasing/Decreasing', 'Odd Functions',
+    'Average Rate of Change', 'Rates of Change',
   ],
 };
 
-const Y11_COUNTING: SkillTreeNode = {
-  id: 'y11-counting',
-  title: 'Counting Principles',
-  description: 'Counting principles and combinatorics.',
-  prerequisites: ['y10-cond-probability'],
+const Y11_PROBABILITY: SkillTreeNode = {
+  id: 'y11-probability',
+  title: 'Probability & Stats',
+  description: 'Counting principles, combinations, probability rules, discrete random variables, expected value.',
+  prerequisites: ['y10-probability', 'y10a-probability'],
   topic: Topic.PROBABILITY,
   difficulty: 3,
   tier: 3,
-  position: { x: 3, y: 5 },
+  position: { x: 3, y: 3 },
   questions: [],
   questionTypes: ['Probability Distributions', 'Discrete Distributions', 'Discrete Random Variables', 'Expected Value'],
 };
 
 // ── Year 12 — Methods Units 3&4 (tier: 4) ──────────────────────
 
-const Y12_DIFF_RULES: SkillTreeNode = {
-  id: 'y12-diff-rules',
-  title: 'Differentiation Rules',
-  description: 'Chain rule, product rule, quotient rule.',
-  prerequisites: ['y11-intro-calculus'],
-  topic: Topic.CALCULUS,
+const Y12_FUNCTIONS: SkillTreeNode = {
+  id: 'y12-functions',
+  title: 'Functions & Graphs',
+  description: 'Exponential, logarithmic, circular (sin/cos/tan) functions, transformations, modelling.',
+  prerequisites: ['y11-functions'],
+  topic: Topic.FUNCTIONS,
   difficulty: 4,
   tier: 4,
   position: { x: 4, y: 0 },
   questions: [],
-  questionTypes: ['Chain Rule', 'Product Rule', 'Quotient Rule'],
+  questionTypes: [],
 };
 
-const Y12_APPLICATIONS_DIFF: SkillTreeNode = {
-  id: 'y12-applications-diff',
-  title: 'Applications of Diff.',
-  description: 'Tangent lines, stationary points, optimization.',
-  prerequisites: ['y12-diff-rules'],
-  topic: Topic.CALCULUS,
+const Y12_ALGEBRA: SkillTreeNode = {
+  id: 'y12-algebra',
+  title: 'Algebra & Structure',
+  description: 'Advanced algebra, polynomial division, solving exponential/log/trig equations.',
+  prerequisites: ['y11-algebra'],
+  topic: Topic.FUNCTIONS,
   difficulty: 4,
   tier: 4,
   position: { x: 4, y: 1 },
   questions: [],
-  questionTypes: [
-    'Tangent Lines', 'Tangents', 'Tangent Properties',
-    'Stationary Points', 'Nature of Stationary Points', 'Turning Points', 'Points of Inflection',
-    'Optimisation', 'Optimization', 'Distance Optimisation', 'Transformations and Optimisation', 'Min Distance',
-    'Intersection Analysis', 'Intersections', 'Proof',
-  ],
+  questionTypes: [],
 };
 
-const Y12_ANTIDIFF: SkillTreeNode = {
-  id: 'y12-antidiff',
-  title: 'Anti-differentiation',
-  description: 'Indefinite integrals, basic anti-differentiation rules.',
-  prerequisites: ['y11-intro-calculus'],
+const Y12_CALCULUS: SkillTreeNode = {
+  id: 'y12-calculus',
+  title: 'Calculus',
+  description: 'Chain/product/quotient rules, applications (tangent lines, optimization, related rates), anti-differentiation, definite integrals, area under/between curves.',
+  prerequisites: ['y11-calculus'],
   topic: Topic.CALCULUS,
   difficulty: 4,
   tier: 4,
   position: { x: 4, y: 2 },
   questions: [],
-  questionTypes: ['Anti-differentiation', 'Antidifferentiation', 'Integration'],
-};
-
-const Y12_DEFINITE_INT: SkillTreeNode = {
-  id: 'y12-definite-int',
-  title: 'Definite Integrals',
-  description: 'Area under curves, area between curves, FTC.',
-  prerequisites: ['y12-antidiff'],
-  topic: Topic.CALCULUS,
-  difficulty: 4,
-  tier: 4,
-  position: { x: 4, y: 3 },
-  questions: [],
   questionTypes: [
+    'Chain Rule', 'Product Rule', 'Quotient Rule',
+    'Tangent Lines', 'Tangents', 'Tangent Properties',
+    'Stationary Points', 'Nature of Stationary Points', 'Turning Points', 'Points of Inflection',
+    'Optimisation', 'Optimization', 'Distance Optimisation', 'Transformations and Optimisation', 'Min Distance',
+    'Intersection Analysis', 'Intersections', 'Proof',
+    'Anti-differentiation', 'Antidifferentiation', 'Integration',
     'Definite Integrals', 'Definite Integral', 'Fundamental Theorem of Calculus',
     'Integration Properties', 'Integral Properties', 'Trapezium Rule', 'Riemann Sums',
     'Newton\'s Method', 'Newton', 'Partial Fractions', 'Approximation',
@@ -384,51 +334,25 @@ const Y12_DEFINITE_INT: SkillTreeNode = {
   ],
 };
 
-const Y12_CONTINUOUS_PDF: SkillTreeNode = {
-  id: 'y12-continuous-pdf',
-  title: 'Continuous PDFs',
-  description: 'PDF, CDF, expected value of continuous distributions.',
-  prerequisites: ['y12-antidiff', 'y11-counting'],
+const Y12_PROBABILITY: SkillTreeNode = {
+  id: 'y12-probability',
+  title: 'Probability & Stats',
+  description: 'Continuous random variables, PDF/CDF, normal distribution, confidence intervals, sample proportions, statistical inference.',
+  prerequisites: ['y11-probability'],
   topic: Topic.PROBABILITY,
   difficulty: 4,
   tier: 4,
-  position: { x: 4, y: 4 },
+  position: { x: 4, y: 3 },
   questions: [],
   questionTypes: [
     'Continuous PDF', 'Continuous Distributions', 'Continuous Random Variables',
     'Continuous Distribution', 'Transformations of PDF',
     'Transformations of Random Variables',
-  ],
-};
-
-const Y12_NORMAL_DIST: SkillTreeNode = {
-  id: 'y12-normal-dist',
-  title: 'Normal Distribution',
-  description: 'Z-scores, standard normal, inverse normal.',
-  prerequisites: ['y12-continuous-pdf'],
-  topic: Topic.PROBABILITY,
-  difficulty: 4,
-  tier: 4,
-  position: { x: 4, y: 5 },
-  questions: [],
-  questionTypes: [
     'Normal Distribution',
     'Binomial Distribution', 'Binomial Probability', 'Binomial Parameters',
     'Geometric Distribution',
+    'Confidence Intervals', 'Sample Proportions', 'Sampling Distribution',
   ],
-};
-
-const Y12_CONFIDENCE: SkillTreeNode = {
-  id: 'y12-confidence',
-  title: 'Confidence Intervals',
-  description: 'Confidence intervals, sample proportions, margin of error.',
-  prerequisites: ['y12-normal-dist'],
-  topic: Topic.PROBABILITY,
-  difficulty: 5,
-  tier: 4,
-  position: { x: 4, y: 6 },
-  questions: [],
-  questionTypes: ['Confidence Intervals', 'Sample Proportions', 'Sampling Distribution'],
 };
 
 // ── VCE Exam (tier: 5) ─────────────────────────────────────────
@@ -436,8 +360,8 @@ const Y12_CONFIDENCE: SkillTreeNode = {
 const VCE_EXAM1: SkillTreeNode = {
   id: 'vce-exam1',
   title: 'Exam 1 (Tech-Free)',
-  description: 'All topics, no calculator allowed.',
-  prerequisites: ['y12-diff-rules', 'y12-applications-diff', 'y12-antidiff', 'y12-definite-int', 'y12-continuous-pdf', 'y12-normal-dist', 'y12-confidence'],
+  description: 'All topics, no CAS calculator allowed.',
+  prerequisites: ['y12-functions', 'y12-algebra', 'y12-calculus', 'y12-probability'],
   topic: Topic.CALCULUS,
   difficulty: 5,
   tier: 5,
@@ -450,7 +374,7 @@ const VCE_EXAM2: SkillTreeNode = {
   id: 'vce-exam2',
   title: 'Exam 2 (Tech-Active)',
   description: 'All topics, CAS calculator allowed.',
-  prerequisites: ['y12-diff-rules', 'y12-applications-diff', 'y12-antidiff', 'y12-definite-int', 'y12-continuous-pdf', 'y12-normal-dist', 'y12-confidence'],
+  prerequisites: ['y12-functions', 'y12-algebra', 'y12-calculus', 'y12-probability'],
   topic: Topic.CALCULUS,
   difficulty: 5,
   tier: 5,
@@ -463,15 +387,17 @@ const VCE_EXAM2: SkillTreeNode = {
 
 const ALL_NODES: SkillTreeNode[] = [
   // Year 8
-  Y8_ALGEBRA, Y8_LINEAR_EQ, Y8_NUMBER_OPS, Y8_PROBABILITY, Y8_GRAPHING,
+  Y8_NUMBER, Y8_ALGEBRA, Y8_STATISTICS, Y8_PROBABILITY,
   // Year 9
-  Y9_NON_LINEAR, Y9_INDEX_LAWS, Y9_TRIGONOMETRY, Y9_PROBABILITY, Y9_STATISTICS,
+  Y9_NUMBER, Y9_ALGEBRA, Y9_STATISTICS, Y9_PROBABILITY,
   // Year 10
-  Y10_QUADRATICS, Y10_POLYNOMIALS, Y10_EXPONENTIAL, Y10_TRIG_UNIT_CIRCLE, Y10_RATES_CHANGE, Y10_COND_PROBABILITY,
+  Y10_NUMBER, Y10_ALGEBRA, Y10_STATISTICS, Y10_PROBABILITY,
+  // Year 10A
+  Y10A_ALGEBRA, Y10A_PROBABILITY,
   // Year 11
-  Y11_FUNCTIONS, Y11_TRANSFORMATIONS, Y11_LOG_FUNCTIONS, Y11_CIRCULAR_FN, Y11_INTRO_CALCULUS, Y11_COUNTING,
+  Y11_FUNCTIONS, Y11_ALGEBRA, Y11_CALCULUS, Y11_PROBABILITY,
   // Year 12
-  Y12_DIFF_RULES, Y12_APPLICATIONS_DIFF, Y12_ANTIDIFF, Y12_DEFINITE_INT, Y12_CONTINUOUS_PDF, Y12_NORMAL_DIST, Y12_CONFIDENCE,
+  Y12_FUNCTIONS, Y12_ALGEBRA, Y12_CALCULUS, Y12_PROBABILITY,
   // VCE Exam
   VCE_EXAM1, VCE_EXAM2,
 ];

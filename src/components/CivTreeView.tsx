@@ -17,7 +17,7 @@ const NODE_SPACING_Y = 100;
 const PADDING_X = 120;
 const PADDING_Y = 80;
 
-const TIER_LABELS = ['Year 8', 'Year 9', 'Year 10', 'Year 11', 'Year 12', 'VCE Exam'];
+const TIER_LABELS = ['Year 8', 'Year 9', 'Year 10 / 10A', 'Year 11 (U1&2)', 'Year 12 (U3&4)', 'VCE Exam'];
 
 const STATUS_COLORS: Record<string, string> = {
   locked: '#374151',
