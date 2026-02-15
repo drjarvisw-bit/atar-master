@@ -24,8 +24,13 @@ export default function TrainingSession({ nodeId, level, onComplete, onBack }: P
         marks: mq.question.marks,
         hints: mq.question.markingGuide || [],
         answer: mq.question.answer || '',
-        isMultipleChoice: !!(mq.question as any).options?.length,
-        options: (mq.question as any).options || [],
+        isMultipleChoice: !!mq.question.options?.length,
+        // Transform ExamQuestion options to TrainingQuestion format
+        options: mq.question.options ? mq.question.options.map(opt => ({
+          label: opt.label,
+          text: opt.text,
+          correct: opt.label === mq.question.answer || opt.text === mq.question.answer,
+        })) : [],
         examTitle: mq.examTitle,
       }));
     }

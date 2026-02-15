@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect, type MouseEvent, type WheelEvent, type TouchEvent } from 'react';
+import { useRef, useState, useCallback, useEffect, useImperativeHandle, forwardRef, type MouseEvent, type WheelEvent, type TouchEvent } from 'react';
 import { ALL_NODES } from '../data/skillTreeData';
 import { SKILL_TOPIC_COLORS, type Topic } from '../types';
 import type { UserProgress } from '../lib/progress';
@@ -8,6 +8,10 @@ interface Props {
   progress: UserProgress;
   onSelectNode: (nodeId: string) => void;
   onViewportChange?: (vp: { x: number; y: number; w: number; h: number; scale: number }) => void;
+}
+
+export interface CivTreeViewRef {
+  navigateTo: (x: number, y: number) => void;
 }
 
 // Layout constants
@@ -71,7 +75,7 @@ function computeLayout() {
 
 const { positions, totalWidth, totalHeight } = computeLayout();
 
-export default function CivTreeView({ progress, onSelectNode, onViewportChange }: Props) {
+const CivTreeView = forwardRef<CivTreeViewRef, Props>(function CivTreeView({ progress, onSelectNode, onViewportChange }, ref) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [scale, setScale] = useState(0.85);
@@ -163,12 +167,10 @@ export default function CivTreeView({ progress, onSelectNode, onViewportChange }
     setPan(np);
   }, [scale, clampPan]);
 
-  // Expose navigateTo
-  useEffect(() => {
-    if (containerRef.current) {
-      (containerRef.current as any).__navigateTo = navigateTo;
-    }
-  }, [navigateTo]);
+  // Expose navigateTo through ref
+  useImperativeHandle(ref, () => ({
+    navigateTo,
+  }), [navigateTo]);
 
   return (
     <div
@@ -357,6 +359,8 @@ export default function CivTreeView({ progress, onSelectNode, onViewportChange }
       </svg>
     </div>
   );
-}
+});
+
+export default CivTreeView;
 
 export { positions, totalWidth, totalHeight };
