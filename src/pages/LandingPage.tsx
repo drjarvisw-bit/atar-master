@@ -338,7 +338,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed">
-            2,270+ practice questions. 10 years of past exams. AI-powered skill tracking.
+            2,270+ practice questions. 10 years of past exams. Smart skill tracking.
             Everything you need to ace Mathematical Methods.
           </p>
 

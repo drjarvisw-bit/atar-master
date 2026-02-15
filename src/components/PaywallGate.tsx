@@ -43,7 +43,7 @@ export default function PaywallGate({ requirePro, children }: PaywallGateProps) 
           <ul className="text-left space-y-2 text-sm text-gray-300">
             {[
               'All exam papers 2021–2025',
-              'Full AI-powered worked solutions',
+              'Full worked solutions',
               'Performance analytics & tracking',
               'Priority support',
             ].map((t) => (
