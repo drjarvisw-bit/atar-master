@@ -1,6 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://rspajiohrayabxkonvde.supabase.co'
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_MyEJrZ3SM4G5E5wg00BQGw_Mqkch8G0'
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+if (!supabaseUrl && import.meta.env.PROD) {
+  throw new Error('VITE_SUPABASE_URL is required in production');
+}
+if (!supabaseAnonKey && import.meta.env.PROD) {
+  throw new Error('VITE_SUPABASE_ANON_KEY is required in production');
+}
+
+export const supabase = createClient(supabaseUrl!, supabaseAnonKey!)

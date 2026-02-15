@@ -1,5 +1,6 @@
 import 'katex/dist/katex.min.css';
 import katex from 'katex';
+import DOMPurify from 'dompurify';
 
 interface MathTextProps {
   text: string;
@@ -12,10 +13,11 @@ interface MathTextProps {
  */
 export default function MathText({ text, className }: MathTextProps) {
   const html = parseMath(text);
+  const sanitizedHtml = DOMPurify.sanitize(html);
   return (
     <span
       className={className}
-      dangerouslySetInnerHTML={{ __html: html }}
+      dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
     />
   );
 }

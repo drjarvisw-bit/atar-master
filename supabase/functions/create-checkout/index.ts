@@ -32,6 +32,28 @@ serve(async (req) => {
     const { priceId } = await req.json()
     if (!priceId) throw new Error('Missing priceId')
 
+    // Validate priceId against whitelist
+    const validPriceIds = [
+      'price_1T12VEH3RCPIiRpCcMASHDhz', // Pro Monthly
+      'price_1T12VEH3RCPIiRpCggPyLE0w'  // Pro Yearly
+    ]
+
+    if (!validPriceIds.includes(priceId)) {
+      throw new Error('Invalid priceId')
+    }
+
+    // Validate origin for security
+    const origin = req.headers.get('origin')
+    const allowedOrigins = [
+      'https://atarmaster.com',
+      'https://www.atarmaster.com',
+      'http://localhost:5173'
+    ]
+
+    if (!origin || !allowedOrigins.includes(origin)) {
+      throw new Error('Invalid origin')
+    }
+
     // Find or create Stripe customer
     const { data: sub } = await supabase
       .from('subscriptions')
@@ -60,8 +82,8 @@ serve(async (req) => {
       customer: customerId,
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${req.headers.get('origin')}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get('origin')}/pricing`,
+      success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/pricing`,
       metadata: { supabase_user_id: user.id },
     })
 
