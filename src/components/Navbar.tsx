@@ -3,6 +3,7 @@ import { GitBranch, FileText, Dumbbell, BarChart3, DollarSign, LogIn, LogOut, Us
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { ADMIN_EMAILS } from '../lib/constants';
+import StreakBadge from './StreakBadge';
 
 function UserDropdown() {
   const { user, isPro, signOut } = useAuth();
@@ -120,6 +121,7 @@ export default function Navbar() {
             </NavLink>
           ))}
           <div className="ml-2 pl-2 border-l border-gh-border flex items-center gap-2">
+            {user && <StreakBadge />}
             {user ? (
               <UserDropdown />
             ) : (
@@ -148,7 +150,8 @@ export default function Navbar() {
               {l.icon} {l.label}
             </NavLink>
           ))}
-          <div className="border-t border-gh-border pt-2 mt-2">
+          <div className="border-t border-gh-border pt-2 mt-2 flex items-center gap-2">
+            {user && <StreakBadge />}
             {user ? (
               <UserDropdown />
             ) : (

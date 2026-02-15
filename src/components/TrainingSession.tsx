@@ -77,6 +77,10 @@ export default function TrainingSession({ nodeId, level, onComplete, onBack }: P
   }, [currentIdx, total]);
 
   const handleFinish = useCallback(() => {
+    import('../lib/streak').then(({ recordActivity }) => {
+      recordActivity();
+      window.dispatchEvent(new Event('streak-updated'));
+    });
     onComplete(nodeId, level, correctCount, total);
   }, [nodeId, level, correctCount, total, onComplete]);
 
