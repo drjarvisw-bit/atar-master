@@ -84,21 +84,20 @@ export default function SkillNodePanel({ nodeId, progress, onClose, onEnter }: P
         style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.2s ease' }}
       />
 
-      {/* Panel — centered modal on all sizes */}
+      {/* Panel — centered modal */}
       <div
-        className="fixed z-50 inset-x-2 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 bottom-2 sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 sm:w-[380px] max-h-[90vh] sm:max-h-[85vh]"
-        style={{
-          transform: visible
-            ? window.innerWidth >= 640
-              ? 'translate(-50%, -50%) scale(1)'
-              : 'translateY(0) scale(1)'
-            : window.innerWidth >= 640
-              ? 'translate(-50%, -45%) scale(0.95)'
-              : 'translateY(20px) scale(0.95)',
-          opacity: visible ? 1 : 0,
-          transition: 'all 0.25s ease-out',
-        }}
+        className="fixed z-50 inset-0 flex items-center justify-center p-4"
+        onClick={onClose}
       >
+        <div
+          className="w-full max-w-[380px] max-h-[85vh]"
+          onClick={e => e.stopPropagation()}
+          style={{
+            opacity: visible ? 1 : 0,
+            transform: visible ? 'scale(1)' : 'scale(0.95)',
+            transition: 'all 0.25s ease-out',
+          }}
+        >
         <div
           className="rounded-3xl overflow-hidden border border-gray-700/50 max-h-[85vh] sm:max-h-[85vh] flex flex-col"
           style={{ background: '#111827' }}
@@ -220,6 +219,7 @@ export default function SkillNodePanel({ nodeId, progress, onClose, onEnter }: P
               </button>
             )}
           </div>
+        </div>
         </div>
       </div>
     </>

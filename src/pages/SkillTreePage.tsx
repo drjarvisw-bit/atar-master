@@ -9,20 +9,37 @@ import TrainingSession from '../components/TrainingSession';
 import YearLevelSelector, { getStoredYearLevel } from '../components/YearLevelSelector';
 import OnboardingTutorial, { isOnboardingComplete, OnboardingHelpButton, resetOnboarding } from '../components/OnboardingTutorial';
 import { loadProgress, saveProgress, xpForLevel, computeNodeStatus, type UserProgress } from '../lib/progress';
+import { useAuth } from '../hooks/useAuth';
 
 type View = 'tree' | 'subtree' | 'session';
 
 export default function SkillTreePage() {
-  const [progress, setProgress] = useState<UserProgress>(loadProgress);
+  const { isPro } = useAuth();
+  const [progress, setProgress] = useState<UserProgress>(() => {
+    const p = loadProgress();
+    // Pro/Admin users: auto-unlock ALL nodes
+    if (isPro) {
+      const updated = { ...p.nodes };
+      for (const node of ALL_NODES) {
+        if (!updated[node.id] || updated[node.id].status === 'locked') {
+          updated[node.id] = updated[node.id]
+            ? { ...updated[node.id], status: 'unlocked' }
+            : { status: 'unlocked', levelsCompleted: [], score: 0 };
+        }
+      }
+      return { ...p, nodes: updated };
+    }
+    return p;
+  });
   const [view, setView] = useState<View>('tree');
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [activeSubTreeId, setActiveSubTreeId] = useState<string | null>(null);
   const [sessionLevel, setSessionLevel] = useState<number>(0);
   const treeContainerRef = useRef<HTMLDivElement>(null);
 
-  // Onboarding flow state
-  const [showYearSelector, setShowYearSelector] = useState(() => getStoredYearLevel() === null);
-  const [showOnboarding, setShowOnboarding] = useState(() => getStoredYearLevel() !== null && !isOnboardingComplete());
+  // Pro/Admin: skip onboarding entirely
+  const [showYearSelector, setShowYearSelector] = useState(() => !isPro && getStoredYearLevel() === null);
+  const [showOnboarding, setShowOnboarding] = useState(() => !isPro && getStoredYearLevel() !== null && !isOnboardingComplete());
 
   // Persist
   useEffect(() => { saveProgress(progress); }, [progress]);
