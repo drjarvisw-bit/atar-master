@@ -6,3 +6,4 @@ public/exam-images/
 .env
 .env.local
 .vercel
+.tex-tmp/
