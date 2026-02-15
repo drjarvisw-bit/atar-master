@@ -1,8 +1,8 @@
-import { useRef, useState, useEffect, useMemo, type ReactNode } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import {
   Hash, Sigma, BarChart2, Dice5, TrendingUp,
   PieChart, Calculator, Triangle, Waves, Mountain,
-  Bell, Binary, FileCode, PenTool, Monitor,
+  Bell, Binary, PenTool, Monitor,
   Lock, Play, CheckCircle2, Sparkles, Link2,
   FunctionSquare, Braces, LineChart, GitBranch,
   type LucideIcon,
@@ -107,7 +107,6 @@ function NodeCard({
   const isLocked = status === 'locked';
   const isCompleted = status === 'completed' || status === 'mastered';
   const isMastered = status === 'mastered';
-  const isInProgress = status === 'in-progress';
   const np = progress.nodes[node.id];
   const levelsCompleted = np?.levelsCompleted?.length ?? 0;
 

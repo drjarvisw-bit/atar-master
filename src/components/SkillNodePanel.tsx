@@ -48,8 +48,9 @@ export default function SkillNodePanel({ nodeId, progress, onClose, onEnter }: P
   const examCount = useMemo(() => getNodeQuestionCounts()[nodeId] ?? 0, [nodeId]);
   const trainingCount = useMemo(() => getTrainingForNode(nodeId).length, [nodeId]);
   const qCount = trainingCount + examCount;
-  const icon = NODE_ICONS[nodeId] ?? '📐';
-  const tierColor = node ? TIER_ACCENT[node.tier] ?? '#60A5FA' : '#60A5FA';
+  const Icon = NODE_ICON_MAP[nodeId] ?? Calculator;
+  const tierGrad = node ? TIER_GRADIENTS[node.tier] ?? ['#60A5FA', '#3B82F6'] : ['#60A5FA', '#3B82F6'];
+  const tierColor = tierGrad[0];
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -105,14 +106,14 @@ export default function SkillNodePanel({ nodeId, progress, onClose, onEnter }: P
             </button>
 
             <div
-              className="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-4xl mb-3"
+              className="w-20 h-20 rounded-2xl mx-auto flex items-center justify-center mb-3"
               style={{
-                border: `3px solid ${tierColor}`,
-                background: `${tierColor}15`,
-                boxShadow: `0 0 30px ${tierColor}20`,
+                background: `linear-gradient(135deg, ${tierGrad[0]}20, ${tierGrad[1]}10)`,
+                border: `1px solid ${tierGrad[0]}30`,
+                boxShadow: `0 0 30px ${tierColor}15`,
               }}
             >
-              {icon}
+              <Icon size={36} style={{ color: tierColor }} strokeWidth={1.5} />
             </div>
 
             <h3 className="text-xl font-bold text-white">{node.title}</h3>
