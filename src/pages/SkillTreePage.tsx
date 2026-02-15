@@ -1,159 +1,139 @@
-import { useState, useMemo } from 'react';
-import { sampleSkillTree } from '../data/sampleTree';
-import { type SkillTreeNode, SkillNodeStatus, SKILL_TOPIC_COLORS, Difficulty } from '../types';
-import SkillNodePanel from '../components/SkillNodePanel';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { TreePine, RotateCcw } from 'lucide-react';
+import type { SkillNodeStatus } from '../types';
+import { SkillNodeStatus as SNS, Topic, SKILL_TOPIC_COLORS } from '../types';
+import { UNIFIED_SKILL_TREE } from '../data/skillTreeData';
+import { getNodeQuestionCounts } from '../data/questionMatcher';
+import SkillTreeView from '../components/SkillTreeView';
 
-// Simulated progress — in real app this comes from backend/localStorage
-function getNodeStatus(node: SkillTreeNode, completedIds: Set<string>): SkillNodeStatus {
-  if (completedIds.has(node.id)) return SkillNodeStatus.COMPLETED;
-  const prereqsMet = node.prerequisites.every((p) => completedIds.has(p));
-  return prereqsMet ? SkillNodeStatus.UNLOCKED : SkillNodeStatus.LOCKED;
+const STORAGE_KEY = 'atar-unified-skill-tree-progress';
+
+interface NodeProgress {
+  status: SkillNodeStatus;
+  attempts: number;
 }
 
-const starLabel = (d: Difficulty) => '★'.repeat(d) + '☆'.repeat(5 - d);
-
 export default function SkillTreePage() {
-  const tree = sampleSkillTree;
-  const [completedIds, setCompletedIds] = useState<Set<string>>(new Set(['limits']));
-  const [selectedNode, setSelectedNode] = useState<SkillTreeNode | null>(null);
+  const tree = UNIFIED_SKILL_TREE;
 
-  const nodeStatuses = useMemo(() => {
-    const m = new Map<string, SkillNodeStatus>();
-    tree.nodes.forEach((n) => m.set(n.id, getNodeStatus(n, completedIds)));
-    return m;
-  }, [tree.nodes, completedIds]);
+  // Load progress from localStorage
+  const [progress, setProgress] = useState<Record<string, NodeProgress>>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  });
 
-  // Compute SVG viewBox
-  const padding = 80;
-  const maxX = Math.max(...tree.nodes.map((n) => n.position.x)) + padding * 2;
-  const maxY = Math.max(...tree.nodes.map((n) => n.position.y)) + padding * 2;
+  // Persist progress
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+  }, [progress]);
 
-  const completeNode = (id: string) => {
-    setCompletedIds((prev) => new Set([...prev, id]));
-  };
+  const handleComplete = useCallback((nodeId: string) => {
+    setProgress(prev => ({
+      ...prev,
+      [nodeId]: {
+        status: SNS.COMPLETED,
+        attempts: (prev[nodeId]?.attempts || 0) + 1,
+      },
+    }));
+  }, []);
+
+  const handleReset = useCallback(() => {
+    if (confirm('Reset all progress? This cannot be undone.')) {
+      setProgress({});
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, []);
+
+  // Stats
+  const questionCounts = useMemo(() => getNodeQuestionCounts(), []);
+  const totalQuestions = useMemo(() => Object.values(questionCounts).reduce((s, c) => s + c, 0), [questionCounts]);
+  const completedNodes = useMemo(() =>
+    Object.values(progress).filter(p => p.status === SNS.COMPLETED || p.status === SNS.MASTERED).length,
+    [progress]
+  );
+
+  // Per-topic stats
+  const topicStats = useMemo(() => {
+    const stats: Record<string, { total: number; completed: number; label: string }> = {};
+    tree.nodes.forEach(n => {
+      if (!stats[n.topic]) stats[n.topic] = { total: 0, completed: 0, label: n.topic };
+      stats[n.topic].total++;
+      const p = progress[n.id];
+      if (p && (p.status === SNS.COMPLETED || p.status === SNS.MASTERED)) {
+        stats[n.topic].completed++;
+      }
+    });
+    return stats;
+  }, [tree.nodes, progress]);
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">{tree.title}</h1>
-        <p className="text-gh-text-secondary text-sm">{tree.description}</p>
-      </div>
-
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Tree canvas */}
-        <div className="flex-1 border border-gh-border rounded-xl bg-gh-inset overflow-auto">
-          <svg viewBox={`0 0 ${maxX} ${maxY}`} className="w-full" style={{ minHeight: 500 }}>
-            {/* Edges */}
-            {tree.nodes.flatMap((node) =>
-              node.prerequisites.map((preId) => {
-                const pre = tree.nodes.find((n) => n.id === preId);
-                if (!pre) return null;
-                const completed =
-                  nodeStatuses.get(preId) === SkillNodeStatus.COMPLETED &&
-                  nodeStatuses.get(node.id) !== SkillNodeStatus.LOCKED;
-                return (
-                  <line
-                    key={`${preId}-${node.id}`}
-                    x1={pre.position.x + padding}
-                    y1={pre.position.y + padding + 20}
-                    x2={node.position.x + padding}
-                    y2={node.position.y + padding - 20}
-                    className={`skill-edge ${completed ? 'completed' : ''}`}
-                  />
-                );
-              }),
-            )}
-
-            {/* Nodes */}
-            {tree.nodes.map((node) => {
-              const status = nodeStatuses.get(node.id)!;
-              const colors = SKILL_TOPIC_COLORS[node.topic] ?? { primary: '#8b949e', glow: '#8b949e', bg: 'rgba(139,148,158,0.15)' };
-              const isLocked = status === SkillNodeStatus.LOCKED;
-              const isCompleted = status === SkillNodeStatus.COMPLETED;
-              const cx = node.position.x + padding;
-              const cy = node.position.y + padding;
-
+    <div className="min-h-screen bg-gh-canvas flex flex-col">
+      {/* Header bar */}
+      <div className="border-b border-gh-border bg-gh-surface px-4 sm:px-6 h-14 flex items-center justify-between flex-shrink-0">
+        <div className="flex items-center gap-3">
+          <TreePine size={16} className="text-gh-accent-blue" />
+          <span className="text-gh-text-primary font-bold font-mono text-sm">VCE Methods Skill Tree</span>
+          <span className="text-gh-border">|</span>
+          <span className="text-xs text-gh-text-muted font-mono">
+            {tree.nodes.length} skills • {totalQuestions} questions
+          </span>
+        </div>
+        <div className="flex items-center gap-3">
+          {/* Mini stats */}
+          <div className="hidden sm:flex items-center gap-3">
+            {Object.entries(topicStats).map(([topic, stat]) => {
+              const color = SKILL_TOPIC_COLORS[topic as Topic];
+              if (!color) return null;
               return (
-                <g
-                  key={node.id}
-                  onClick={() => !isLocked && setSelectedNode(node)}
-                  className={isLocked ? 'opacity-40' : 'cursor-pointer'}
-                >
-                  {/* Glow for completed */}
-                  {isCompleted && (
-                    <circle cx={cx} cy={cy} r={32} fill="none" stroke={colors.glow} strokeWidth={2} opacity={0.5}>
-                      <animate attributeName="r" values="30;36;30" dur="2s" repeatCount="indefinite" />
-                      <animate attributeName="opacity" values="0.5;0.2;0.5" dur="2s" repeatCount="indefinite" />
-                    </circle>
-                  )}
-                  <circle
-                    cx={cx}
-                    cy={cy}
-                    r={28}
-                    fill={isCompleted ? colors.bg : '#0d1117'}
-                    stroke={isCompleted ? colors.primary : isLocked ? '#30363d' : colors.primary}
-                    strokeWidth={isCompleted ? 3 : 2}
-                    strokeDasharray={isLocked ? '4 4' : undefined}
-                  />
-                  {/* Exam badge */}
-                  {node.isExamQuestion && (
-                    <text x={cx} y={cy - 12} textAnchor="middle" fontSize={12}>📝</text>
-                  )}
-                  <text
-                    x={cx}
-                    y={cy + (node.isExamQuestion ? 4 : 0)}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fontSize={10}
-                    fontWeight={600}
-                    fill={isLocked ? '#484f58' : colors.primary}
-                  >
-                    {node.title.length > 12 ? node.title.slice(0, 11) + '…' : node.title}
-                  </text>
-                  <text
-                    x={cx}
-                    y={cy + 44}
-                    textAnchor="middle"
-                    fontSize={9}
-                    fill="#8b949e"
-                  >
-                    {node.title}
-                  </text>
-                  <text x={cx} y={cy + 56} textAnchor="middle" fontSize={8} fill="#484f58">
-                    {starLabel(node.difficulty)}
-                  </text>
-                </g>
+                <div key={topic} className="flex items-center gap-1">
+                  <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color.primary }} />
+                  <span className="text-[10px] text-gh-text-muted font-mono">
+                    {stat.completed}/{stat.total}
+                  </span>
+                </div>
               );
             })}
-          </svg>
-        </div>
-
-        {/* Side panel */}
-        <div className="w-full lg:w-80 shrink-0">
-          {selectedNode ? (
-            <SkillNodePanel
-              node={selectedNode}
-              status={nodeStatuses.get(selectedNode.id)!}
-              onComplete={() => {
-                completeNode(selectedNode.id);
-                setSelectedNode(null);
-              }}
-              onClose={() => setSelectedNode(null)}
-            />
-          ) : (
-            <div className="border border-gh-border rounded-xl bg-gh-surface p-6 text-center text-gh-text-muted">
-              <p className="text-sm">Click a node to view details</p>
-            </div>
-          )}
+          </div>
+          <button
+            onClick={handleReset}
+            className="flex items-center gap-1 px-2 py-1 text-xs text-gh-text-muted hover:text-gh-dangerFg font-mono rounded border border-gh-border hover:border-gh-dangerFg/30 transition-colors"
+            title="Reset progress"
+          >
+            <RotateCcw size={12} />
+            <span className="hidden sm:inline">Reset</span>
+          </button>
         </div>
       </div>
 
-      {/* Legend */}
-      <div className="mt-6 flex flex-wrap gap-4 sm:gap-6 text-xs text-gh-text-muted">
-        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full border-2 border-gh-border bg-gh-canvas inline-block" /> Locked</span>
-        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full border-2 border-gh-accent-blue bg-gh-canvas inline-block" /> Unlocked</span>
-        <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full border-2 border-gh-success-fg bg-green-900/30 inline-block" /> Completed</span>
-        <span className="flex items-center gap-1">📝 Exam Question</span>
+      {/* Overall progress bar */}
+      <div className="bg-gh-surface/50 border-b border-gh-border px-4 sm:px-6 py-2">
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-gh-text-muted font-mono w-20">Overall</span>
+          <div className="flex-1 h-2 rounded-full bg-gh-border overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gh-accent-blue transition-all duration-700"
+              style={{ width: `${tree.nodes.length ? (completedNodes / tree.nodes.length) * 100 : 0}%` }}
+            />
+          </div>
+          <span className="text-xs text-gh-text-secondary font-mono w-16 text-right">
+            {completedNodes}/{tree.nodes.length}
+          </span>
+          <span className="text-xs text-gh-text-muted font-mono">
+            ({tree.nodes.length ? Math.round((completedNodes / tree.nodes.length) * 100) : 0}%)
+          </span>
+        </div>
+      </div>
+
+      {/* Tree content */}
+      <div className="flex-1 p-4 sm:p-6 overflow-hidden flex flex-col max-w-full">
+        <SkillTreeView
+          progress={progress}
+          onCompleteNode={handleComplete}
+        />
       </div>
     </div>
   );

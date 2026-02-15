@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom';
-import { Home, FileText, Dumbbell, BarChart3, DollarSign, LogIn, LogOut, User, Menu, X } from 'lucide-react';
+import { Home, GitBranch, FileText, Dumbbell, BarChart3, DollarSign, LogIn, LogOut, User, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { AuthContext, useAuth, useAuthProvider } from './hooks/useAuth';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -22,6 +22,7 @@ function NavBar() {
 
   const navLinks = [
     { to: '/', icon: <Home size={16} />, label: 'Home', end: true },
+    { to: '/skill-tree', icon: <GitBranch size={16} />, label: 'Skill Tree' },
     { to: '/exams', icon: <FileText size={16} />, label: 'Exams' },
     { to: '/practice', icon: <Dumbbell size={16} />, label: 'Practice' },
     { to: '/dashboard', icon: <BarChart3 size={16} />, label: 'Dashboard' },

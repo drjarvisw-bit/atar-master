@@ -55,6 +55,7 @@ export interface SkillTreeNode {
   tier: number;
   position: { x: number; y: number };
   questions: SkillPracticeQuestion[];
+  questionTypes?: string[];
   isExamQuestion?: boolean;
   examRef?: {
     examId: string;
