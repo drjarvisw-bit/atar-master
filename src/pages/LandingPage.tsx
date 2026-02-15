@@ -1,305 +1,275 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { GitBranch, BookOpen, BarChart3, ChevronDown, ChevronRight, Check, X, ArrowRight, Zap } from 'lucide-react';
+import { Check } from 'lucide-react';
 
-const stats = [
-  { value: '10', label: 'Past Exams' },
-  { value: '800+', label: 'Questions' },
-  { value: '5', label: 'Years Covered' },
-];
+/* ───────────── animated count-up hook ───────────── */
+function useCountUp(end: number, duration = 1800) {
+  const [value, setValue] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const started = useRef(false);
 
-const features = [
-  {
-    emoji: '🌳',
-    icon: <GitBranch size={28} />,
-    title: 'Skill Tree',
-    desc: 'Unlock topics step by step, from foundations to exam mastery. See your learning path laid out visually — like a tech tree for VCE.',
-  },
-  {
-    emoji: '📝',
-    icon: <BookOpen size={28} />,
-    title: 'Real Exam Practice',
-    desc: 'Every VCE Mathematical Methods exam from 2021–2025, with detailed step-by-step solutions. Practice with the real thing.',
-  },
-  {
-    emoji: '📊',
-    icon: <BarChart3 size={28} />,
-    title: 'Progress Tracking',
-    desc: 'Real-time mastery tracking across every topic. Instantly spot weak areas and focus your study where it matters most.',
-  },
-];
+  const start = useCallback(() => {
+    if (started.current) return;
+    started.current = true;
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min((now - t0) / duration, 1);
+      setValue(Math.floor(p * end));
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [end, duration]);
 
-const steps = [
-  { num: '01', title: 'Pick a Topic', desc: 'Choose from the skill tree or jump into a past exam.', icon: <ChevronRight size={20} /> },
-  { num: '02', title: 'Practice', desc: 'Solve real exam questions with hints and detailed solutions.', icon: <Zap size={20} /> },
-  { num: '03', title: 'Master', desc: 'Track your progress and unlock advanced topics as you improve.', icon: <Check size={20} /> },
-];
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) start(); }, { threshold: 0.3 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [start]);
 
-const plans = [
-  {
-    name: 'Free',
-    price: '$0',
-    period: 'forever',
-    desc: 'Try before you commit',
-    cta: 'Get Started Free',
-    highlight: false,
-    features: [
-      { text: '3 past exams (2021–2023)', included: true },
-      { text: 'Basic progress tracking', included: true },
-      { text: 'Full skill tree access', included: false },
-      { text: 'Step-by-step solutions', included: false },
-      { text: 'All 10 past exams', included: false },
-    ],
-  },
-  {
-    name: 'Pro',
-    price: '$9.99',
-    period: '/month',
-    desc: 'Everything you need to ace Methods',
-    cta: 'Start Pro Trial',
-    highlight: true,
-    features: [
-      { text: 'All 10 past exams (2021–2025)', included: true },
-      { text: 'Full skill tree with unlocks', included: true },
-      { text: 'Advanced progress analytics', included: true },
-      { text: 'Step-by-step worked solutions', included: true },
-      { text: 'Priority new content access', included: true },
-    ],
-  },
-];
+  return { ref, value };
+}
 
-const faqs = [
-  {
-    q: 'What subjects are covered?',
-    a: 'Currently we cover VCE Mathematical Methods Units 3 & 4. Specialist Mathematics is coming soon.',
-  },
-  {
-    q: 'Are these real VCE exam questions?',
-    a: 'Yes! Every question comes from actual VCAA past exams (2021–2025), including both Exam 1 and Exam 2.',
-  },
-  {
-    q: 'How does the skill tree work?',
-    a: 'Topics are arranged in a dependency graph. Master foundational concepts to unlock advanced ones, building a solid understanding from the ground up.',
-  },
-  {
-    q: 'Can I cancel my Pro subscription?',
-    a: 'Absolutely. Cancel anytime with one click — no lock-in contracts, no questions asked.',
-  },
-  {
-    q: 'Is this suitable for all VCE Methods students?',
-    a: "Yes! Whether you're aiming for a 25 or a 50, the skill tree adapts to your level. Start from basics or jump straight to exam-level problems.",
-  },
-];
+/* ───────────── fade-in on scroll ───────────── */
+function useFadeIn() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(32px)';
+    el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      }
+    }, { threshold: 0.15 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return ref;
+}
 
-function FAQItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false);
+/* ───────────── stat item ───────────── */
+function StatItem({ end, suffix, label }: { end: number; suffix: string; label: string }) {
+  const { ref, value } = useCountUp(end);
   return (
-    <div className="border border-gh-border rounded-lg overflow-hidden">
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-gh-surface/50 transition-colors"
-      >
-        <span className="font-medium text-gh-text-primary">{q}</span>
-        <ChevronDown size={18} className={`text-gh-text-muted transition-transform shrink-0 ml-4 ${open ? 'rotate-180' : ''}`} />
-      </button>
-      {open && (
-        <div className="px-6 pb-4 text-gh-text-secondary text-sm leading-relaxed">
-          {a}
-        </div>
-      )}
+    <div ref={ref} className="text-center">
+      <div className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
+        {value.toLocaleString()}{suffix}
+      </div>
+      <div className="text-sm text-gray-400 mt-2 uppercase tracking-widest">{label}</div>
     </div>
   );
 }
 
+/* ═══════════════════════════════════════════════ */
 export default function LandingPage() {
+  const featuresRef = useFadeIn();
+  const stepsRef = useFadeIn();
+  const pricingRef = useFadeIn();
+
   return (
-    <div className="min-h-screen">
-      {/* Hero */}
-      <section className="relative">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 pt-16 sm:pt-24 pb-14 sm:pb-20 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gh-border bg-gh-surface text-sm text-gh-text-secondary mb-8">
-            📐 2021–2025 VCE Methods Exams Now Available
+    <div className="min-h-screen bg-[#0a0a0f] text-white overflow-hidden">
+      {/* inline keyframes */}
+      <style>{`
+        @keyframes orbFloat {
+          0%, 100% { transform: translate(-50%, -50%) scale(1); }
+          50% { transform: translate(-50%, -50%) scale(1.15); }
+        }
+        @keyframes orbFloat2 {
+          0%, 100% { transform: translate(-50%, -50%) scale(1.1); }
+          50% { transform: translate(-50%, -50%) scale(0.95); }
+        }
+        .orb1 { animation: orbFloat 8s ease-in-out infinite; }
+        .orb2 { animation: orbFloat2 10s ease-in-out infinite; }
+      `}</style>
+
+      {/* ─── Hero ─── */}
+      <section className="relative min-h-[90vh] flex items-center justify-center">
+        {/* gradient orbs */}
+        <div className="orb1 pointer-events-none absolute top-1/2 left-1/2 w-[600px] h-[600px] rounded-full bg-blue-600/20 blur-[120px]" />
+        <div className="orb2 pointer-events-none absolute top-[40%] left-[55%] w-[400px] h-[400px] rounded-full bg-cyan-500/15 blur-[100px]" />
+
+        <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur text-sm text-gray-300 mb-10">
+            📐 2016–2024 VCE Methods Exams Available
           </div>
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-6 text-white leading-tight tracking-tight">
-            ATAR Master
+
+          <h1 className="text-5xl sm:text-7xl md:text-8xl font-black leading-[0.95] tracking-tight mb-8">
+            Master VCE Methods.
+            <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500">
+              Score Higher.
+            </span>
           </h1>
-          <p className="text-xl text-gh-text-secondary mb-3">
-            VCE Maths Exam Prep — Built for Results
+
+          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed">
+            2,270+ practice questions. 9 years of past exams. AI-powered skill tracking.
+            Everything you need to ace Mathematical Methods.
           </p>
-          <p className="text-gh-text-muted max-w-xl mx-auto mb-10 leading-relaxed">
-            Real past exams. Structured skill trees. Progress tracking that shows exactly where to focus. Built by students who've been through it.
-          </p>
+
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               to="/skill-tree"
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-8 py-3.5 rounded-xl transition-colors"
+              className="group relative px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-lg transition-all hover:shadow-[0_0_40px_rgba(59,130,246,0.4)]"
             >
-              <GitBranch size={18} />
-              Start Learning Free
+              Get Started Free
             </Link>
-            <a
-              href="#features"
-              className="inline-flex items-center gap-2 border border-gh-border hover:border-gh-text-muted text-gh-text-secondary font-medium px-8 py-3.5 rounded-xl transition-colors"
+            <Link
+              to="/skill-tree"
+              className="px-8 py-4 rounded-2xl border border-white/15 hover:border-white/30 text-gray-300 hover:text-white font-medium text-lg transition-all backdrop-blur-sm"
             >
-              See How It Works
-              <ArrowRight size={16} />
-            </a>
+              View Skill Tree
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="border-y border-gh-border bg-gh-surface/50">
-        <div className="mx-auto max-w-4xl px-6 py-12 grid grid-cols-3 gap-8 text-center">
-          {stats.map((s) => (
-            <div key={s.label}>
-              <div className="text-4xl md:text-5xl font-bold text-blue-500">
-                {s.value}
-              </div>
-              <div className="text-sm text-gh-text-muted mt-1 uppercase tracking-wider">{s.label}</div>
-            </div>
-          ))}
+      {/* ─── Stats Bar ─── */}
+      <section className="relative border-y border-white/5 bg-white/[0.02]">
+        <div className="mx-auto max-w-5xl px-6 py-16 grid grid-cols-2 md:grid-cols-4 gap-10">
+          <StatItem end={2270} suffix="+" label="Questions" />
+          <StatItem end={31} suffix="" label="Skill Nodes" />
+          <StatItem end={9} suffix=" Years" label="Past Exams (2016–2024)" />
+          <StatItem end={1450} suffix="" label="Training Questions" />
         </div>
       </section>
 
-      {/* Features */}
-      <section id="features" className="mx-auto max-w-5xl px-6 py-24">
+      {/* ─── Features ─── */}
+      <section ref={featuresRef} className="mx-auto max-w-6xl px-6 py-28">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold mb-4 text-white">Everything You Need to Ace Methods</h2>
-          <p className="text-gh-text-secondary max-w-2xl mx-auto">Three tools working together to take you from confused to confident.</p>
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">Everything you need</h2>
+          <p className="text-gray-400 max-w-xl mx-auto">Powerful tools designed to take you from confused to confident.</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {features.map((f) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[
+            { icon: '🎯', title: 'Skill Tree', desc: 'Visual learning path from Year 8 to VCE Exam. See exactly where your gaps are.' },
+            { icon: '📝', title: 'Past Exam Practice', desc: '9 years of real VCAA exams with detailed marking guides and solutions.' },
+            { icon: '📊', title: 'Progress Tracking', desc: 'Track your mastery across every topic. Know when you\'re exam-ready.' },
+            { icon: '📄', title: 'PDF Study Guides', desc: 'Download combined question + marking guide PDFs. Study offline.' },
+          ].map((f) => (
             <div
               key={f.title}
-              className="border border-gh-border rounded-2xl p-8 bg-gh-surface hover:border-gh-text-muted transition-colors"
+              className="group rounded-2xl p-8 border border-white/[0.06] bg-white/[0.02] backdrop-blur-sm hover:border-white/15 hover:bg-white/[0.04] transition-all duration-300"
             >
-              <div className="text-4xl mb-4">{f.emoji}</div>
-              <h3 className="text-lg font-semibold mb-3 text-white">{f.title}</h3>
-              <p className="text-gh-text-secondary text-sm leading-relaxed">{f.desc}</p>
+              <div className="text-4xl mb-5">{f.icon}</div>
+              <h3 className="text-lg font-semibold mb-3">{f.title}</h3>
+              <p className="text-sm text-gray-400 leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* How it works */}
-      <section className="bg-gh-surface/30 border-y border-gh-border">
-        <div className="mx-auto max-w-5xl px-6 py-24">
+      {/* ─── How It Works ─── */}
+      <section ref={stepsRef} className="border-y border-white/5 bg-white/[0.01]">
+        <div className="mx-auto max-w-5xl px-6 py-28">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4 text-white">How It Works</h2>
-            <p className="text-gh-text-secondary">Three steps to exam mastery.</p>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">How it works</h2>
+            <p className="text-gray-400">Three steps to exam mastery.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {steps.map((s) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {[
+              { num: '01', title: 'Sign up for free', desc: 'Create your account in seconds. No credit card required.' },
+              { num: '02', title: 'Practice by topic or exam', desc: 'Choose from the skill tree or dive into real past papers.' },
+              { num: '03', title: 'Track, improve, ace it', desc: 'Monitor your progress, fill gaps, and walk into the exam confident.' },
+            ].map((s) => (
               <div key={s.num} className="text-center">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-blue-600/15 border border-blue-600/30 text-blue-500 mb-6">
-                  <span className="text-xl font-bold">{s.num}</span>
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600/20 to-cyan-500/10 border border-blue-500/20 text-blue-400 font-bold text-xl mb-6">
+                  {s.num}
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-white">{s.title}</h3>
-                <p className="text-gh-text-secondary text-sm">{s.desc}</p>
+                <h3 className="text-lg font-semibold mb-2">{s.title}</h3>
+                <p className="text-sm text-gray-400">{s.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Pricing */}
-      <section className="mx-auto max-w-4xl px-6 py-24">
+      {/* ─── Pricing ─── */}
+      <section ref={pricingRef} className="mx-auto max-w-4xl px-6 py-28">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold mb-4 text-white">Simple, Student-Friendly Pricing</h2>
-          <p className="text-gh-text-secondary">Start free. Upgrade when you're ready.</p>
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">Simple pricing</h2>
+          <p className="text-gray-400">Start free. Upgrade when you're ready.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-          {plans.map((plan) => (
-            <div
-              key={plan.name}
-              className={`relative rounded-2xl p-8 border transition-colors ${
-                plan.highlight
-                  ? 'border-blue-600 bg-gh-surface'
-                  : 'border-gh-border bg-gh-surface'
-              }`}
-            >
-              {plan.highlight && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-blue-600 text-xs font-semibold text-white">
-                  MOST POPULAR
-                </div>
-              )}
-              <h3 className="text-xl font-bold mb-1 text-white">{plan.name}</h3>
-              <p className="text-gh-text-muted text-sm mb-4">{plan.desc}</p>
-              <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-4xl font-bold text-white">{plan.price}</span>
-                <span className="text-gh-text-muted text-sm">{plan.period}</span>
-              </div>
-              <Link
-                to={plan.highlight ? "/pricing" : "/skill-tree"}
-                className={`block w-full text-center py-3 rounded-xl font-semibold transition-colors ${
-                  plan.highlight
-                    ? 'bg-blue-600 hover:bg-blue-500 text-white'
-                    : 'border border-gh-border hover:border-gh-text-muted text-gh-text-primary'
-                }`}
-              >
-                {plan.cta}
-              </Link>
-              <ul className="mt-6 space-y-3">
-                {plan.features.map((f) => (
-                  <li key={f.text} className="flex items-start gap-3 text-sm">
-                    {f.included ? (
-                      <Check size={16} className="text-green-500 shrink-0 mt-0.5" />
-                    ) : (
-                      <X size={16} className="text-gh-text-muted shrink-0 mt-0.5" />
-                    )}
-                    <span className={f.included ? 'text-gh-text-secondary' : 'text-gh-text-muted'}>{f.text}</span>
-                  </li>
-                ))}
-              </ul>
+          {/* Free */}
+          <div className="rounded-2xl p-8 border border-white/[0.06] bg-white/[0.02]">
+            <h3 className="text-xl font-bold mb-1">Free</h3>
+            <p className="text-gray-500 text-sm mb-5">Get started at no cost</p>
+            <div className="flex items-baseline gap-1 mb-6">
+              <span className="text-4xl font-extrabold">$0</span>
+              <span className="text-gray-500 text-sm">forever</span>
             </div>
-          ))}
+            <Link to="/skill-tree" className="block w-full text-center py-3 rounded-xl border border-white/10 hover:border-white/25 text-gray-300 hover:text-white font-semibold transition-all">
+              Get Started Free
+            </Link>
+            <ul className="mt-6 space-y-3">
+              {['Basic skill tree access', '3 free exam papers', 'Progress tracking'].map(t => (
+                <li key={t} className="flex items-center gap-3 text-sm text-gray-400"><Check size={15} className="text-green-500 shrink-0" />{t}</li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Pro */}
+          <div className="relative rounded-2xl p-8 border border-blue-500/30 bg-gradient-to-b from-blue-600/[0.06] to-transparent">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-blue-600 text-xs font-bold tracking-wide">
+              MOST POPULAR
+            </div>
+            <h3 className="text-xl font-bold mb-1">Pro</h3>
+            <p className="text-gray-500 text-sm mb-5">Everything to ace Methods</p>
+            <div className="flex items-baseline gap-1 mb-6">
+              <span className="text-4xl font-extrabold">$9.99</span>
+              <span className="text-gray-500 text-sm">/month</span>
+            </div>
+            <Link to="/pricing" className="block w-full text-center py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-all hover:shadow-[0_0_30px_rgba(59,130,246,0.3)]">
+              Start Pro Trial
+            </Link>
+            <ul className="mt-6 space-y-3">
+              {[
+                'All 9 years of exams (2016–2024)',
+                'Full skill tree with unlocks',
+                'Unlimited practice questions',
+                'PDF study guide downloads',
+                'Priority new features',
+              ].map(t => (
+                <li key={t} className="flex items-center gap-3 text-sm text-gray-300"><Check size={15} className="text-green-500 shrink-0" />{t}</li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="bg-gh-surface/30 border-y border-gh-border">
-        <div className="mx-auto max-w-3xl px-6 py-24">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4 text-white">Frequently Asked Questions</h2>
-          </div>
-          <div className="space-y-3">
-            {faqs.map((faq) => (
-              <FAQItem key={faq.q} q={faq.q} a={faq.a} />
-            ))}
-          </div>
+      {/* ─── Final CTA ─── */}
+      <section className="relative py-28 text-center">
+        <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] rounded-full bg-blue-600/10 blur-[100px]" />
+        <div className="relative z-10">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">Ready to master Methods?</h2>
+          <p className="text-gray-400 mb-8 max-w-lg mx-auto">Join students across Victoria preparing smarter, not harder.</p>
+          <Link to="/skill-tree" className="inline-block px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-lg transition-all hover:shadow-[0_0_40px_rgba(59,130,246,0.4)]">
+            Get Started Free
+          </Link>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="mx-auto max-w-5xl px-6 py-24 text-center">
-        <h2 className="text-3xl font-bold mb-4 text-white">Ready to Master Methods?</h2>
-        <p className="text-gh-text-secondary mb-8 max-w-xl mx-auto">
-          Join students across Victoria who are preparing smarter, not harder.
-        </p>
-        <Link
-          to="/skill-tree"
-          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-8 py-3.5 rounded-xl transition-colors"
-        >
-          <GitBranch size={18} />
-          Start Learning Free
-        </Link>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-gh-border">
-        <div className="mx-auto max-w-5xl px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+      {/* ─── Footer ─── */}
+      <footer className="border-t border-white/5">
+        <div className="mx-auto max-w-5xl px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <GitBranch size={18} className="text-blue-500" />
-            <span className="font-semibold text-white">ATAR Master</span>
+            <span className="text-xl">🎓</span>
+            <span className="font-bold text-lg">ATAR Master</span>
           </div>
-          <p className="text-gh-text-muted text-sm">
-            © 2025 ATAR Master. Built for VCE students in Victoria, Australia.
-          </p>
-          <div className="flex gap-6 text-sm text-gh-text-muted">
-            <a href="#" className="hover:text-gh-text-secondary transition-colors">Privacy</a>
-            <a href="#" className="hover:text-gh-text-secondary transition-colors">Terms</a>
-            <a href="#" className="hover:text-gh-text-secondary transition-colors">Contact</a>
+          <div className="flex gap-8 text-sm text-gray-500">
+            <Link to="/skill-tree" className="hover:text-gray-300 transition-colors">Skill Tree</Link>
+            <Link to="/exams" className="hover:text-gray-300 transition-colors">Exams</Link>
+            <Link to="/pricing" className="hover:text-gray-300 transition-colors">Pricing</Link>
+            <Link to="/auth" className="hover:text-gray-300 transition-colors">Sign In</Link>
+          </div>
+          <div className="text-sm text-gray-600 text-center md:text-right">
+            <p>Built for VCE students</p>
+            <p>© 2026 ATAR Master</p>
           </div>
         </div>
       </footer>
