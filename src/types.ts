@@ -1,36 +1,40 @@
 // Shared types - synced from VCE Master question bank format
 
-export enum Subject {
-  METHODS = 'Mathematical Methods',
-  SPECIALIST = 'Specialist Mathematics',
-}
+export const Subject = {
+  METHODS: 'Mathematical Methods',
+  SPECIALIST: 'Specialist Mathematics',
+} as const;
+export type Subject = (typeof Subject)[keyof typeof Subject];
 
-export enum Topic {
-  CALCULUS = 'Calculus',
-  FUNCTIONS = 'Functions & Graphs',
-  PROBABILITY = 'Probability & Statistics',
-  VECTORS = 'Vectors',
-  COMPLEX_NUMBERS = 'Complex Numbers',
-  MECHANICS = 'Mechanics',
-  PROOF = 'Proof & Logic',
-  SEQUENCES = 'Sequences & Series',
-}
+export const Topic = {
+  CALCULUS: 'Calculus',
+  FUNCTIONS: 'Functions & Graphs',
+  PROBABILITY: 'Probability & Statistics',
+  VECTORS: 'Vectors',
+  COMPLEX_NUMBERS: 'Complex Numbers',
+  MECHANICS: 'Mechanics',
+  PROOF: 'Proof & Logic',
+  SEQUENCES: 'Sequences & Series',
+} as const;
+export type Topic = (typeof Topic)[keyof typeof Topic];
 
-export enum Difficulty {
-  STAR_1 = 1,
-  STAR_2 = 2,
-  STAR_3 = 3,
-  STAR_4 = 4,
-  STAR_5 = 5,
-}
+export const Difficulty = {
+  STAR_1: 1,
+  STAR_2: 2,
+  STAR_3: 3,
+  STAR_4: 4,
+  STAR_5: 5,
+} as const;
+export type Difficulty = (typeof Difficulty)[keyof typeof Difficulty];
 
-export enum SkillNodeStatus {
-  LOCKED = 'locked',
-  UNLOCKED = 'unlocked',
-  IN_PROGRESS = 'in-progress',
-  COMPLETED = 'completed',
-  MASTERED = 'mastered',
-}
+export const SkillNodeStatus = {
+  LOCKED: 'locked',
+  UNLOCKED: 'unlocked',
+  IN_PROGRESS: 'in-progress',
+  COMPLETED: 'completed',
+  MASTERED: 'mastered',
+} as const;
+export type SkillNodeStatus = (typeof SkillNodeStatus)[keyof typeof SkillNodeStatus];
 
 export interface SkillPracticeQuestion {
   id: string;
@@ -81,6 +85,7 @@ export interface ExamQuestion {
   answer: string;
   markingGuide: string[];
   options?: { label: string; text: string }[];
+  subQuestions?: ExamQuestion[];
   imageUrl?: string;
   solutionImageUrl?: string;
 }
@@ -91,6 +96,16 @@ export interface ExamPaper {
   subject: Subject;
   title: string;
   questions: ExamQuestion[];
+}
+
+export interface PracticeSession {
+  id: string;
+  date: string;
+  mode: string;
+  questionsAttempted: number;
+  correctCount: number;
+  weakCount: number;
+  durationMs: number;
 }
 
 // Topic colors for skill tree visualization

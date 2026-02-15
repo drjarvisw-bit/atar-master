@@ -1,8 +1,10 @@
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
-import { Home, GitBranch, FileText } from 'lucide-react';
+import { Home, GitBranch, FileText, Dumbbell, BarChart3 } from 'lucide-react';
 import LandingPage from './pages/LandingPage';
 import SkillTreePage from './pages/SkillTreePage';
 import ExamViewerPage from './pages/ExamViewerPage';
+import PracticePage from './pages/PracticePage';
+import DashboardPage from './pages/DashboardPage';
 import './index.css';
 
 function NavBar() {
@@ -26,6 +28,12 @@ function NavBar() {
           <NavLink to="/exams" className={({ isActive }) => `${link} ${isActive ? active : inactive}`}>
             <FileText size={16} /> Exams
           </NavLink>
+          <NavLink to="/practice" className={({ isActive }) => `${link} ${isActive ? active : inactive}`}>
+            <Dumbbell size={16} /> Practice
+          </NavLink>
+          <NavLink to="/dashboard" className={({ isActive }) => `${link} ${isActive ? active : inactive}`}>
+            <BarChart3 size={16} /> Dashboard
+          </NavLink>
         </div>
       </div>
     </nav>
@@ -41,6 +49,8 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/skill-tree" element={<SkillTreePage />} />
           <Route path="/exams" element={<ExamViewerPage />} />
+          <Route path="/practice" element={<PracticePage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
         </Routes>
       </div>
     </BrowserRouter>
