@@ -71,9 +71,9 @@ export default function SkillTreePage() {
         ? [...np.levelsCompleted, level].sort()
         : np.levelsCompleted;
       const avgScore = levelsCompleted.length > 0
-        ? Math.round((levelsCompleted.length / 6) * 100)
+        ? Math.round((levelsCompleted.length / 4) * 100)
         : np.score;
-      const allDone = levelsCompleted.length === 6;
+      const allDone = levelsCompleted.length === 4;
       const xpGain = passed ? (level * 10 + Math.round(pct / 10)) : 0;
 
       return {

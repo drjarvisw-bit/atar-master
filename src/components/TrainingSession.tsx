@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { ArrowLeft, ArrowRight, Check, X, RotateCcw, Trophy, Lightbulb, ChevronRight } from 'lucide-react';
-import { getTrainingByLevel, type TrainingQuestion } from '../data/training';
+import { getTrainingByDifficulty, type TrainingQuestion } from '../data/training';
 import { getQuestionsForNode } from '../data/questionMatcher';
 import MathText from './MathText';
 
@@ -15,8 +15,8 @@ type Phase = 'quiz' | 'summary';
 
 export default function TrainingSession({ nodeId, level, onComplete, onBack }: Props) {
   const questions = useMemo(() => {
-    if (level === 6) {
-      // Real exam questions for level 6 (VCE Exam)
+    if (level === 4) {
+      // Real exam questions for level 4
       return getQuestionsForNode(nodeId).map(mq => ({
         id: mq.question.id,
         text: mq.question.text,
@@ -28,7 +28,8 @@ export default function TrainingSession({ nodeId, level, onComplete, onBack }: P
         examTitle: mq.examTitle,
       }));
     }
-    return getTrainingByLevel(nodeId, level as 1 | 2 | 3 | 4);
+    const diffKeys: ('easy' | 'medium' | 'hard')[] = ['easy', 'medium', 'hard'];
+    return getTrainingByDifficulty(nodeId, diffKeys[level - 1]);
   }, [nodeId, level]);
 
   const [phase, setPhase] = useState<Phase>('quiz');

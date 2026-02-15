@@ -47,7 +47,7 @@ export default function SkillNodePanel({ nodeId, progress, onClose, onEnter }: P
           <div className="text-[10px] text-gray-500">Score</div>
         </div>
         <div className="bg-gray-900 rounded-lg p-2 text-center">
-          <div className="text-lg font-bold text-white">{np.levelsCompleted.length}/6</div>
+          <div className="text-lg font-bold text-white">{np.levelsCompleted.length}/4</div>
           <div className="text-[10px] text-gray-500">Levels</div>
         </div>
         <div className="bg-gray-900 rounded-lg p-2 text-center">
@@ -61,7 +61,7 @@ export default function SkillNodePanel({ nodeId, progress, onClose, onEnter }: P
         <div
           className="h-full rounded-full transition-all duration-500"
           style={{
-            width: `${(np.levelsCompleted.length / 6) * 100}%`,
+            width: `${(np.levelsCompleted.length / 4) * 100}%`,
             backgroundColor: topicColor?.primary ?? '#3B82F6',
           }}
         />

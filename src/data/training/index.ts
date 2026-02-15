@@ -1,28 +1,22 @@
 import type { TrainingQuestion } from './types';
 
-// Tier 0: Prerequisites
+// Import all training question files (keyed by old node IDs)
 import basicAlgebra from './basic-algebra';
 import numberOps from './number-ops';
 import basicTrig from './basic-trig';
 import basicProb from './basic-prob';
 import graphingBasics from './graphing-basics';
-
-// Tier 1: Foundation
 import polynomialFn from './polynomial-fn';
 import exponentialFn from './exponential-fn';
 import logarithmicFn from './logarithmic-fn';
 import circularFn from './circular-fn';
 import transformations from './transformations';
 import domainRange from './domain-range';
-
-// Tier 2: Intermediate
 import compositeFn from './composite-fn';
 import inverseFn from './inverse-fn';
 import derivatives from './derivatives';
 import diffRules from './diff-rules';
 import simultEq from './simult-eq';
-
-// Tier 3: Advanced
 import tangentLines from './tangent-lines';
 import stationaryPts from './stationary-pts';
 import optimisation from './optimisation';
@@ -30,8 +24,6 @@ import antiDiff from './anti-diff';
 import definiteInt from './definite-int';
 import areaCurves from './area-curves';
 import avgRate from './avg-rate';
-
-// Tier 4: Probability & Statistics
 import condProb from './cond-prob';
 import binomialDist from './binomial-dist';
 import normalDist from './normal-dist';
@@ -39,27 +31,24 @@ import continuousPdf from './continuous-pdf';
 import confidenceInt from './confidence-int';
 import sampleProp from './sample-prop';
 
-export const trainingQuestions: Record<string, TrainingQuestion[]> = {
-  // Tier 0
+// Old node ID training data (unchanged)
+const oldTraining: Record<string, TrainingQuestion[]> = {
   'basic-algebra': basicAlgebra,
   'number-ops': numberOps,
   'basic-trig': basicTrig,
   'basic-prob': basicProb,
   'graphing-basics': graphingBasics,
-  // Tier 1
   'polynomial-fn': polynomialFn,
   'exponential-fn': exponentialFn,
   'logarithmic-fn': logarithmicFn,
   'circular-fn': circularFn,
   'transformations': transformations,
   'domain-range': domainRange,
-  // Tier 2
   'composite-fn': compositeFn,
   'inverse-fn': inverseFn,
   'derivatives': derivatives,
   'diff-rules': diffRules,
   'simult-eq': simultEq,
-  // Tier 3
   'tangent-lines': tangentLines,
   'stationary-pts': stationaryPts,
   'optimisation': optimisation,
@@ -67,7 +56,6 @@ export const trainingQuestions: Record<string, TrainingQuestion[]> = {
   'definite-int': definiteInt,
   'area-curves': areaCurves,
   'avg-rate': avgRate,
-  // Tier 4
   'cond-prob': condProb,
   'binomial-dist': binomialDist,
   'normal-dist': normalDist,
@@ -76,12 +64,87 @@ export const trainingQuestions: Record<string, TrainingQuestion[]> = {
   'sample-prop': sampleProp,
 };
 
+/**
+ * Mapping from new year-level node IDs to old training file IDs.
+ * Each new node pulls training questions from one or more old nodes.
+ */
+const NODE_TO_TRAINING: Record<string, string[]> = {
+  // Year 8
+  'y8-algebra': ['basic-algebra'],
+  'y8-linear-eq': ['basic-algebra'],
+  'y8-number-ops': ['number-ops'],
+  'y8-probability': ['basic-prob'],
+  'y8-graphing': ['graphing-basics'],
+  // Year 9
+  'y9-non-linear': ['polynomial-fn'],
+  'y9-index-laws': ['number-ops'],
+  'y9-trigonometry': ['basic-trig'],
+  'y9-probability': ['basic-prob'],
+  'y9-statistics': ['basic-prob'],
+  // Year 10
+  'y10-quadratics': ['polynomial-fn'],
+  'y10-polynomials': ['polynomial-fn'],
+  'y10-exponential': ['exponential-fn'],
+  'y10-trig-unit-circle': ['basic-trig', 'circular-fn'],
+  'y10-rates-change': ['derivatives'],
+  'y10-cond-probability': ['cond-prob'],
+  // Year 11
+  'y11-functions': ['domain-range', 'composite-fn', 'inverse-fn'],
+  'y11-transformations': ['transformations'],
+  'y11-log-functions': ['logarithmic-fn'],
+  'y11-circular-fn': ['circular-fn'],
+  'y11-intro-calculus': ['derivatives'],
+  'y11-counting': ['basic-prob'],
+  // Year 12
+  'y12-diff-rules': ['diff-rules'],
+  'y12-applications-diff': ['tangent-lines', 'stationary-pts', 'optimisation', 'simult-eq'],
+  'y12-antidiff': ['anti-diff'],
+  'y12-definite-int': ['definite-int', 'area-curves', 'avg-rate'],
+  'y12-continuous-pdf': ['continuous-pdf'],
+  'y12-normal-dist': ['normal-dist', 'binomial-dist'],
+  'y12-confidence': ['confidence-int', 'sample-prop'],
+  // VCE Exam — no training, exam questions only
+  'vce-exam1': [],
+  'vce-exam2': [],
+};
+
+/** Merge training from mapped old nodes */
+function mergeTraining(sources: string[]): TrainingQuestion[] {
+  const result: TrainingQuestion[] = [];
+  for (const src of sources) {
+    const qs = oldTraining[src];
+    if (qs) result.push(...qs);
+  }
+  return result;
+}
+
+// Build the new training map
+export const trainingQuestions: Record<string, TrainingQuestion[]> = {};
+for (const [newId, sources] of Object.entries(NODE_TO_TRAINING)) {
+  trainingQuestions[newId] = mergeTraining(sources);
+}
+
 export function getTrainingForNode(nodeId: string): TrainingQuestion[] {
   return trainingQuestions[nodeId] || [];
 }
 
 export function getTrainingByLevel(nodeId: string, level: 1 | 2 | 3 | 4 | 5): TrainingQuestion[] {
   return getTrainingForNode(nodeId).filter(q => q.level === level);
+}
+
+/**
+ * Get training by difficulty bucket:
+ * - 'easy' = level 1-2
+ * - 'medium' = level 3
+ * - 'hard' = level 4-5
+ */
+export function getTrainingByDifficulty(nodeId: string, difficulty: 'easy' | 'medium' | 'hard'): TrainingQuestion[] {
+  const all = getTrainingForNode(nodeId);
+  switch (difficulty) {
+    case 'easy': return all.filter(q => q.level <= 2);
+    case 'medium': return all.filter(q => q.level === 3);
+    case 'hard': return all.filter(q => q.level >= 4);
+  }
 }
 
 export function getTrainingStats(nodeId: string): { total: number; byLevel: Record<number, number> } {

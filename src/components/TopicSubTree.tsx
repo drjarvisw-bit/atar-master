@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { ArrowLeft, Lock, Play, CheckCircle2, Flame } from 'lucide-react';
 import { ALL_NODES } from '../data/skillTreeData';
 import { getQuestionsForNode } from '../data/questionMatcher';
-import { getTrainingByLevel, type TrainingQuestion } from '../data/training';
+import { getTrainingByDifficulty, type TrainingQuestion } from '../data/training';
 import { SKILL_TOPIC_COLORS, type Topic } from '../types';
 import type { UserProgress } from '../lib/progress';
 import { getNodeProgress } from '../lib/progress';
@@ -15,15 +15,15 @@ interface Props {
   onStartLevel: (nodeId: string, level: number) => void;
 }
 
-const LEVEL_NAMES = ['Year 8', 'Year 9', 'Year 10', 'Year 11', 'Year 12', 'VCE Exam'];
+const LEVEL_NAMES = ['Easy ⭐', 'Medium ⭐⭐', 'Hard ⭐⭐⭐', 'Real Exam Questions'];
 const LEVEL_DESCRIPTIONS = [
-  'Foundation skills — where it all begins',
-  'Building on the basics',
-  'Pre-Methods preparation',
-  'Methods Unit 1 & 2 level',
-  'Methods Unit 3 & 4 level',
-  'Real VCE exam questions — prove your mastery!',
+  'Foundation practice — build your confidence',
+  'Intermediate challenge — solidify your skills',
+  'Advanced problems — push your limits',
+  'Actual VCE exam questions — prove your mastery!',
 ];
+
+const DIFFICULTY_KEYS: ('easy' | 'medium' | 'hard')[] = ['easy', 'medium', 'hard'];
 
 interface LevelData {
   training: TrainingQuestion[];
@@ -39,22 +39,20 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
 
   if (!node) return null;
 
-  // Levels 1-5: training MC (Year 8-12), Level 6: real VCE exam questions
+  // 4 levels: Easy, Medium, Hard, Real Exam
   const levels: LevelData[] = useMemo(() => {
-    return [1, 2, 3, 4, 5, 6].map(level => {
-      if (level === 6) {
+    return [1, 2, 3, 4].map(level => {
+      if (level === 4) {
         return { training: [], examCount: examQuestions.length, isExamLevel: true };
       }
+      const diff = DIFFICULTY_KEYS[level - 1];
       return {
-        training: getTrainingByLevel(nodeId, level as 1 | 2 | 3 | 4 | 5),
+        training: getTrainingByDifficulty(nodeId, diff),
         examCount: 0,
         isExamLevel: false,
       };
     });
   }, [nodeId, examQuestions]);
-
-  
-  
 
   return (
     <div className="min-h-full bg-gray-900 p-4 sm:p-6 animate-fade-in">
@@ -78,8 +76,8 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
           <p className="text-sm text-gray-400 mt-0.5">{node.description}</p>
         </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-white">{np.levelsCompleted.length > 0 ? LEVEL_NAMES[Math.max(...np.levelsCompleted) - 1] : '—'}</div>
-          <div className="text-xs text-gray-500">current level</div>
+          <div className="text-2xl font-bold text-white">{np.levelsCompleted.length}/4</div>
+          <div className="text-xs text-gray-500">levels done</div>
         </div>
       </div>
 
@@ -105,7 +103,6 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
             >
               <div className="flex items-center justify-between p-4">
                 <div className="flex items-center gap-3">
-                  {/* Status icon */}
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                     isLocked ? 'bg-gray-800' : isCompleted ? 'bg-green-900/50' : levelData.isExamLevel ? 'bg-orange-900/30' : 'bg-blue-900/30'
                   }`}>
@@ -123,15 +120,8 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className={`font-semibold ${isLocked ? 'text-gray-600' : 'text-white'}`}>
-                        Level {levelNum}: {LEVEL_NAMES[i]}
-                      </h3>
-                      <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-full ${
-                        levelData.isExamLevel
-                          ? 'bg-orange-500/20 text-orange-400'
-                          : 'bg-gray-700 text-gray-400'
-                      }`}>
                         {LEVEL_NAMES[i]}
-                      </span>
+                      </h3>
                       {levelData.isExamLevel && !isLocked && (
                         <span className="px-1.5 py-0.5 text-[10px] font-bold bg-orange-500/20 text-orange-400 rounded-full">
                           REAL EXAMS
@@ -149,7 +139,6 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
                   </div>
                 </div>
 
-                {/* Action */}
                 {!isLocked && qCount > 0 && !isCompleted && (
                   <button
                     onClick={() => onStartLevel(nodeId, levelNum)}
@@ -175,7 +164,7 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
                 )}
               </div>
 
-              {/* Question cards preview (training MC) */}
+              {/* Training question preview */}
               {!isLocked && !levelData.isExamLevel && levelData.training.length > 0 && (
                 <div className="px-4 pb-4 flex gap-2 overflow-x-auto">
                   {levelData.training.slice(0, 6).map((tq, qi) => (
