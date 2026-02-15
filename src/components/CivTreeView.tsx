@@ -1,5 +1,12 @@
-import { useRef, useState, useEffect, useMemo } from 'react';
-import { Play, Lock, Crown, CheckCircle2 } from 'lucide-react';
+import { useRef, useState, useEffect, useMemo, type ReactNode } from 'react';
+import {
+  Hash, Sigma, BarChart2, Dice5, TrendingUp,
+  PieChart, Calculator, Triangle, Waves, Mountain,
+  Bell, Binary, FileCode, PenTool, Monitor,
+  Lock, Play, CheckCircle2, Sparkles, Link2,
+  FunctionSquare, Braces, LineChart, GitBranch,
+  type LucideIcon,
+} from 'lucide-react';
 import { ALL_NODES } from '../data/skillTreeData';
 import { getNodeQuestionCounts } from '../data/questionMatcher';
 import { getTrainingForNode } from '../data/training';
@@ -16,20 +23,49 @@ export interface CivTreeViewRef {
   navigateTo: (x: number, y: number) => void;
 }
 
-const TIER_LABELS = ['Year 8', 'Year 9', 'Year 10 / 10A', 'Year 11', 'Year 12', 'VCE Exam'];
-const TIER_COLORS = ['#818CF8', '#A78BFA', '#C084FC', '#60A5FA', '#22D3EE', '#FBBF24'];
+const TIER_LABELS = ['Year 8', 'Year 9', 'Year 10', 'Year 11', 'Year 12', 'VCE Exam'];
+const TIER_GRADIENTS = [
+  ['#6366F1', '#8B5CF6'], // Indigo → Violet
+  ['#A855F7', '#D946EF'], // Purple → Fuchsia
+  ['#F43F5E', '#EC4899'], // Rose → Pink
+  ['#3B82F6', '#06B6D4'], // Blue → Cyan
+  ['#14B8A6', '#10B981'], // Teal → Emerald
+  ['#F59E0B', '#EAB308'], // Amber → Gold
+];
 
-const NODE_ICONS: Record<string, string> = {
-  'y8-number': '🔢', 'y8-algebra': '✖️', 'y8-statistics': '📊', 'y8-probability': '🎲',
-  'y9-number': '🔬', 'y9-algebra': '📈', 'y9-statistics': '📉', 'y9-probability': '🎯',
-  'y10-number': '💰', 'y10-algebra': '📐', 'y10-statistics': '🔍', 'y10-probability': '🧩',
-  'y10a-algebra': '🔗', 'y10a-probability': '🎰',
-  'y11-a1-linear': '📏', 'y11-a2-quadratics': '〰️', 'y11-a3-domain-range': '🗺️',
-  'y11-a4-transformations': '🔄', 'y11-a5-trigonometry': '📐', 'y11-a6-logs-indices': '📊',
-  'y11-a7-differentiation': '📉', 'y11-a8-integration': '∫', 'y11-a9-combinatorics': '🎲',
-  'y12-a1-algebra-functions': '⚡', 'y12-a2-differentiation': '🏔️', 'y12-a3-integration': '🌊',
-  'y12-a4-discrete-prob': '🎰', 'y12-a5-continuous-prob': '🔔', 'y12-a6-pseudocode': '💻',
-  'vce-exam1': '✏️', 'vce-exam2': '🖥️',
+// Lucide icon map — premium SVG icons instead of emoji
+const NODE_ICON_MAP: Record<string, LucideIcon> = {
+  'y8-number': Hash,
+  'y8-algebra': Braces,
+  'y8-statistics': BarChart2,
+  'y8-probability': Dice5,
+  'y9-number': Sigma,
+  'y9-algebra': TrendingUp,
+  'y9-statistics': LineChart,
+  'y9-probability': PieChart,
+  'y10-number': Calculator,
+  'y10-algebra': FunctionSquare,
+  'y10-statistics': BarChart2,
+  'y10-probability': GitBranch,
+  'y10a-algebra': Link2,
+  'y10a-probability': Dice5,
+  'y11-a1-linear': TrendingUp,
+  'y11-a2-quadratics': Waves,
+  'y11-a3-domain-range': Braces,
+  'y11-a4-transformations': GitBranch,
+  'y11-a5-trigonometry': Triangle,
+  'y11-a6-logs-indices': Sigma,
+  'y11-a7-differentiation': LineChart,
+  'y11-a8-integration': Waves,
+  'y11-a9-combinatorics': PieChart,
+  'y12-a1-algebra-functions': Sparkles,
+  'y12-a2-differentiation': Mountain,
+  'y12-a3-integration': Waves,
+  'y12-a4-discrete-prob': Dice5,
+  'y12-a5-continuous-prob': Bell,
+  'y12-a6-pseudocode': Binary,
+  'vce-exam1': PenTool,
+  'vce-exam2': Monitor,
 };
 
 function getNodesByTier() {
@@ -49,24 +85,24 @@ function findCurrentNode(progress: UserProgress): string | null {
   return null;
 }
 
-/* ─── Column Node ─── */
+/* ─── Node Card ─── */
 
-function ColumnNode({
+function NodeCard({
   node,
   status,
   progress,
   isCurrent,
-  icon,
-  tierColor,
+  tierGrad,
   onSelect,
+  delay,
 }: {
   node: typeof ALL_NODES[0];
   status: string;
   progress: UserProgress;
   isCurrent: boolean;
-  icon: string;
-  tierColor: string;
+  tierGrad: [string, string];
   onSelect: () => void;
+  delay: number;
 }) {
   const isLocked = status === 'locked';
   const isCompleted = status === 'completed' || status === 'mastered';
@@ -79,135 +115,194 @@ function ColumnNode({
   const trainingCount = useMemo(() => getTrainingForNode(node.id).length, [node.id]);
   const totalQ = examCount + trainingCount;
 
+  const Icon = NODE_ICON_MAP[node.id] ?? Calculator;
+  const [g1, g2] = tierGrad;
+
   return (
     <button
       onClick={() => !isLocked && onSelect()}
       disabled={isLocked}
       data-node={node.id}
       className={`
-        group relative flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all duration-200
-        w-[100px] sm:w-[120px]
+        group relative w-[130px] sm:w-[150px] rounded-xl transition-all duration-300
         ${isLocked
-          ? 'opacity-35 cursor-not-allowed'
-          : isCurrent
-            ? 'cursor-pointer'
-            : 'cursor-pointer hover:scale-105'
+          ? 'opacity-30 cursor-not-allowed'
+          : 'cursor-pointer hover:-translate-y-1 hover:shadow-xl active:scale-[0.98]'
         }
       `}
+      style={{
+        animationDelay: `${delay}ms`,
+      }}
     >
-      {/* Current badge */}
+      {/* Glow ring for current node */}
       {isCurrent && (
         <div
-          className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider z-10"
-          style={{ background: tierColor, color: '#000' }}
-        >
-          Next
-        </div>
+          className="absolute -inset-[2px] rounded-xl opacity-60"
+          style={{
+            background: `linear-gradient(135deg, ${g1}, ${g2})`,
+            animation: 'glow-pulse 2s ease-in-out infinite',
+          }}
+        />
       )}
 
-      {/* Node circle */}
-      <div className="relative">
-        {/* Pulse ring for current */}
-        {isCurrent && (
-          <div
-            className="absolute inset-0 rounded-full animate-ping-slow"
-            style={{ border: `2px solid ${tierColor}`, margin: -4 }}
-          />
-        )}
-
-        {/* Crown */}
-        {isCompleted && (
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-            <Crown
-              size={isMastered ? 18 : 14}
-              className={isMastered ? 'text-amber-400' : 'text-green-400'}
-              fill="currentColor"
-              strokeWidth={0}
-            />
-          </div>
-        )}
-
+      {/* Card body */}
+      <div
+        className={`
+          relative rounded-xl overflow-hidden
+          border backdrop-blur-md
+          ${isCurrent
+            ? 'border-white/20 bg-white/[0.08]'
+            : isCompleted
+              ? 'border-emerald-500/30 bg-emerald-500/[0.06]'
+              : isLocked
+                ? 'border-white/[0.04] bg-white/[0.02]'
+                : 'border-white/[0.08] bg-white/[0.04] hover:border-white/15 hover:bg-white/[0.06]'
+          }
+        `}
+      >
+        {/* Top gradient accent bar */}
         <div
-          className="w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center relative transition-all"
+          className="h-1 w-full"
           style={{
-            border: `3px solid ${isLocked ? '#374151' : isCompleted ? '#22C55E' : isCurrent ? tierColor : '#4B5563'}`,
-            background: isLocked ? '#111827' : isCompleted ? '#14532D' : isCurrent ? `${tierColor}18` : '#1F2937',
-            boxShadow: isCurrent
-              ? `0 0 20px ${tierColor}30`
+            background: isLocked
+              ? '#1F2937'
               : isCompleted
-                ? '0 0 12px rgba(34,197,94,0.15)'
-                : 'none',
+                ? 'linear-gradient(90deg, #22C55E, #10B981)'
+                : `linear-gradient(90deg, ${g1}, ${g2})`,
+            opacity: isLocked ? 0.3 : 1,
           }}
-        >
-          {/* Progress arc */}
-          {isInProgress && levelsCompleted > 0 && (
-            <svg className="absolute inset-0" viewBox="0 0 64 64">
-              <circle
-                cx="32" cy="32" r="28"
-                fill="none"
-                stroke={tierColor}
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeDasharray={`${(levelsCompleted / 4) * 175.9} 175.9`}
-                transform="rotate(-90 32 32)"
-                opacity={0.5}
-              />
-            </svg>
-          )}
+        />
 
-          {/* Completed badge */}
-          {isCompleted && (
-            <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-green-500 flex items-center justify-center border-2 border-[#0B0F1A] z-10">
-              <CheckCircle2 size={11} className="text-white" strokeWidth={3} />
+        <div className="p-3 sm:p-3.5">
+          {/* Icon + status */}
+          <div className="flex items-start justify-between mb-2">
+            <div
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center"
+              style={{
+                background: isLocked
+                  ? 'rgba(255,255,255,0.03)'
+                  : isCompleted
+                    ? 'rgba(34,197,94,0.12)'
+                    : `linear-gradient(135deg, ${g1}18, ${g2}12)`,
+                border: `1px solid ${isLocked ? 'rgba(255,255,255,0.04)' : isCompleted ? 'rgba(34,197,94,0.2)' : `${g1}25`}`,
+              }}
+            >
+              {isLocked ? (
+                <Lock size={16} className="text-gray-600" />
+              ) : (
+                <Icon
+                  size={18}
+                  style={{ color: isCompleted ? '#22C55E' : g1 }}
+                  strokeWidth={1.8}
+                />
+              )}
+            </div>
+
+            {/* Status indicator */}
+            {isCompleted && (
+              <div className="flex items-center gap-0.5">
+                <CheckCircle2 size={14} className={isMastered ? 'text-amber-400' : 'text-emerald-400'} />
+              </div>
+            )}
+            {isCurrent && (
+              <div className="flex items-center">
+                <Play size={12} fill={g1} style={{ color: g1 }} />
+              </div>
+            )}
+          </div>
+
+          {/* Title */}
+          <h4 className={`text-[11px] sm:text-xs font-semibold leading-tight mb-1.5 line-clamp-2 ${
+            isLocked ? 'text-gray-600' : isCompleted ? 'text-emerald-200' : 'text-gray-100'
+          }`}>
+            {node.title}
+          </h4>
+
+          {/* Progress + stats */}
+          {!isLocked && (
+            <div className="space-y-1.5">
+              {/* Level progress bar */}
+              <div className="h-1 rounded-full bg-white/[0.06] overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{
+                    width: `${(levelsCompleted / 4) * 100}%`,
+                    background: isCompleted
+                      ? 'linear-gradient(90deg, #22C55E, #10B981)'
+                      : `linear-gradient(90deg, ${g1}, ${g2})`,
+                  }}
+                />
+              </div>
+
+              {/* Stats row */}
+              <div className="flex items-center justify-between">
+                <span className="text-[9px] text-gray-500 font-mono">{levelsCompleted}/4</span>
+                {totalQ > 0 && (
+                  <span className="text-[9px] text-gray-500">{totalQ}Q</span>
+                )}
+              </div>
             </div>
           )}
-
-          <span className="text-xl sm:text-2xl" style={{ filter: isLocked ? 'grayscale(1) brightness(0.3)' : 'none' }}>
-            {isLocked ? <Lock size={20} className="text-gray-600" /> : icon}
-          </span>
         </div>
       </div>
-
-      {/* Title */}
-      <span className={`text-[10px] sm:text-xs font-semibold leading-tight text-center line-clamp-2 ${
-        isLocked ? 'text-gray-700' : isCurrent ? 'text-white' : isCompleted ? 'text-green-300' : 'text-gray-300'
-      }`}>
-        {node.title}
-      </span>
-
-      {/* Stats */}
-      {!isLocked && (
-        <div className="flex items-center gap-1">
-          <div className="flex gap-0.5">
-            {[0, 1, 2, 3].map(lvl => (
-              <div
-                key={lvl}
-                className="w-2 h-1 rounded-full"
-                style={{
-                  background: (np?.levelsCompleted ?? []).includes(lvl + 1)
-                    ? isCompleted ? '#22C55E' : tierColor
-                    : 'rgba(255,255,255,0.08)',
-                }}
-              />
-            ))}
-          </div>
-          {totalQ > 0 && (
-            <span className="text-[8px] text-gray-500 ml-0.5">{totalQ}Q</span>
-          )}
-        </div>
-      )}
-
-      {/* START pill for current */}
-      {isCurrent && (
-        <div
-          className="flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide mt-0.5"
-          style={{ background: tierColor, color: '#000' }}
-        >
-          <Play size={10} fill="currentColor" />
-          {isInProgress ? 'Continue' : 'Start'}
-        </div>
-      )}
     </button>
+  );
+}
+
+/* ─── Column Header ─── */
+
+function ColumnHeader({ tier, nodes, progress, gradient }: {
+  tier: number;
+  nodes: typeof ALL_NODES;
+  progress: UserProgress;
+  gradient: [string, string];
+}) {
+  const completedCount = nodes.filter(n => {
+    const s = computeNodeStatus(n.id, n.prerequisites, progress);
+    return s === 'completed' || s === 'mastered';
+  }).length;
+  const pct = Math.round((completedCount / nodes.length) * 100);
+  const [g1, g2] = gradient;
+
+  return (
+    <div className="w-full px-2 pb-3 pt-2">
+      {/* Gradient banner */}
+      <div
+        className="rounded-lg px-3 py-2.5 sm:py-3 text-center relative overflow-hidden"
+        style={{
+          background: `linear-gradient(135deg, ${g1}20, ${g2}10)`,
+          border: `1px solid ${g1}20`,
+        }}
+      >
+        {/* Subtle shine */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            background: `radial-gradient(ellipse at 30% 0%, white, transparent 70%)`,
+          }}
+        />
+
+        <h3 className="text-xs sm:text-sm font-bold relative" style={{ color: g1 }}>
+          {TIER_LABELS[tier]}
+        </h3>
+
+        {/* Segmented progress bar */}
+        <div className="flex items-center justify-center gap-1 mt-2">
+          {nodes.map((_, i) => (
+            <div
+              key={i}
+              className="h-1 rounded-full flex-1 max-w-[16px] transition-all duration-500"
+              style={{
+                background: i < completedCount
+                  ? `linear-gradient(90deg, ${g1}, ${g2})`
+                  : 'rgba(255,255,255,0.06)',
+              }}
+            />
+          ))}
+        </div>
+        <span className="text-[9px] text-gray-500 mt-1.5 block font-mono">{pct}%</span>
+      </div>
+    </div>
   );
 }
 
@@ -218,32 +313,31 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
   const tiers = useMemo(() => getNodesByTier(), []);
   const currentNodeId = useMemo(() => findCurrentNode(progress), [progress]);
 
-  // Node position map for SVG connections (populated after render)
+  // SVG connections
   const [nodeRects, setNodeRects] = useState<Record<string, DOMRect>>({});
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Measure node positions for connection lines
   useEffect(() => {
-    if (!containerRef.current) return;
-    const rects: Record<string, DOMRect> = {};
-    const containerRect = containerRef.current.getBoundingClientRect();
-    containerRef.current.querySelectorAll('[data-node]').forEach(el => {
-      const nodeId = el.getAttribute('data-node');
-      if (nodeId) {
-        const r = el.getBoundingClientRect();
-        // Store relative to container
-        rects[nodeId] = new DOMRect(
-          r.x - containerRect.x,
-          r.y - containerRect.y,
-          r.width,
-          r.height,
-        );
-      }
-    });
-    setNodeRects(rects);
+    const measure = () => {
+      if (!containerRef.current) return;
+      const rects: Record<string, DOMRect> = {};
+      const cRect = containerRef.current.getBoundingClientRect();
+      containerRef.current.querySelectorAll('[data-node]').forEach(el => {
+        const nodeId = el.getAttribute('data-node');
+        if (nodeId) {
+          const r = el.getBoundingClientRect();
+          rects[nodeId] = new DOMRect(r.x - cRect.x, r.y - cRect.y, r.width, r.height);
+        }
+      });
+      setNodeRects(rects);
+    };
+    measure();
+    // Re-measure after animations settle
+    const t = setTimeout(measure, 500);
+    return () => clearTimeout(t);
   }, [progress]);
 
-  // Auto-scroll to current node column
+  // Auto-scroll to current node
   useEffect(() => {
     if (!currentNodeId || !scrollRef.current) return;
     const el = scrollRef.current.querySelector(`[data-node="${currentNodeId}"]`);
@@ -253,145 +347,163 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
         const nodeEl = el as HTMLElement;
         const scrollTarget = nodeEl.offsetLeft - container.clientWidth / 2 + nodeEl.clientWidth / 2;
         container.scrollTo({ left: Math.max(0, scrollTarget), behavior: 'smooth' });
-      }, 200);
+      }, 300);
     }
   }, [currentNodeId]);
 
-  // Compute all connections
   const connections = useMemo(() => {
-    const conns: { from: string; to: string; fromTier: number }[] = [];
-    for (const node of ALL_NODES) {
-      for (const preId of node.prerequisites) {
-        const preNode = ALL_NODES.find(n => n.id === preId);
-        if (preNode) {
-          conns.push({ from: preId, to: node.id, fromTier: preNode.tier });
-        }
-      }
-    }
-    return conns;
+    return ALL_NODES.flatMap(node =>
+      node.prerequisites.map(preId => ({
+        from: preId,
+        to: node.id,
+        fromTier: ALL_NODES.find(n => n.id === preId)?.tier ?? 0,
+      }))
+    );
   }, []);
 
   return (
     <div
       ref={scrollRef}
       className="w-full h-full overflow-x-auto overflow-y-auto"
-      style={{ background: '#0B0F1A' }}
     >
       <style>{`
-        @keyframes ping-slow {
-          0% { transform: scale(1); opacity: 0.3; }
-          50% { transform: scale(1.2); opacity: 0; }
-          100% { transform: scale(1); opacity: 0.3; }
+        @keyframes glow-pulse {
+          0%, 100% { opacity: 0.4; }
+          50% { opacity: 0.7; }
         }
-        .animate-ping-slow { animation: ping-slow 2s ease-in-out infinite; }
+        @keyframes flow {
+          to { stroke-dashoffset: -20; }
+        }
       `}</style>
 
-      <div ref={containerRef} className="relative inline-flex min-w-full min-h-full p-4 sm:p-6 gap-1 sm:gap-2">
-        {/* SVG overlay for connection lines */}
-        {Object.keys(nodeRects).length > 0 && (
-          <svg className="absolute inset-0 pointer-events-none" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
-            {connections.map(({ from, to, fromTier }) => {
-              const fromRect = nodeRects[from];
-              const toRect = nodeRects[to];
-              if (!fromRect || !toRect) return null;
+      {/* Rich background */}
+      <div
+        className="min-w-full min-h-full relative"
+        style={{
+          background: `
+            radial-gradient(ellipse 80% 60% at 20% 20%, rgba(99,102,241,0.06), transparent),
+            radial-gradient(ellipse 60% 40% at 80% 70%, rgba(14,165,233,0.04), transparent),
+            linear-gradient(180deg, #08090F 0%, #0C0E18 50%, #08090F 100%)
+          `,
+        }}
+      >
+        {/* Subtle dot grid */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.03]"
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.8) 0.5px, transparent 0.5px)',
+            backgroundSize: '24px 24px',
+          }}
+        />
 
-              const fromStatus = computeNodeStatus(from, ALL_NODES.find(n => n.id === from)?.prerequisites ?? [], progress);
-              const isActive = fromStatus === 'completed' || fromStatus === 'mastered';
-              const color = isActive ? TIER_COLORS[fromTier] ?? '#4B5563' : '#1E293B';
+        <div ref={containerRef} className="relative inline-flex min-w-full p-4 sm:p-6 gap-2 sm:gap-3">
+          {/* SVG connections */}
+          {Object.keys(nodeRects).length > 0 && (
+            <svg className="absolute inset-0 pointer-events-none" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
+              <defs>
+                {TIER_GRADIENTS.map(([c1, c2], i) => (
+                  <linearGradient key={i} id={`conn-grad-${i}`} x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor={c1} stopOpacity={0.4} />
+                    <stop offset="100%" stopColor={c2} stopOpacity={0.4} />
+                  </linearGradient>
+                ))}
+              </defs>
+              {connections.map(({ from, to, fromTier }) => {
+                const fR = nodeRects[from];
+                const tR = nodeRects[to];
+                if (!fR || !tR) return null;
 
-              // Connect from right-center of source to left-center of target
-              const x1 = fromRect.x + fromRect.width / 2 + 30;
-              const y1 = fromRect.y + 42;
-              const x2 = toRect.x + toRect.width / 2 - 30;
-              const y2 = toRect.y + 42;
-              const mx = (x1 + x2) / 2;
+                const fromStatus = computeNodeStatus(from, ALL_NODES.find(n => n.id === from)?.prerequisites ?? [], progress);
+                const isActive = fromStatus === 'completed' || fromStatus === 'mastered';
+
+                const x1 = fR.x + fR.width - 4;
+                const y1 = fR.y + fR.height / 2;
+                const x2 = tR.x + 4;
+                const y2 = tR.y + tR.height / 2;
+                const mx = (x1 + x2) / 2;
+
+                return (
+                  <g key={`${from}-${to}`}>
+                    <path
+                      d={`M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`}
+                      fill="none"
+                      stroke={isActive ? `url(#conn-grad-${fromTier})` : 'rgba(255,255,255,0.04)'}
+                      strokeWidth={isActive ? 2 : 1}
+                      strokeDasharray={isActive ? 'none' : '3 5'}
+                      style={!isActive ? { animation: 'flow 2s linear infinite' } : undefined}
+                    />
+                    {/* Glow for active lines */}
+                    {isActive && (
+                      <path
+                        d={`M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`}
+                        fill="none"
+                        stroke={TIER_GRADIENTS[fromTier]?.[0] ?? '#6366F1'}
+                        strokeWidth={4}
+                        opacity={0.08}
+                        filter="blur(4px)"
+                      />
+                    )}
+                  </g>
+                );
+              })}
+            </svg>
+          )}
+
+          {/* Columns */}
+          {Object.entries(tiers)
+            .sort(([a], [b]) => Number(a) - Number(b))
+            .map(([tierStr, nodes]) => {
+              const tier = Number(tierStr);
+              const gradient = TIER_GRADIENTS[tier] as [string, string];
+              const hasCurrentNode = nodes.some(n => n.id === currentNodeId);
 
               return (
-                <g key={`${from}-${to}`}>
-                  <path
-                    d={`M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`}
-                    fill="none"
-                    stroke={color}
-                    strokeWidth={isActive ? 2.5 : 1.5}
-                    strokeDasharray={isActive ? 'none' : '4 4'}
-                    opacity={isActive ? 0.5 : 0.2}
+                <div
+                  key={tier}
+                  className="flex flex-col items-center shrink-0 relative"
+                  style={{ minWidth: '146px' }}
+                >
+                  {/* Active column spotlight */}
+                  {hasCurrentNode && (
+                    <div
+                      className="absolute inset-0 rounded-2xl pointer-events-none"
+                      style={{
+                        background: `radial-gradient(ellipse 100% 50% at 50% 30%, ${gradient[0]}08, transparent)`,
+                      }}
+                    />
+                  )}
+
+                  <ColumnHeader
+                    tier={tier}
+                    nodes={nodes}
+                    progress={progress}
+                    gradient={gradient}
                   />
-                </g>
-              );
-            })}
-          </svg>
-        )}
 
-        {/* Columns */}
-        {Object.entries(tiers)
-          .sort(([a], [b]) => Number(a) - Number(b))
-          .map(([tierStr, nodes]) => {
-            const tier = Number(tierStr);
-            const color = TIER_COLORS[tier] ?? '#9CA3AF';
-            const hasCurrentNode = nodes.some(n => n.id === currentNodeId);
+                  {/* Node cards */}
+                  <div className="flex flex-col items-center gap-2.5 sm:gap-3 px-1.5">
+                    {nodes.map((node, i) => {
+                      const status = computeNodeStatus(node.id, node.prerequisites, progress);
+                      const isCurrent = node.id === currentNodeId;
 
-            const completedCount = nodes.filter(n => {
-              const s = computeNodeStatus(n.id, n.prerequisites, progress);
-              return s === 'completed' || s === 'mastered';
-            }).length;
-            const pct = Math.round((completedCount / nodes.length) * 100);
-
-            return (
-              <div
-                key={tier}
-                className={`
-                  flex flex-col items-center shrink-0 relative
-                  rounded-2xl border transition-all duration-300
-                  ${hasCurrentNode
-                    ? 'border-white/10 bg-white/[0.03]'
-                    : 'border-transparent bg-transparent'
-                  }
-                `}
-                style={{
-                  minWidth: nodes.length > 6 ? '140px' : '120px',
-                  width: 'fit-content',
-                }}
-              >
-                {/* Column header */}
-                <div className="sticky top-0 z-10 w-full pt-3 pb-2 px-2 text-center backdrop-blur-sm" style={{
-                  background: hasCurrentNode ? `linear-gradient(180deg, ${color}08, transparent)` : undefined,
-                }}>
-                  <h3 className="text-xs sm:text-sm font-bold" style={{ color }}>{TIER_LABELS[tier]}</h3>
-                  <div className="flex items-center justify-center gap-2 mt-1">
-                    <div className="w-10 h-1 rounded-full bg-gray-800 overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-700"
-                        style={{ width: `${pct}%`, background: color }}
-                      />
-                    </div>
-                    <span className="text-[9px] text-gray-500 font-mono">{completedCount}/{nodes.length}</span>
+                      return (
+                        <NodeCard
+                          key={node.id}
+                          node={node}
+                          status={status}
+                          progress={progress}
+                          isCurrent={isCurrent}
+                          tierGrad={gradient}
+                          onSelect={() => onSelectNode(node.id)}
+                          delay={i * 50}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
-
-                {/* Nodes */}
-                <div className="flex flex-col items-center gap-2 sm:gap-3 px-2 pb-4">
-                  {nodes.map(node => {
-                    const status = computeNodeStatus(node.id, node.prerequisites, progress);
-                    const icon = NODE_ICONS[node.id] ?? '📐';
-                    const isCurrent = node.id === currentNodeId;
-
-                    return (
-                      <ColumnNode
-                        key={node.id}
-                        node={node}
-                        status={status}
-                        progress={progress}
-                        isCurrent={isCurrent}
-                        icon={icon}
-                        tierColor={color}
-                        onSelect={() => onSelectNode(node.id)}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+        </div>
       </div>
     </div>
   );

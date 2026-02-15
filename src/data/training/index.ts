@@ -30,6 +30,11 @@ import normalDist from './normal-dist';
 import continuousPdf from './continuous-pdf';
 import confidenceInt from './confidence-int';
 import sampleProp from './sample-prop';
+import y9Number from './y9-number';
+import y10Number from './y10-number';
+import y10Statistics from './y10-statistics';
+import y10aProbability from './y10a-probability';
+import pseudocode from './pseudocode';
 
 // Old node ID training data (unchanged)
 const oldTraining: Record<string, TrainingQuestion[]> = {
@@ -62,6 +67,11 @@ const oldTraining: Record<string, TrainingQuestion[]> = {
   'continuous-pdf': continuousPdf,
   'confidence-int': confidenceInt,
   'sample-prop': sampleProp,
+  'y9-number': y9Number,
+  'y10-number': y10Number,
+  'y10-statistics': y10Statistics,
+  'y10a-probability': y10aProbability,
+  'pseudocode': pseudocode,
 };
 
 /**
@@ -75,18 +85,18 @@ const NODE_TO_TRAINING: Record<string, string[]> = {
   'y8-statistics': ['graphing-basics'],
   'y8-probability': ['basic-prob'],
   // Year 9
-  'y9-number': [],
+  'y9-number': ['y9-number'],
   'y9-algebra': ['polynomial-fn', 'simult-eq'],
   'y9-statistics': ['graphing-basics'],
   'y9-probability': ['basic-prob'],
   // Year 10
-  'y10-number': [],
+  'y10-number': ['y10-number'],
   'y10-algebra': ['exponential-fn', 'domain-range'],
-  'y10-statistics': [],
+  'y10-statistics': ['y10-statistics'],
   'y10-probability': ['cond-prob'],
   // Year 10A
   'y10a-algebra': ['composite-fn', 'inverse-fn', 'logarithmic-fn'],
-  'y10a-probability': [],
+  'y10a-probability': ['y10a-probability'],
   // Year 11 (A1-A9)
   'y11-a1-linear': ['basic-algebra', 'simult-eq'],
   'y11-a2-quadratics': ['polynomial-fn'],
@@ -103,7 +113,7 @@ const NODE_TO_TRAINING: Record<string, string[]> = {
   'y12-a3-integration': ['anti-diff', 'definite-int', 'area-curves'],
   'y12-a4-discrete-prob': ['binomial-dist', 'cond-prob'],
   'y12-a5-continuous-prob': ['continuous-pdf', 'normal-dist', 'confidence-int', 'sample-prop'],
-  'y12-a6-pseudocode': [],
+  'y12-a6-pseudocode': ['pseudocode'],
   // VCE Exam — no training, exam questions only
   'vce-exam1': [],
   'vce-exam2': [],
