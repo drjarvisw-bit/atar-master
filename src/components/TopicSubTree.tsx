@@ -15,12 +15,13 @@ interface Props {
   onStartLevel: (nodeId: string, level: number) => void;
 }
 
-const LEVEL_NAMES = ['Warm-up', 'Foundation', 'Developing', 'Proficient', 'Exam Challenge'];
+const LEVEL_NAMES = ['Year 8', 'Year 9', 'Year 10', 'Year 11', 'Year 12', 'VCE Exam'];
 const LEVEL_DESCRIPTIONS = [
-  'Basic concept check — get started!',
-  'Build core understanding',
-  'Apply knowledge to standard problems',
-  'Tackle complex multi-step problems',
+  'Foundation skills — where it all begins',
+  'Building on the basics',
+  'Pre-Methods preparation',
+  'Methods Unit 1 & 2 level',
+  'Methods Unit 3 & 4 level',
   'Real VCE exam questions — prove your mastery!',
 ];
 
@@ -38,14 +39,14 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
 
   if (!node) return null;
 
-  // Levels 1-4: training MC questions, Level 5: real exam questions
+  // Levels 1-5: training MC (Year 8-12), Level 6: real VCE exam questions
   const levels: LevelData[] = useMemo(() => {
-    return [1, 2, 3, 4, 5].map(level => {
-      if (level === 5) {
+    return [1, 2, 3, 4, 5, 6].map(level => {
+      if (level === 6) {
         return { training: [], examCount: examQuestions.length, isExamLevel: true };
       }
       return {
-        training: getTrainingByLevel(nodeId, level as 1 | 2 | 3 | 4),
+        training: getTrainingByLevel(nodeId, level as 1 | 2 | 3 | 4 | 5),
         examCount: 0,
         isExamLevel: false,
       };
@@ -77,8 +78,8 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
           <p className="text-sm text-gray-400 mt-0.5">{node.description}</p>
         </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-white">{np.score}%</div>
-          <div className="text-xs text-gray-500">{totalQuestions} questions</div>
+          <div className="text-2xl font-bold text-white">{np.levelsCompleted.length > 0 ? LEVEL_NAMES[Math.max(...np.levelsCompleted) - 1] : '—'}</div>
+          <div className="text-xs text-gray-500">current level</div>
         </div>
       </div>
 
@@ -90,7 +91,6 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
           const isUnlocked = levelNum === 1 || np.levelsCompleted.includes(levelNum - 1);
           const isLocked = !isUnlocked;
           const qCount = levelData.isExamLevel ? levelData.examCount : levelData.training.length;
-          const stars = levelNum;
 
           return (
             <div
@@ -125,8 +125,12 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
                       <h3 className={`font-semibold ${isLocked ? 'text-gray-600' : 'text-white'}`}>
                         Level {levelNum}: {LEVEL_NAMES[i]}
                       </h3>
-                      <span className="text-yellow-400 text-sm">
-                        {'⭐'.repeat(stars)}
+                      <span className={`px-1.5 py-0.5 text-[10px] font-bold rounded-full ${
+                        levelData.isExamLevel
+                          ? 'bg-orange-500/20 text-orange-400'
+                          : 'bg-gray-700 text-gray-400'
+                      }`}>
+                        {LEVEL_NAMES[i]}
                       </span>
                       {levelData.isExamLevel && !isLocked && (
                         <span className="px-1.5 py-0.5 text-[10px] font-bold bg-orange-500/20 text-orange-400 rounded-full">

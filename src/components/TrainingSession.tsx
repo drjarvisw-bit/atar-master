@@ -15,8 +15,8 @@ type Phase = 'quiz' | 'summary';
 
 export default function TrainingSession({ nodeId, level, onComplete, onBack }: Props) {
   const questions = useMemo(() => {
-    if (level === 5) {
-      // Real exam questions for level 5
+    if (level === 6) {
+      // Real exam questions for level 6 (VCE Exam)
       return getQuestionsForNode(nodeId).map(mq => ({
         id: mq.question.id,
         text: mq.question.text,
