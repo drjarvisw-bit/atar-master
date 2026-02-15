@@ -3,9 +3,8 @@ import { Home, GitBranch, FileText, Dumbbell, BarChart3, DollarSign, LogIn, LogO
 import { useState, useRef, useEffect, lazy, Suspense } from 'react';
 import { AuthContext, useAuth, useAuthProvider } from './hooks/useAuth';
 import AuthGuard from './components/AuthGuard';
+import { ADMIN_EMAILS } from './lib/constants';
 import './index.css';
-
-const ADMIN_EMAILS = ['wangmengjames@gmail.com', 'drjarvisw@gmail.com'];
 
 // Lazy-loaded pages for code splitting
 const LandingPage = lazy(() => import('./pages/LandingPage'));

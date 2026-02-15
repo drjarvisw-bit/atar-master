@@ -38,7 +38,8 @@ export function useAuthProvider(): AuthContextType {
         .eq('status', 'active')
         .maybeSingle()
       setIsPro(!!data)
-    } catch {
+    } catch (error) {
+      console.error('Failed to check user subscription status:', error);
       setIsPro(false)
     }
   }, [])
