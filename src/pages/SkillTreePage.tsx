@@ -7,6 +7,8 @@ import MiniMap from '../components/MiniMap';
 import SkillNodePanel from '../components/SkillNodePanel';
 import TopicSubTree from '../components/TopicSubTree';
 import TrainingSession from '../components/TrainingSession';
+import YearLevelSelector, { getStoredYearLevel } from '../components/YearLevelSelector';
+import OnboardingTutorial, { isOnboardingComplete, OnboardingHelpButton, resetOnboarding } from '../components/OnboardingTutorial';
 import { loadProgress, saveProgress, xpForLevel, computeNodeStatus, type UserProgress } from '../lib/progress';
 
 type View = 'tree' | 'subtree' | 'session';
@@ -19,6 +21,10 @@ export default function SkillTreePage() {
   const [sessionLevel, setSessionLevel] = useState<number>(0);
   const [viewport, setViewport] = useState({ x: 0, y: 0, w: 1000, h: 600, scale: 1 });
   const treeContainerRef = useRef<HTMLDivElement>(null);
+
+  // Onboarding flow state
+  const [showYearSelector, setShowYearSelector] = useState(() => getStoredYearLevel() === null);
+  const [showOnboarding, setShowOnboarding] = useState(() => getStoredYearLevel() !== null && !isOnboardingComplete());
 
   // Persist
   useEffect(() => { saveProgress(progress); }, [progress]);
@@ -111,8 +117,44 @@ export default function SkillTreePage() {
     }
   }, []);
 
+  // Year level selection: unlock all nodes up to that tier
+  const handleYearLevelComplete = useCallback((_yearLevel: number, unlockedNodeIds: string[]) => {
+    setProgress(prev => {
+      const updated = { ...prev.nodes };
+      for (const id of unlockedNodeIds) {
+        if (!updated[id]) {
+          updated[id] = { status: 'unlocked', levelsCompleted: [], score: 0 };
+        } else if (updated[id].status === 'locked') {
+          updated[id] = { ...updated[id], status: 'unlocked' };
+        }
+      }
+      return { ...prev, nodes: updated };
+    });
+    setShowYearSelector(false);
+    setShowOnboarding(true);
+  }, []);
+
+  const handleOnboardingComplete = useCallback(() => {
+    setShowOnboarding(false);
+  }, []);
+
+  const handleReplayTutorial = useCallback(() => {
+    resetOnboarding();
+    setShowOnboarding(true);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col">
+      {/* Year Level Selector overlay */}
+      {showYearSelector && (
+        <YearLevelSelector onComplete={handleYearLevelComplete} />
+      )}
+
+      {/* Onboarding Tutorial overlay */}
+      {showOnboarding && !showYearSelector && (
+        <OnboardingTutorial onComplete={handleOnboardingComplete} />
+      )}
+
       {/* XP Header Bar */}
       <div className="border-b border-gray-800 bg-gray-900/95 backdrop-blur-sm px-4 sm:px-6 py-3 flex-shrink-0">
         <div className="flex items-center justify-between">
@@ -157,6 +199,9 @@ export default function SkillTreePage() {
             <div className="h-4 w-px bg-gray-700" />
 
             <span className="text-xs text-gray-500 font-mono">{totalQuestions} questions</span>
+
+            {/* Help button to replay tutorial */}
+            <OnboardingHelpButton onClick={handleReplayTutorial} />
 
             <button
               onClick={handleReset}
