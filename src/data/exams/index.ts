@@ -1,5 +1,7 @@
 import type { ExamPaper } from '../../types';
 
+import { MM_2016_EXAM1 } from './mm_2016_exam1';
+import { MM_2016_EXAM2 } from './mm_2016_exam2';
 import { MM_2017_EXAM1 } from './mm_2017_exam1';
 import { MM_2017_EXAM2 } from './mm_2017_exam2';
 import { MM_2019_EXAM1 } from './mm_2019_exam1';
@@ -18,6 +20,8 @@ import { MM_2025_EXAM1 } from './mm_2025_exam1';
 import { MM_2025_EXAM2 } from './mm_2025_exam2';
 
 const ALL_EXAMS: ExamPaper[] = [
+  MM_2016_EXAM1,
+  MM_2016_EXAM2,
   MM_2017_EXAM1,
   MM_2017_EXAM2,
   MM_2019_EXAM1,
@@ -45,6 +49,8 @@ export function getExamById(id: string): ExamPaper | undefined {
 }
 
 export {
+  MM_2016_EXAM1,
+  MM_2016_EXAM2,
   MM_2017_EXAM1,
   MM_2017_EXAM2,
   MM_2019_EXAM1,
