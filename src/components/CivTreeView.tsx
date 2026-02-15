@@ -312,6 +312,14 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
   const tiers = useMemo(() => getNodesByTier(), []);
   const currentNodeId = useMemo(() => findCurrentNode(progress), [progress]);
 
+  // Mobile detection for responsive dual-col
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 640 : false);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 640);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
   // SVG connections
   const [nodeRects, setNodeRects] = useState<Record<string, DOMRect>>({});
   const containerRef = useRef<HTMLDivElement>(null);
@@ -334,7 +342,7 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
     // Re-measure after animations settle
     const t = setTimeout(measure, 500);
     return () => clearTimeout(t);
-  }, [progress]);
+  }, [progress, isMobile]);
 
   // Auto-scroll to current node
   useEffect(() => {
@@ -415,16 +423,39 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
                 const fromStatus = computeNodeStatus(from, ALL_NODES.find(n => n.id === from)?.prerequisites ?? [], progress);
                 const isActive = fromStatus === 'completed' || fromStatus === 'mastered';
 
-                const x1 = fR.x + fR.width - 4;
-                const y1 = fR.y + fR.height / 2;
-                const x2 = tR.x + 4;
-                const y2 = tR.y + tR.height / 2;
-                const mx = (x1 + x2) / 2;
+                // Smart anchor selection: if target is to the right, use right→left;
+                // if target is below (dual-col same tier area), use bottom→top
+                const fCx = fR.x + fR.width / 2;
+                const fCy = fR.y + fR.height / 2;
+                const tCx = tR.x + tR.width / 2;
+                const tCy = tR.y + tR.height / 2;
+                const dx = tCx - fCx;
+                const dy = tCy - fCy;
+
+                let x1: number, y1: number, x2: number, y2: number, pathD: string;
+
+                if (Math.abs(dx) > fR.width * 0.6) {
+                  // Horizontal flow: exit right, enter left
+                  x1 = fR.x + fR.width - 4;
+                  y1 = fCy;
+                  x2 = tR.x + 4;
+                  y2 = tCy;
+                  const mx = (x1 + x2) / 2;
+                  pathD = `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`;
+                } else {
+                  // Vertical flow (dual-col, nodes stacked): exit bottom, enter top
+                  x1 = fCx;
+                  y1 = dy > 0 ? fR.y + fR.height : fR.y;
+                  x2 = tCx;
+                  y2 = dy > 0 ? tR.y : tR.y + tR.height;
+                  const my = (y1 + y2) / 2;
+                  pathD = `M ${x1} ${y1} C ${x1} ${my}, ${x2} ${my}, ${x2} ${y2}`;
+                }
 
                 return (
                   <g key={`${from}-${to}`}>
                     <path
-                      d={`M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`}
+                      d={pathD}
                       fill="none"
                       stroke={isActive ? `url(#conn-grad-${fromTier})` : 'rgba(255,255,255,0.04)'}
                       strokeWidth={isActive ? 2 : 1}
@@ -434,7 +465,7 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
                     {/* Glow for active lines */}
                     {isActive && (
                       <path
-                        d={`M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`}
+                        d={pathD}
                         fill="none"
                         stroke={TIER_GRADIENTS[fromTier]?.[0] ?? '#6366F1'}
                         strokeWidth={4}
@@ -456,7 +487,7 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
               const gradient = TIER_GRADIENTS[tier] as [string, string];
               const hasCurrentNode = nodes.some(n => n.id === currentNodeId);
               // Tiers with many nodes → two-column layout for widescreen
-              const useDualCol = tier >= 2 && tier <= 4 && nodes.length > 4;
+              const useDualCol = !isMobile && tier >= 2 && tier <= 4 && nodes.length > 4;
 
               if (useDualCol) {
                 const mid = Math.ceil(nodes.length / 2);
