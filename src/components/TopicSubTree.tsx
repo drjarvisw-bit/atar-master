@@ -6,7 +6,7 @@ import { getTrainingByDifficulty, type TrainingQuestion } from '../data/training
 import { SKILL_TOPIC_COLORS, type Topic } from '../types';
 import type { UserProgress } from '../lib/progress';
 import { getNodeProgress } from '../lib/progress';
-import MathText from './MathText';
+// MathText no longer needed — question previews removed
 import { formatEstimatedTime } from '../lib/utils';
 
 interface Props {
@@ -162,61 +162,7 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
                 )}
               </div>
 
-              {/* Training question preview */}
-              {!isLocked && !levelData.isExamLevel && levelData.training.length > 0 && (
-                <div className="px-4 pb-4 flex gap-2 overflow-x-auto">
-                  {levelData.training.slice(0, 6).map((tq, qi) => (
-                    <div
-                      key={qi}
-                      className={`flex-shrink-0 w-48 p-3 rounded-lg border text-xs ${
-                        isCompleted
-                          ? 'bg-green-900/20 border-green-800/30 text-green-300'
-                          : 'bg-gray-900 border-gray-700 text-gray-400'
-                      }`}
-                    >
-                      <div className="font-mono text-[10px] text-gray-500 mb-1">
-                        {tq.marks} marks
-                      </div>
-                      <div className="line-clamp-2">
-                        <MathText text={tq.text.slice(0, 80) + (tq.text.length > 80 ? '…' : '')} />
-                      </div>
-                    </div>
-                  ))}
-                  {levelData.training.length > 6 && (
-                    <div className="flex-shrink-0 w-24 p-3 rounded-lg border border-gray-700 bg-gray-900 flex items-center justify-center text-xs text-gray-500">
-                      +{levelData.training.length - 6} more
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Exam question preview */}
-              {!isLocked && levelData.isExamLevel && examQuestions.length > 0 && (
-                <div className="px-4 pb-4 flex gap-2 overflow-x-auto">
-                  {examQuestions.slice(0, 6).map((mq, qi) => (
-                    <div
-                      key={qi}
-                      className={`flex-shrink-0 w-48 p-3 rounded-lg border text-xs ${
-                        isCompleted
-                          ? 'bg-green-900/20 border-green-800/30 text-green-300'
-                          : 'bg-gray-900 border-orange-800/30 text-gray-400'
-                      }`}
-                    >
-                      <div className="font-mono text-[10px] text-orange-500/70 mb-1">
-                        {mq.examTitle} • {mq.question.marks}mk
-                      </div>
-                      <div className="line-clamp-2">
-                        {mq.question.text.slice(0, 80)}…
-                      </div>
-                    </div>
-                  ))}
-                  {examQuestions.length > 6 && (
-                    <div className="flex-shrink-0 w-24 p-3 rounded-lg border border-orange-800/30 bg-gray-900 flex items-center justify-center text-xs text-orange-500/50">
-                      +{examQuestions.length - 6} more
-                    </div>
-                  )}
-                </div>
-              )}
+              {/* Question previews removed — students go straight to practice */}
             </div>
           );
         })}
