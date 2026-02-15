@@ -23,9 +23,11 @@ function useCountUp(end: number, duration = 1800) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) start(); }, { threshold: 0.3 });
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) start(); }, { threshold: 0.1 });
     io.observe(el);
-    return () => io.disconnect();
+    // Also trigger after a short delay as fallback
+    const t = setTimeout(start, 1500);
+    return () => { io.disconnect(); clearTimeout(t); };
   }, [start]);
 
   return { ref, value };
@@ -34,22 +36,19 @@ function useCountUp(end: number, duration = 1800) {
 /* ───────────── fade-in on scroll ───────────── */
 function useFadeIn() {
   const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(32px)';
-    el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
     const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) {
-        el.style.opacity = '1';
-        el.style.transform = 'translateY(0)';
-      }
-    }, { threshold: 0.15 });
+      if (e.isIntersecting) setVisible(true);
+    }, { threshold: 0.1 });
     io.observe(el);
-    return () => io.disconnect();
+    // Fallback: show after 2s regardless
+    const t = setTimeout(() => setVisible(true), 2000);
+    return () => { io.disconnect(); clearTimeout(t); };
   }, []);
-  return ref;
+  return { ref, visible };
 }
 
 /* ───────────── stat item ───────────── */
@@ -67,9 +66,9 @@ function StatItem({ end, suffix, label }: { end: number; suffix: string; label: 
 
 /* ═══════════════════════════════════════════════ */
 export default function LandingPage() {
-  const featuresRef = useFadeIn();
-  const stepsRef = useFadeIn();
-  const pricingRef = useFadeIn();
+  const features = useFadeIn();
+  const steps = useFadeIn();
+  const pricing = useFadeIn();
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white overflow-hidden">
@@ -139,7 +138,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── Features ─── */}
-      <section ref={featuresRef} className="mx-auto max-w-6xl px-6 py-28">
+      <section ref={features.ref} className={`mx-auto max-w-6xl px-6 py-28 transition-all duration-700 ${features.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">Everything you need</h2>
           <p className="text-gray-400 max-w-xl mx-auto">Powerful tools designed to take you from confused to confident.</p>
@@ -164,7 +163,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── How It Works ─── */}
-      <section ref={stepsRef} className="border-y border-white/5 bg-white/[0.01]">
+      <section ref={steps.ref} className={`border-y border-white/5 bg-white/[0.01] transition-all duration-700 ${steps.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="mx-auto max-w-5xl px-6 py-28">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">How it works</h2>
@@ -189,7 +188,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── Pricing ─── */}
-      <section ref={pricingRef} className="mx-auto max-w-4xl px-6 py-28">
+      <section ref={pricing.ref} className={`mx-auto max-w-4xl px-6 py-28 transition-all duration-700 ${pricing.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">Simple pricing</h2>
           <p className="text-gray-400">Start free. Upgrade when you're ready.</p>
