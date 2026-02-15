@@ -4,7 +4,6 @@ import { getStreakData, type StreakInfo } from '../lib/streak';
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 function getWeekDayLabels(): string[] {
-  const today = new Date().getDay(); // 0=Sun
   const labels: string[] = [];
   for (let i = 6; i >= 0; i--) {
     const d = new Date();

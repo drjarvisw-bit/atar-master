@@ -3,7 +3,7 @@ import {
   Hash, Sigma, BarChart2, Dice5, TrendingUp,
   PieChart, Calculator, Triangle, Waves, Mountain,
   Bell, Binary, PenTool, Monitor,
-  Lock, Play, CheckCircle2, Sparkles, Link2,
+  Lock, CheckCircle2, Sparkles, Link2,
   FunctionSquare, Braces, LineChart, GitBranch,
   type LucideIcon,
 } from 'lucide-react';
@@ -77,33 +77,12 @@ function getNodesByTier() {
   return tiers;
 }
 
-function findCurrentNode(progress: UserProgress): string | null {
-  // Prefer in-progress nodes (user already started)
-  for (const node of ALL_NODES) {
-    const status = computeNodeStatus(node.id, node.prerequisites, progress);
-    if (status === 'in-progress') return node.id;
-  }
-  // If no in-progress, find the first unlocked node that hasn't been completed
-  // but SKIP tier 0 if there are higher-tier unlocked nodes
-  const unlocked = ALL_NODES.filter(n => {
-    const s = computeNodeStatus(n.id, n.prerequisites, progress);
-    return s === 'unlocked';
-  });
-  // Prefer highest tier unlocked node (most advanced frontier)
-  if (unlocked.length > 0) {
-    const maxTier = Math.max(...unlocked.map(n => n.tier));
-    return unlocked.find(n => n.tier === maxTier)?.id ?? unlocked[0].id;
-  }
-  return null;
-}
-
 /* ─── Node Card ─── */
 
 function NodeCard({
   node,
   status,
   progress,
-  isCurrent,
   tierGrad,
   onSelect,
   delay,
@@ -111,7 +90,6 @@ function NodeCard({
   node: typeof ALL_NODES[0];
   status: string;
   progress: UserProgress;
-  isCurrent: boolean;
   tierGrad: [string, string];
   onSelect: () => void;
   delay: number;
@@ -302,12 +280,11 @@ function ColumnHeader({ tier, nodes, progress, gradient }: {
 
 /* ═══════════════════════════════════════════════ */
 
-export default function CivTreeView({ progress, onSelectNode, selectedNodeId: externalSelectedId }: Props & { selectedNodeId?: string | null }) {
+export default function CivTreeView({ progress, onSelectNode,  }: Props & { selectedNodeId?: string | null }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const tiers = useMemo(() => getNodesByTier(), []);
-  const progressCurrentId = useMemo(() => findCurrentNode(progress), [progress]);
   // If user clicked a node, highlight that one; otherwise fall back to progress-based current
-  const currentNodeId = externalSelectedId ?? progressCurrentId;
+  // currentNodeId removed — no single highlighted node
 
   // Mobile detection for responsive dual-col
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 640 : false);
@@ -359,8 +336,6 @@ export default function CivTreeView({ progress, onSelectNode, selectedNodeId: ex
       className="w-full h-full overflow-x-auto overflow-y-auto"
     >
       <style>{`
-        @keyframes glow-pulse {
-          0%, 100% { opacity: 0.4; }
           50% { opacity: 0.7; }
         }
         @keyframes flow {
@@ -470,7 +445,6 @@ export default function CivTreeView({ progress, onSelectNode, selectedNodeId: ex
             .map(([tierStr, nodes]) => {
               const tier = Number(tierStr);
               const gradient = TIER_GRADIENTS[tier] as [string, string];
-              const hasCurrentNode = nodes.some(n => n.id === currentNodeId);
               // Tiers with many nodes → two-column layout for widescreen
               const useDualCol = !isMobile && tier >= 2 && tier <= 4 && nodes.length > 4;
 
@@ -507,14 +481,13 @@ export default function CivTreeView({ progress, onSelectNode, selectedNodeId: ex
                       <div className="flex flex-col items-center gap-2.5 sm:gap-3">
                         {colA.map((node, i) => {
                           const status = computeNodeStatus(node.id, node.prerequisites, progress);
-                          const isCurrent = node.id === currentNodeId;
                           return (
                             <NodeCard
                               key={node.id}
                               node={node}
                               status={status}
                               progress={progress}
-                              isCurrent={isCurrent}
+                              
                               tierGrad={gradient}
                               onSelect={() => onSelectNode(node.id)}
                               delay={i * 50}
@@ -526,14 +499,13 @@ export default function CivTreeView({ progress, onSelectNode, selectedNodeId: ex
                       <div className="flex flex-col items-center gap-2.5 sm:gap-3">
                         {colB.map((node, i) => {
                           const status = computeNodeStatus(node.id, node.prerequisites, progress);
-                          const isCurrent = node.id === currentNodeId;
                           return (
                             <NodeCard
                               key={node.id}
                               node={node}
                               status={status}
                               progress={progress}
-                              isCurrent={isCurrent}
+                              
                               tierGrad={gradient}
                               onSelect={() => onSelectNode(node.id)}
                               delay={(i + colA.length) * 50}
@@ -573,7 +545,6 @@ export default function CivTreeView({ progress, onSelectNode, selectedNodeId: ex
                   <div className="flex flex-col items-center gap-2.5 sm:gap-3 px-1.5">
                     {nodes.map((node, i) => {
                       const status = computeNodeStatus(node.id, node.prerequisites, progress);
-                      const isCurrent = node.id === currentNodeId;
 
                       return (
                         <NodeCard
@@ -581,7 +552,7 @@ export default function CivTreeView({ progress, onSelectNode, selectedNodeId: ex
                           node={node}
                           status={status}
                           progress={progress}
-                          isCurrent={isCurrent}
+                          
                           tierGrad={gradient}
                           onSelect={() => onSelectNode(node.id)}
                           delay={i * 50}

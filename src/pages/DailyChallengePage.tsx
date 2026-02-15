@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { ArrowLeft, ArrowRight, Check, X, Trophy, Clock, Zap, Flame, Lightbulb, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowRight, Check, X, Trophy, Clock, Zap, Flame, Lightbulb, ChevronDown, ChevronUp } from 'lucide-react';
 import {
   getDailyChallenge,
   getDailyChallengeState,
@@ -52,7 +52,6 @@ export default function DailyChallengePage() {
 
   const current = questions[currentIdx] as TrainingQuestion | undefined;
   const total = questions.length;
-  const correctCount = Object.values(results).filter(Boolean).length;
 
   const todayStr = new Date().toLocaleDateString('en-AU', {
     timeZone: 'Australia/Melbourne',
@@ -208,7 +207,6 @@ export default function DailyChallengePage() {
   // ── Quiz View ──
   const isCorrect = results[currentIdx];
   const correctOption = current.options?.find(o => o.correct);
-  const progressPct = ((currentIdx + (isAnswered ? 1 : 0)) / total) * 100;
   const levelLabels = ['L1 · Easy', 'L2 · Basic', 'L3 · Medium', 'L4 · Hard', 'L5 · Expert'];
 
   return (

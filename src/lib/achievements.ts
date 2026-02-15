@@ -2,8 +2,8 @@
  * Achievement / badge system for ATAR Master.
  */
 
-import { loadProgress, type UserProgress } from './progress';
-import { getStreak, type StreakData } from './streak';
+import { type UserProgress } from './progress';
+import { type StreakData } from './streak';
 
 export interface Achievement {
   id: string;

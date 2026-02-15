@@ -48,7 +48,7 @@ function flattenExam(exam: ExamPaper): FlatQuestion[] {
     result.push({ question: enrichedQuestion, examId: exam.id, year: exam.year, examTitle: exam.title });
     if (q.subQuestions) q.subQuestions.forEach(sq => walk(sq, q.text));
   };
-  exam.questions.forEach(walk);
+  exam.questions.forEach(q => walk(q));
   return result;
 }
 
