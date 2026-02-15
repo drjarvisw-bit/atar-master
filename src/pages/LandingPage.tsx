@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, X as XIcon, Target, FileText, BarChart3, Download, UserPlus, BookOpen, TrendingUp, ChevronDown, GraduationCap, Sparkles, Award } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 /* ───────────── optimized mouse tracker hook ───────────── */
 function useMousePosition() {
@@ -282,6 +283,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 
 /* ═══════════════════════════════════════════════ */
 export default function LandingPage() {
+  const { user } = useAuth();
   const features = useFadeIn();
   const steps = useFadeIn();
   const pricing = useFadeIn();
@@ -332,19 +334,36 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-            <Link
-              to="/skill-tree"
-              className="group relative w-full sm:w-auto px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-lg transition-all hover:shadow-[0_0_40px_rgba(59,130,246,0.4)]"
-            >
-              Start Practicing Now →
-            </Link>
-            <Link
-              to="/skill-tree"
-              className="w-full sm:w-auto px-8 py-4 rounded-2xl border border-white/15 hover:border-white/30 text-gray-300 hover:text-white font-medium text-lg transition-all backdrop-blur-sm text-center"
-            >
-              View Skill Tree
-            </Link>
+            {user ? (
+              <Link
+                to="/skill-tree"
+                className="group relative w-full sm:w-auto px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-lg transition-all hover:shadow-[0_0_40px_rgba(59,130,246,0.4)]"
+              >
+                Continue Learning →
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/skill-tree"
+                  className="group relative w-full sm:w-auto px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-lg transition-all hover:shadow-[0_0_40px_rgba(59,130,246,0.4)]"
+                >
+                  Start Practicing Now →
+                </Link>
+                <Link
+                  to="/skill-tree"
+                  className="w-full sm:w-auto px-8 py-4 rounded-2xl border border-white/15 hover:border-white/30 text-gray-300 hover:text-white font-medium text-lg transition-all backdrop-blur-sm text-center"
+                >
+                  View Skill Tree
+                </Link>
+              </>
+            )}
           </div>
+
+          {user && (
+            <p className="mt-6 text-sm text-gray-400">
+              Welcome back, {user.email}! 🎉
+            </p>
+          )}
         </div>
       </section>
 

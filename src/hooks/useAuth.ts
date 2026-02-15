@@ -70,6 +70,14 @@ export function useAuthProvider(): AuthContextType {
       if (u && (_event === 'SIGNED_IN' || _event === 'TOKEN_REFRESHED')) {
         try { await syncFromCloud(u.id) } catch (e) { console.error('[auth] cloud sync failed:', e) }
       }
+
+      // Redirect to skill-tree after sign-in if on landing or pricing page
+      if (_event === 'SIGNED_IN' && u) {
+        const path = window.location.pathname
+        if (path === '/' || path === '/pricing') {
+          window.location.href = '/skill-tree'
+        }
+      }
     })
 
     return () => subscription.unsubscribe()
@@ -100,7 +108,7 @@ export function useAuthProvider(): AuthContextType {
   const signInWithGoogle = useCallback(async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: 'https://atarmaster.com/dashboard' },
+      options: { redirectTo: 'https://atarmaster.com/skill-tree' },
     })
     return { error }
   }, [])
