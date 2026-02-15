@@ -214,7 +214,7 @@ const Y10A_PROBABILITY: SkillTreeNode = {
 
 const Y11_A1: SkillTreeNode = {
   id: 'y11-a1-linear',
-  title: 'A1: Linear Graphs & Algebra',
+  title: 'Linear Graphs & Algebra',
   description: 'Linear equations, simultaneous equations, linear graphs, gradient, intercepts, distance, midpoint.',
   prerequisites: ['y10-algebra'],
   topic: Topic.FUNCTIONS,
@@ -227,7 +227,7 @@ const Y11_A1: SkillTreeNode = {
 
 const Y11_A2: SkillTreeNode = {
   id: 'y11-a2-quadratics',
-  title: 'A2: Quadratics, Cubics & Quartics',
+  title: 'Quadratics, Cubics & Quartics',
   description: 'Quadratic/cubic/quartic functions, factoring, graphs, turning points, discriminant.',
   prerequisites: ['y10-algebra'],
   topic: Topic.FUNCTIONS,
@@ -244,7 +244,7 @@ const Y11_A2: SkillTreeNode = {
 
 const Y11_A3: SkillTreeNode = {
   id: 'y11-a3-domain-range',
-  title: 'A3: Domain, Range & Functions',
+  title: 'Domain, Range & Functions',
   description: 'Domain & range, function notation, composite functions, inverse functions, piecewise functions.',
   prerequisites: ['y10-algebra', 'y10a-algebra'],
   topic: Topic.FUNCTIONS,
@@ -265,7 +265,7 @@ const Y11_A3: SkillTreeNode = {
 
 const Y11_A4: SkillTreeNode = {
   id: 'y11-a4-transformations',
-  title: 'A4: Functions & Transformations',
+  title: 'Functions & Transformations',
   description: 'Dilations, reflections, translations of graphs. Transformations of y=f(x).',
   prerequisites: ['y10-algebra'],
   topic: Topic.FUNCTIONS,
@@ -278,7 +278,7 @@ const Y11_A4: SkillTreeNode = {
 
 const Y11_A5: SkillTreeNode = {
   id: 'y11-a5-trigonometry',
-  title: 'A5: Trigonometry',
+  title: 'Trigonometry',
   description: 'Circular functions (sin, cos, tan), unit circle, graphs, amplitude, period, phase shift, trig equations & identities.',
   prerequisites: ['y10-algebra', 'y10a-algebra'],
   topic: Topic.FUNCTIONS,
@@ -294,7 +294,7 @@ const Y11_A5: SkillTreeNode = {
 
 const Y11_A6: SkillTreeNode = {
   id: 'y11-a6-logs-indices',
-  title: 'A6: Logarithms & Indices',
+  title: 'Logarithms & Indices',
   description: 'Index laws, logarithm laws, exponential & logarithmic equations, exponential/log graphs.',
   prerequisites: ['y10-algebra', 'y10a-algebra'],
   topic: Topic.FUNCTIONS,
@@ -311,7 +311,7 @@ const Y11_A6: SkillTreeNode = {
 
 const Y11_A7: SkillTreeNode = {
   id: 'y11-a7-differentiation',
-  title: 'A7: Differentiation',
+  title: 'Differentiation',
   description: 'Limits, first principles, power rule, derivative graphs, rates of change, tangent lines intro.',
   prerequisites: ['y10-algebra'],
   topic: Topic.CALCULUS,
@@ -332,7 +332,7 @@ const Y11_A7: SkillTreeNode = {
 
 const Y11_A8: SkillTreeNode = {
   id: 'y11-a8-integration',
-  title: 'A8: Integration',
+  title: 'Integration',
   description: 'Anti-differentiation, basic integration rules, introduction to definite integrals.',
   prerequisites: ['y10-algebra'],
   topic: Topic.CALCULUS,
@@ -345,7 +345,7 @@ const Y11_A8: SkillTreeNode = {
 
 const Y11_A9: SkillTreeNode = {
   id: 'y11-a9-combinatorics',
-  title: 'A9: Combinatorics & Probability',
+  title: 'Combinatorics & Probability',
   description: 'Counting principles, permutations, combinations, probability rules, discrete random variables, expected value.',
   prerequisites: ['y10-probability', 'y10a-probability'],
   topic: Topic.PROBABILITY,
@@ -360,7 +360,7 @@ const Y11_A9: SkillTreeNode = {
 
 const Y12_A1: SkillTreeNode = {
   id: 'y12-a1-algebra-functions',
-  title: 'A1: Algebra & Functions',
+  title: 'Algebra & Functions',
   description: 'Advanced functions (exponential, log, circular), transformations, modelling, polynomial division, solving equations.',
   prerequisites: ['y11-a2-quadratics', 'y11-a3-domain-range', 'y11-a5-trigonometry', 'y11-a6-logs-indices'],
   topic: Topic.FUNCTIONS,
@@ -385,7 +385,7 @@ const Y12_A1: SkillTreeNode = {
 
 const Y12_A2: SkillTreeNode = {
   id: 'y12-a2-differentiation',
-  title: 'A2: Differentiation',
+  title: 'Differentiation',
   description: 'Chain/product/quotient rules, tangent lines, stationary points, curve sketching, optimization, related rates.',
   prerequisites: ['y11-a7-differentiation'],
   topic: Topic.CALCULUS,
@@ -412,7 +412,7 @@ const Y12_A2: SkillTreeNode = {
 
 const Y12_A3: SkillTreeNode = {
   id: 'y12-a3-integration',
-  title: 'A3: Integration',
+  title: 'Integration',
   description: 'Anti-differentiation rules, definite integrals, fundamental theorem, area under/between curves.',
   prerequisites: ['y11-a8-integration'],
   topic: Topic.CALCULUS,
@@ -433,7 +433,7 @@ const Y12_A3: SkillTreeNode = {
 
 const Y12_A4: SkillTreeNode = {
   id: 'y12-a4-discrete-prob',
-  title: 'A4: Discrete Probability',
+  title: 'Discrete Probability',
   description: 'Discrete random variables, binomial distribution, expected value, variance, probability rules.',
   prerequisites: ['y11-a9-combinatorics'],
   topic: Topic.PROBABILITY,
@@ -450,7 +450,7 @@ const Y12_A4: SkillTreeNode = {
 
 const Y12_A5: SkillTreeNode = {
   id: 'y12-a5-continuous-prob',
-  title: 'A5: Continuous Prob & Stats',
+  title: 'Continuous Prob & Stats',
   description: 'Continuous random variables, PDF/CDF, normal distribution, confidence intervals, sample proportions, statistical inference.',
   prerequisites: ['y11-a9-combinatorics'],
   topic: Topic.PROBABILITY,
@@ -469,7 +469,7 @@ const Y12_A5: SkillTreeNode = {
 
 const Y12_A6: SkillTreeNode = {
   id: 'y12-a6-pseudocode',
-  title: 'A6: Pseudocode',
+  title: 'Pseudocode',
   description: 'Algorithmic thinking, pseudocode interpretation, loops, conditionals, numerical methods.',
   prerequisites: ['y11-a1-linear'],
   topic: Topic.FUNCTIONS,
