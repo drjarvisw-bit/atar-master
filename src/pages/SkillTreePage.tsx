@@ -145,39 +145,41 @@ export default function SkillTreePage() {
       )}
 
       {/* XP Header Bar */}
-      <div className="border-b border-gray-800 bg-gray-900/95 backdrop-blur-sm px-4 sm:px-6 py-3 flex-shrink-0">
+      <div className="border-b border-gray-800 bg-gray-900/95 backdrop-blur-sm px-3 sm:px-6 py-2.5 sm:py-3 flex-shrink-0">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {/* Level badge */}
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center border-2 border-blue-500">
-                <span className="text-white font-bold text-sm">{progress.level}</span>
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center border-2 border-blue-500">
+                <span className="text-white font-bold text-xs sm:text-sm">{progress.level}</span>
               </div>
               <div>
-                <div className="text-xs text-gray-400 font-mono">LEVEL {progress.level}</div>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <Zap size={12} className="text-yellow-400" />
-                  <div className="w-24 h-1.5 rounded-full bg-gray-800 overflow-hidden">
+                <div className="text-[10px] sm:text-xs text-gray-400 font-mono">LVL {progress.level}</div>
+                <div className="flex items-center gap-1 sm:gap-1.5 mt-0.5">
+                  <Zap size={10} className="text-yellow-400 sm:hidden" />
+                  <Zap size={12} className="text-yellow-400 hidden sm:block" />
+                  <div className="w-16 sm:w-24 h-1.5 rounded-full bg-gray-800 overflow-hidden">
                     <div
                       className="h-full rounded-full bg-gradient-to-r from-yellow-500 to-yellow-300 transition-all duration-700"
                       style={{ width: `${xpPct}%` }}
                     />
                   </div>
-                  <span className="text-[10px] text-gray-500 font-mono">{progress.totalXP}/{xpNeeded} XP</span>
+                  <span className="text-[9px] sm:text-[10px] text-gray-500 font-mono">{progress.totalXP}/{xpNeeded}</span>
                 </div>
               </div>
             </div>
 
             {/* Streak */}
             {progress.streak > 0 && (
-              <div className="flex items-center gap-1 px-2 py-1 bg-orange-900/30 rounded-lg border border-orange-800/30">
-                <Flame size={14} className="text-orange-400" />
-                <span className="text-xs text-orange-300 font-bold">{progress.streak}</span>
+              <div className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-orange-900/30 rounded-lg border border-orange-800/30">
+                <Flame size={12} className="text-orange-400 sm:hidden" />
+                <Flame size={14} className="text-orange-400 hidden sm:block" />
+                <span className="text-[10px] sm:text-xs text-orange-300 font-bold">{progress.streak}</span>
               </div>
             )}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Overall progress */}
             <div className="hidden sm:flex items-center gap-2">
               <Trophy size={14} className="text-green-400" />
@@ -185,16 +187,21 @@ export default function SkillTreePage() {
               <span className="text-xs text-gray-500">({overallPct}%)</span>
             </div>
 
-            <div className="h-4 w-px bg-gray-700" />
+            {/* Mobile compact progress */}
+            <div className="sm:hidden flex items-center gap-1">
+              <Trophy size={12} className="text-green-400" />
+              <span className="text-[10px] text-gray-400 font-mono">{overallPct}%</span>
+            </div>
 
-            <span className="text-xs text-gray-500 font-mono">{totalQuestions} questions</span>
+            <div className="h-4 w-px bg-gray-700 hidden sm:block" />
 
-            {/* Help button to replay tutorial */}
+            <span className="text-[10px] sm:text-xs text-gray-500 font-mono hidden sm:inline">{totalQuestions} Q</span>
+
             <OnboardingHelpButton onClick={handleReplayTutorial} />
 
             <button
               onClick={handleReset}
-              className="flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:text-red-400 font-mono rounded border border-gray-800 hover:border-red-800/50 transition-colors"
+              className="flex items-center gap-1 px-1.5 sm:px-2 py-1 text-xs text-gray-500 hover:text-red-400 font-mono rounded border border-gray-800 hover:border-red-800/50 transition-colors"
               title="Reset progress"
             >
               <RotateCcw size={12} />

@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect } from 'react';
+import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import { ALL_NODES } from '../data/skillTreeData';
 import { SKILL_TOPIC_COLORS, type Topic } from '../types';
 import type { UserProgress } from '../lib/progress';
@@ -17,55 +17,23 @@ export interface CivTreeViewRef {
 const TIER_LABELS = ['Year 8', 'Year 9', 'Year 10 / 10A', 'Year 11 (U1&2)', 'Year 12 (U3&4)', 'VCE Exam'];
 const TIER_COLORS = ['#6366F1', '#8B5CF6', '#A855F7', '#3B82F6', '#0EA5E9', '#F59E0B'];
 
-// Per-node unique icons for visual variety
 const NODE_ICONS: Record<string, string> = {
-  // Year 8
-  'y8-number': '🔢',
-  'y8-algebra': '✖️',
-  'y8-statistics': '📊',
-  'y8-probability': '🎲',
-  // Year 9
-  'y9-number': '🔬',
-  'y9-algebra': '📈',
-  'y9-statistics': '📉',
-  'y9-probability': '🎯',
-  // Year 10
-  'y10-number': '💰',
-  'y10-algebra': '📐',
-  'y10-statistics': '🔍',
-  'y10-probability': '🧩',
-  // Year 10A
-  'y10a-algebra': '🔗',
-  'y10a-probability': '🎰',
-  // Year 11
-  'y11-a1-linear': '📏',
-  'y11-a2-quadratics': '〰️',
-  'y11-a3-domain-range': '🎯',
-  'y11-a4-transformations': '🔄',
-  'y11-a5-trigonometry': '📐',
-  'y11-a6-logs-indices': '📊',
-  'y11-a7-differentiation': '📉',
-  'y11-a8-integration': '∫',
-  'y11-a9-combinatorics': '🎲',
-  // Year 12
-  'y12-a1-algebra-functions': '⚡',
-  'y12-a2-differentiation': '🏔️',
-  'y12-a3-integration': '🌊',
-  'y12-a4-discrete-prob': '🎰',
-  'y12-a5-continuous-prob': '🔔',
-  'y12-a6-pseudocode': '💻',
-  // VCE
-  'vce-exam1': '✏️',
-  'vce-exam2': '🖥️',
+  'y8-number': '🔢', 'y8-algebra': '✖️', 'y8-statistics': '📊', 'y8-probability': '🎲',
+  'y9-number': '🔬', 'y9-algebra': '📈', 'y9-statistics': '📉', 'y9-probability': '🎯',
+  'y10-number': '💰', 'y10-algebra': '📐', 'y10-statistics': '🔍', 'y10-probability': '🧩',
+  'y10a-algebra': '🔗', 'y10a-probability': '🎰',
+  'y11-a1-linear': '📏', 'y11-a2-quadratics': '〰️', 'y11-a3-domain-range': '🗺️',
+  'y11-a4-transformations': '🔄', 'y11-a5-trigonometry': '📐', 'y11-a6-logs-indices': '📊',
+  'y11-a7-differentiation': '📉', 'y11-a8-integration': '∫', 'y11-a9-combinatorics': '🎲',
+  'y12-a1-algebra-functions': '⚡', 'y12-a2-differentiation': '🏔️', 'y12-a3-integration': '🌊',
+  'y12-a4-discrete-prob': '🎰', 'y12-a5-continuous-prob': '🔔', 'y12-a6-pseudocode': '💻',
+  'vce-exam1': '✏️', 'vce-exam2': '🖥️',
 };
 
 const TOPIC_ICONS: Record<string, string> = {
-  FUNCTIONS: '📐',
-  CALCULUS: '∫',
-  PROBABILITY: '🎲',
+  FUNCTIONS: '📐', CALCULUS: '∫', PROBABILITY: '🎲',
 };
 
-// Organize nodes by tier for vertical layout
 function getNodesByTier() {
   const tiers: Record<number, typeof ALL_NODES> = {};
   ALL_NODES.forEach(n => {
@@ -75,73 +43,42 @@ function getNodesByTier() {
   return tiers;
 }
 
-// Duolingo-style winding path layout
-function computePathLayout() {
+interface LayoutResult {
+  positions: Record<string, { x: number; y: number; tier: number }>;
+  totalHeight: number;
+  totalWidth: number;
+}
+
+function computePathLayout(isMobile: boolean): LayoutResult {
   const tiers = getNodesByTier();
   const positions: Record<string, { x: number; y: number; tier: number }> = {};
-  
-  const V_SPACING = 130;
-  const TIER_GAP = 80;
-  const CENTER_X = 400;
-  const SWING = 140; // How far nodes swing left/right from center
-  
+
+  const V_SPACING = isMobile ? 110 : 130;
+  const TIER_GAP = isMobile ? 60 : 80;
+  const CENTER_X = isMobile ? 180 : 400;
+  const SWING = isMobile ? 80 : 140;
+
   let currentY = 80;
   let globalNodeIdx = 0;
-  
+
   Object.entries(tiers).forEach(([tierStr, nodes]) => {
     const tier = Number(tierStr);
-    
-    // Add tier label space
     currentY += TIER_GAP;
-    
-    // Winding path: each node snakes along a sine-wave-like path
+
     nodes.forEach((node) => {
-      // Create a winding S-curve effect
       const phase = globalNodeIdx * 0.8;
       const xOffset = Math.sin(phase) * SWING;
-      
-      positions[node.id] = {
-        x: CENTER_X + xOffset,
-        y: currentY,
-        tier,
-      };
-      
+      positions[node.id] = { x: CENTER_X + xOffset, y: currentY, tier };
       currentY += V_SPACING;
       globalNodeIdx++;
     });
-    
-    currentY += 30; // Extra gap between tiers
+
+    currentY += 30;
   });
-  
-  return { positions, totalHeight: currentY + 100, totalWidth: 800 };
+
+  return { positions, totalHeight: currentY + 100, totalWidth: isMobile ? 360 : 800 };
 }
 
-const { positions: nodePositions, totalHeight, totalWidth } = computePathLayout();
-
-// Tier label Y positions
-function getTierLabelPositions() {
-  const tiers = getNodesByTier();
-  const labels: { label: string; y: number; color: string }[] = [];
-  
-  Object.entries(tiers).forEach(([tierStr]) => {
-    const tier = Number(tierStr);
-    const tierNodes = ALL_NODES.filter(n => n.tier === tier);
-    if (tierNodes.length === 0) return;
-    
-    const minY = Math.min(...tierNodes.map(n => nodePositions[n.id]?.y ?? 0));
-    labels.push({
-      label: TIER_LABELS[tier] ?? `Tier ${tier}`,
-      y: minY - 45,
-      color: TIER_COLORS[tier] ?? '#6B7280',
-    });
-  });
-  
-  return labels;
-}
-
-const tierLabels = getTierLabelPositions();
-
-// Find first available node for auto-scroll
 function findCurrentNode(progress: UserProgress): string | null {
   for (const node of ALL_NODES) {
     const status = computeNodeStatus(node.id, node.prerequisites, progress);
@@ -153,8 +90,47 @@ function findCurrentNode(progress: UserProgress): string | null {
 export default function CivTreeView({ progress, onSelectNode }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
-  
-  // Auto-scroll to current node on mount
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 640);
+
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 640);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+
+  const layout = useMemo(() => computePathLayout(isMobile), [isMobile]);
+  const { positions: nodePositions, totalHeight, totalWidth } = layout;
+  const nodeSize = isMobile ? 64 : 80;
+
+  const tierLabels = useMemo(() => {
+    const labels: { label: string; y: number; color: string }[] = [];
+    const tiers = getNodesByTier();
+    Object.entries(tiers).forEach(([tierStr]) => {
+      const tier = Number(tierStr);
+      const tierNodes = ALL_NODES.filter(n => n.tier === tier);
+      if (tierNodes.length === 0) return;
+      const minY = Math.min(...tierNodes.map(n => nodePositions[n.id]?.y ?? 0));
+      labels.push({
+        label: TIER_LABELS[tier] ?? `Tier ${tier}`,
+        y: minY - 45,
+        color: TIER_COLORS[tier] ?? '#6B7280',
+      });
+    });
+    return labels;
+  }, [nodePositions]);
+
+  // Tier background sections
+  const tierSections = useMemo(() => {
+    const tiers = getNodesByTier();
+    return Object.entries(tiers).map(([tierStr]) => {
+      const tier = Number(tierStr);
+      const tierNodes = ALL_NODES.filter(n => n.tier === tier);
+      const ys = tierNodes.map(n => nodePositions[n.id]?.y ?? 0);
+      return { tier, startY: Math.min(...ys) - 80, endY: Math.max(...ys) + 80 };
+    });
+  }, [nodePositions]);
+
+  // Auto-scroll to current node
   useEffect(() => {
     const currentId = findCurrentNode(progress);
     if (currentId && nodePositions[currentId] && scrollRef.current) {
@@ -165,7 +141,7 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
         behavior: 'smooth',
       });
     }
-  }, []);
+  }, [isMobile, nodePositions, progress]);
 
   const getStatus = useCallback((node: typeof ALL_NODES[0]) => {
     return computeNodeStatus(node.id, node.prerequisites, progress);
@@ -180,32 +156,11 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
   }, [progress]);
 
   return (
-    <div 
+    <div
       ref={scrollRef}
       className="w-full h-full overflow-y-auto overflow-x-hidden scroll-smooth"
-      style={{ 
-        background: 'linear-gradient(180deg, #0F172A 0%, #1E1B4B 50%, #0F172A 100%)',
-      }}
+      style={{ background: '#0B0F1A' }}
     >
-      {/* Animated background particles */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full opacity-10"
-            style={{
-              width: `${Math.random() * 4 + 2}px`,
-              height: `${Math.random() * 4 + 2}px`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              background: '#3B82F6',
-              animation: `float ${8 + Math.random() * 12}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 5}s`,
-            }}
-          />
-        ))}
-      </div>
-
       <style>{`
         @keyframes float {
           0%, 100% { transform: translateY(0) translateX(0); }
@@ -228,50 +183,116 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
           from { transform: scale(0.8); opacity: 0; }
           to { transform: scale(1); opacity: 1; }
         }
+        @keyframes bounceHover {
+          0%, 100% { transform: scale(1.08) translateY(0); }
+          50% { transform: scale(1.08) translateY(-4px); }
+        }
+        @keyframes beacon {
+          0% { transform: scale(1); opacity: 0.5; }
+          100% { transform: scale(2.5); opacity: 0; }
+        }
+        @keyframes arrowBounce {
+          0%, 100% { transform: translateY(0); opacity: 1; }
+          50% { transform: translateY(-6px); opacity: 0.7; }
+        }
         .node-enter { animation: nodeAppear 0.3s ease-out both; }
+        .node-bounce:hover { animation: bounceHover 0.4s ease-in-out; }
         .progress-ring { transition: stroke-dasharray 0.8s ease-out; }
       `}</style>
 
       <div className="relative mx-auto" style={{ width: totalWidth, minHeight: totalHeight }}>
-        {/* SVG for connections */}
-        <svg 
-          className="absolute inset-0 pointer-events-none" 
-          width={totalWidth} 
+        {/* Tier background gradients */}
+        {tierSections.map(({ tier, startY, endY }) => {
+          const colors = [
+            'rgba(99,102,241,0.08)', // Year 8 - indigo
+            'rgba(139,92,246,0.07)', // Year 9 - purple
+            'rgba(168,85,247,0.06)', // Year 10 - violet
+            'rgba(59,130,246,0.08)', // Year 11 - blue
+            'rgba(14,165,233,0.07)', // Year 12 - cyan
+            'rgba(245,158,11,0.08)', // VCE - amber
+          ];
+          return (
+            <div
+              key={`tier-bg-${tier}`}
+              className="absolute left-0 right-0 pointer-events-none"
+              style={{
+                top: startY,
+                height: endY - startY,
+                background: `linear-gradient(180deg, transparent, ${colors[tier] ?? 'transparent'} 30%, ${colors[tier] ?? 'transparent'} 70%, transparent)`,
+              }}
+            />
+          );
+        })}
+
+        {/* Floating particles */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {[...Array(12)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute rounded-full"
+              style={{
+                width: `${Math.random() * 3 + 1}px`,
+                height: `${Math.random() * 3 + 1}px`,
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                background: TIER_COLORS[Math.floor(Math.random() * TIER_COLORS.length)],
+                opacity: 0.12,
+                animation: `float ${8 + Math.random() * 12}s ease-in-out infinite`,
+                animationDelay: `${Math.random() * 5}s`,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* SVG connections */}
+        <svg
+          className="absolute inset-0 pointer-events-none"
+          width={totalWidth}
           height={totalHeight}
           style={{ zIndex: 0 }}
         >
+          <defs>
+            {TIER_COLORS.map((color, i) => (
+              <linearGradient key={`grad-${i}`} id={`tierGrad-${i}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={color} stopOpacity={0.6} />
+                <stop offset="100%" stopColor={TIER_COLORS[Math.min(i + 1, TIER_COLORS.length - 1)]} stopOpacity={0.6} />
+              </linearGradient>
+            ))}
+          </defs>
           {ALL_NODES.map(node =>
             node.prerequisites.map(preId => {
               const from = nodePositions[preId];
               const to = nodePositions[node.id];
               if (!from || !to) return null;
-              
-              const fromStatus = computeNodeStatus(preId, ALL_NODES.find(n => n.id === preId)?.prerequisites ?? [], progress);
+
+              const preNode = ALL_NODES.find(n => n.id === preId);
+              const fromStatus = computeNodeStatus(preId, preNode?.prerequisites ?? [], progress);
               const isActive = fromStatus === 'completed' || fromStatus === 'mastered';
-              
-              // Curved path for visual interest
-              const midY = (from.y + to.y) / 2;
+              const fromTier = from.tier;
+
+              const halfNode = nodeSize / 2 - 4;
+              const midY = (from.y + halfNode + to.y - halfNode) / 2;
               const dx = to.x - from.x;
               const controlOffset = Math.abs(dx) < 10 ? 40 : 0;
-              
+
               return (
                 <g key={`${preId}-${node.id}`}>
                   <path
-                    d={`M ${from.x} ${from.y + 36} C ${from.x + controlOffset} ${midY}, ${to.x - controlOffset} ${midY}, ${to.x} ${to.y - 36}`}
+                    d={`M ${from.x} ${from.y + halfNode} C ${from.x + controlOffset} ${midY}, ${to.x - controlOffset} ${midY}, ${to.x} ${to.y - halfNode}`}
                     fill="none"
-                    stroke={isActive ? '#3B82F6' : '#334155'}
+                    stroke={isActive ? `url(#tierGrad-${fromTier})` : '#1E293B'}
                     strokeWidth={isActive ? 3 : 2}
                     strokeDasharray={isActive ? 'none' : '8 6'}
-                    opacity={isActive ? 0.8 : 0.5}
+                    opacity={isActive ? 0.9 : 0.35}
                     style={isActive ? {} : { animation: 'dashFlow 1.5s linear infinite' }}
                   />
                   {isActive && (
                     <path
-                      d={`M ${from.x} ${from.y + 36} C ${from.x + controlOffset} ${midY}, ${to.x - controlOffset} ${midY}, ${to.x} ${to.y - 36}`}
+                      d={`M ${from.x} ${from.y + halfNode} C ${from.x + controlOffset} ${midY}, ${to.x - controlOffset} ${midY}, ${to.x} ${to.y - halfNode}`}
                       fill="none"
-                      stroke="#60A5FA"
-                      strokeWidth={1}
-                      opacity={0.3}
+                      stroke={TIER_COLORS[fromTier] ?? '#60A5FA'}
+                      strokeWidth={1.5}
+                      opacity={0.15}
                       filter="blur(4px)"
                     />
                   )}
@@ -286,13 +307,13 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
           <div
             key={label}
             className="absolute left-0 right-0 flex items-center justify-center"
-            style={{ top: y }}
+            style={{ top: y, zIndex: 5 }}
           >
             <div className="flex items-center gap-3">
-              <div className="h-px w-16 opacity-30" style={{ background: `linear-gradient(to right, transparent, ${color})` }} />
-              <span 
-                className="text-sm font-bold tracking-wider uppercase px-4 py-1.5 rounded-full"
-                style={{ 
+              <div className="h-px w-10 sm:w-16 opacity-30" style={{ background: `linear-gradient(to right, transparent, ${color})` }} />
+              <span
+                className="text-[10px] sm:text-sm font-bold tracking-wider uppercase px-3 sm:px-4 py-1 sm:py-1.5 rounded-full"
+                style={{
                   color,
                   background: `${color}15`,
                   border: `1px solid ${color}30`,
@@ -300,7 +321,7 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
               >
                 {label}
               </span>
-              <div className="h-px w-16 opacity-30" style={{ background: `linear-gradient(to left, transparent, ${color})` }} />
+              <div className="h-px w-10 sm:w-16 opacity-30" style={{ background: `linear-gradient(to left, transparent, ${color})` }} />
             </div>
           </div>
         ))}
@@ -309,7 +330,7 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
         {ALL_NODES.map((node, i) => {
           const pos = nodePositions[node.id];
           if (!pos) return null;
-          
+
           const status = getStatus(node);
           const score = getScore(node.id);
           const levelsCompleted = getLevelsCompleted(node.id);
@@ -319,12 +340,11 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
           const isHovered = hoveredNode === node.id;
           const isCurrent = findCurrentNode(progress) === node.id;
           const topicColor = SKILL_TOPIC_COLORS[node.topic as Topic];
-          const nodeSize = 80;
           const icon = NODE_ICONS[node.id] ?? TOPIC_ICONS[node.topic] ?? '📐';
-          
+
           const progressPct = levelsCompleted / 4;
           const circumference = 2 * Math.PI * (nodeSize / 2 + 4);
-          
+
           return (
             <div
               key={node.id}
@@ -337,39 +357,52 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
                 animationDelay: `${i * 0.03}s`,
               }}
             >
-              {/* Current node indicator */}
+              {/* Current node beacon */}
               {isCurrent && !isLocked && (
-                <div 
-                  className="absolute -inset-3 rounded-full"
-                  style={{ animation: 'pulseGlow 2s ease-in-out infinite' }}
-                />
+                <>
+                  <div
+                    className="absolute rounded-full"
+                    style={{ inset: -6, animation: 'pulseGlow 2s ease-in-out infinite' }}
+                  />
+                  <div
+                    className="absolute rounded-full border-2 border-blue-400"
+                    style={{ inset: -8, animation: 'beacon 2s ease-out infinite' }}
+                  />
+                  <div
+                    className="absolute left-1/2 -translate-x-1/2 text-blue-400 text-sm sm:text-lg"
+                    style={{
+                      top: -(isMobile ? 16 : 22),
+                      animation: 'arrowBounce 1.2s ease-in-out infinite',
+                    }}
+                  >
+                    ▼
+                  </div>
+                </>
               )}
-              
+
               <button
-                className="relative w-full group"
+                className={`relative w-full group ${!isLocked ? 'node-bounce' : ''}`}
                 style={{ height: nodeSize }}
                 onClick={() => !isLocked && onSelectNode(node.id)}
                 onMouseEnter={() => setHoveredNode(node.id)}
                 onMouseLeave={() => setHoveredNode(null)}
                 disabled={isLocked}
               >
-                {/* Progress ring (SVG) */}
+                {/* Progress ring */}
                 <svg
                   className="absolute -inset-2 progress-ring"
                   width={nodeSize + 16}
                   height={nodeSize + 16}
                   viewBox={`0 0 ${nodeSize + 16} ${nodeSize + 16}`}
                 >
-                  {/* Background ring */}
                   <circle
                     cx={(nodeSize + 16) / 2}
                     cy={(nodeSize + 16) / 2}
                     r={nodeSize / 2 + 4}
                     fill="none"
-                    stroke={isLocked ? '#1E293B' : '#334155'}
+                    stroke={isLocked ? '#111827' : '#1E293B'}
                     strokeWidth={3}
                   />
-                  {/* Progress arc */}
                   {(isInProgress || isCompleted) && (
                     <circle
                       cx={(nodeSize + 16) / 2}
@@ -383,7 +416,6 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
                       transform={`rotate(-90 ${(nodeSize + 16) / 2} ${(nodeSize + 16) / 2})`}
                     />
                   )}
-                  {/* Mastered golden ring */}
                   {status === 'mastered' && (
                     <circle
                       cx={(nodeSize + 16) / 2}
@@ -392,69 +424,70 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
                       fill="none"
                       stroke="#F59E0B"
                       strokeWidth={3}
-                      strokeLinecap="round"
                     />
                   )}
                 </svg>
 
-                {/* Main node circle */}
+                {/* Main circle */}
                 <div
                   className={`
                     w-full h-full rounded-full flex items-center justify-center
                     transition-all duration-300 relative overflow-hidden
                     ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer'}
-                    ${isHovered && !isLocked ? 'scale-110' : ''}
                   `}
                   style={{
                     background: isLocked
-                      ? '#1E293B'
+                      ? '#111827'
                       : isCompleted
                         ? `linear-gradient(135deg, ${topicColor?.primary ?? '#22C55E'}, ${topicColor?.bg ?? '#16A34A'})`
                         : isInProgress
-                          ? `linear-gradient(135deg, #1E40AF, #3B82F6)`
-                          : `linear-gradient(135deg, #1E293B, #334155)`,
+                          ? 'linear-gradient(135deg, #1E40AF, #3B82F6)'
+                          : 'linear-gradient(135deg, #1E293B, #334155)',
                     border: isLocked
-                      ? '2px solid #475569'
+                      ? '2px solid #1F2937'
                       : isCompleted
                         ? `2px solid ${topicColor?.primary ?? '#22C55E'}`
                         : isInProgress
                           ? '2px solid #3B82F6'
-                          : '2px solid #475569',
+                          : '2px solid #374151',
                     boxShadow: isHovered && !isLocked
-                      ? `0 0 20px ${topicColor?.glow ?? '#3B82F640'}`
+                      ? `0 0 24px ${topicColor?.glow ?? '#3B82F640'}, 0 8px 32px rgba(0,0,0,0.4)`
                       : isCompleted
-                        ? `0 0 12px ${topicColor?.glow ?? '#22C55E30'}`
-                        : 'none',
-                    opacity: isLocked ? 0.7 : 1,
+                        ? `0 0 16px ${topicColor?.glow ?? '#22C55E30'}`
+                        : isCurrent && !isLocked
+                          ? '0 0 20px rgba(59,130,246,0.3)'
+                          : 'none',
+                    opacity: isLocked ? 0.45 : 1,
+                    filter: isLocked ? 'saturate(0.3)' : 'none',
                   }}
                 >
-                  {/* Shine effect for completed */}
                   {isCompleted && (
                     <div
                       className="absolute inset-0 rounded-full"
                       style={{
-                        background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)',
+                        background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%)',
                         backgroundSize: '200% 100%',
                         animation: 'completedShine 3s ease-in-out infinite',
                       }}
                     />
                   )}
-                  
-                  {/* Icon */}
-                  <span className="text-3xl relative z-10" style={{ filter: isLocked ? 'grayscale(1) brightness(0.6)' : 'none' }}>
+                  <span
+                    className={`${isMobile ? 'text-xl' : 'text-3xl'} relative z-10`}
+                    style={{ filter: isLocked ? 'grayscale(1) brightness(0.4)' : 'none' }}
+                  >
                     {isLocked ? '🔒' : icon}
                   </span>
                 </div>
               </button>
-              
+
               {/* Title */}
-              <div className="mt-2 text-center">
-                <span 
-                  className={`text-xs font-semibold leading-tight block ${
-                    isLocked ? 'text-gray-600' : isCompleted ? 'text-gray-200' : 'text-gray-400'
+              <div className="mt-1.5 text-center">
+                <span
+                  className={`${isMobile ? 'text-[9px]' : 'text-xs'} font-semibold leading-tight block ${
+                    isLocked ? 'text-gray-700' : isCompleted ? 'text-gray-200' : 'text-gray-400'
                   }`}
-                  style={{ 
-                    maxWidth: nodeSize + 20,
+                  style={{
+                    maxWidth: nodeSize + 16,
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical',
@@ -464,15 +497,15 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
                   {node.title}
                 </span>
               </div>
-              
+
               {/* Stars */}
               {isCompleted && (
                 <div className="flex justify-center mt-0.5 gap-0.5">
                   {[1, 2, 3].map(star => (
                     <span
                       key={star}
-                      className="text-[10px]"
-                      style={{ 
+                      className={isMobile ? 'text-[8px]' : 'text-[10px]'}
+                      style={{
                         opacity: score >= (star === 1 ? 1 : star === 2 ? 70 : 90) ? 1 : 0.2,
                         filter: score >= (star === 1 ? 1 : star === 2 ? 70 : 90) ? 'none' : 'grayscale(1)',
                       }}
@@ -482,7 +515,7 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
                   ))}
                 </div>
               )}
-              
+
               {/* Level dots */}
               {!isLocked && !isCompleted && isInProgress && (
                 <div className="flex justify-center mt-1 gap-1">
@@ -492,8 +525,7 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
                       className="w-1.5 h-1.5 rounded-full"
                       style={{
                         background: (progress.nodes[node.id]?.levelsCompleted ?? []).includes(lvl)
-                          ? '#3B82F6'
-                          : '#334155',
+                          ? '#3B82F6' : '#1E293B',
                       }}
                     />
                   ))}
@@ -506,5 +538,3 @@ export default function CivTreeView({ progress, onSelectNode }: Props) {
     </div>
   );
 }
-
-export { nodePositions as positions, totalWidth, totalHeight };

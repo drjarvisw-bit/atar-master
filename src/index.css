@@ -50,6 +50,26 @@ body {
 .animate-fade-in { animation: fade-in 0.3s ease-out; }
 .animate-slide-up { animation: slide-up 0.25s ease-out; }
 
+/* Page transition */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.page-enter { animation: page-enter 0.25s ease-out; }
+
+/* Topic completion celebration */
+@keyframes celebration-burst {
+  0% { transform: scale(0); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+@keyframes celebration-confetti {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(-40px) rotate(720deg); opacity: 0; }
+}
+.celebration-burst { animation: celebration-burst 0.6s ease-out forwards; }
+.celebration-confetti { animation: celebration-confetti 0.8s ease-out forwards; }
+
 /* Year Level Selector animations */
 @keyframes yearFadeDown {
   from { opacity: 0; transform: translateY(-16px); }

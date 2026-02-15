@@ -98,3 +98,22 @@
   background: var(--color-gh-accent-blue);
   border-radius: 1px;
 }
+
+/* Bottom sheet slide-up for mobile panels */
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes sheet-down {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
+.sheet-enter { animation: sheet-up 0.3s ease-out forwards; }
+.sheet-exit { animation: sheet-down 0.2s ease-in forwards; }
+
+/* Sidebar slide for desktop panels */
+@keyframes sidebar-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+.sidebar-enter { animation: sidebar-in 0.3s ease-out forwards; }

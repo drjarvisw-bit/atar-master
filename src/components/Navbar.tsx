@@ -85,14 +85,13 @@ export default function Navbar() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
 
-  const link = 'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors';
-  const active = 'bg-gh-surface text-gh-accent-blue nav-link-active';
-  const inactive = 'text-gh-text-secondary hover:text-gh-text-primary hover:bg-gh-surface/50';
+  const linkBase = 'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 relative';
+  const activeClass = 'bg-blue-600/15 text-blue-400 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.2)]';
+  const inactiveClass = 'text-gh-text-secondary hover:text-gh-text-primary hover:bg-gh-surface/50';
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-gray-800 bg-gray-900/95 backdrop-blur-md">
@@ -104,15 +103,27 @@ export default function Navbar() {
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-1">
           {NAV_LINKS.map(l => (
-            <NavLink key={l.to} to={l.to} className={({ isActive }) => `${link} ${isActive ? active : inactive}`}>
-              {l.icon} {l.label}
+            <NavLink
+              key={l.to}
+              to={l.to}
+              className={({ isActive }) => `${linkBase} ${isActive ? activeClass : inactiveClass}`}
+            >
+              {({ isActive }) => (
+                <>
+                  <span className={isActive ? 'text-blue-400' : ''}>{l.icon}</span>
+                  {l.label}
+                  {isActive && (
+                    <span className="absolute -bottom-[13px] left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-blue-400" />
+                  )}
+                </>
+              )}
             </NavLink>
           ))}
           <div className="ml-2 pl-2 border-l border-gh-border flex items-center gap-2">
             {user ? (
               <UserDropdown />
             ) : (
-              <NavLink to="/auth" className={({ isActive }) => `${link} ${isActive ? active : inactive}`}>
+              <NavLink to="/auth" className={({ isActive }) => `${linkBase} ${isActive ? activeClass : inactiveClass}`}>
                 <LogIn size={16} /> Sign In
               </NavLink>
             )}
@@ -132,7 +143,7 @@ export default function Navbar() {
             <NavLink
               key={l.to}
               to={l.to}
-              className={({ isActive }) => `${link} w-full ${isActive ? active : inactive}`}
+              className={({ isActive }) => `${linkBase} w-full ${isActive ? activeClass : inactiveClass}`}
             >
               {l.icon} {l.label}
             </NavLink>
@@ -141,7 +152,7 @@ export default function Navbar() {
             {user ? (
               <UserDropdown />
             ) : (
-              <NavLink to="/auth" className={({ isActive }) => `${link} w-full ${isActive ? active : inactive}`}>
+              <NavLink to="/auth" className={({ isActive }) => `${linkBase} w-full ${isActive ? activeClass : inactiveClass}`}>
                 <LogIn size={16} /> Sign In
               </NavLink>
             )}
