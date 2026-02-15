@@ -14,27 +14,18 @@ const features = [
     icon: <GitBranch size={28} />,
     title: 'Skill Tree',
     desc: 'Like a Civilization tech tree — unlock topics step by step, from foundations to exam mastery. See your learning path laid out visually.',
-    color: 'from-green-400 to-emerald-600',
-    border: 'hover:border-green-500/50',
-    glow: 'group-hover:shadow-green-500/20',
   },
   {
     emoji: '📝',
     icon: <BookOpen size={28} />,
     title: 'Real Exam Practice',
     desc: 'Every VCE Mathematical Methods exam from 2021–2025, with detailed step-by-step solutions. Practice with the real thing.',
-    color: 'from-blue-400 to-cyan-500',
-    border: 'hover:border-blue-500/50',
-    glow: 'group-hover:shadow-blue-500/20',
   },
   {
     emoji: '📊',
     icon: <BarChart3 size={28} />,
     title: 'Progress Tracking',
     desc: 'Real-time mastery tracking across every topic. Instantly spot weak areas and focus your study where it matters most.',
-    color: 'from-purple-400 to-pink-500',
-    border: 'hover:border-purple-500/50',
-    glow: 'group-hover:shadow-purple-500/20',
   },
 ];
 
@@ -126,13 +117,12 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-gh-accent-blue-bold/10 via-transparent to-transparent pointer-events-none" />
-        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gh-accent-blue-bold/5 rounded-full blur-3xl pointer-events-none" />
         <div className="relative mx-auto max-w-5xl px-6 pt-24 pb-20 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gh-border bg-gh-surface/80 text-sm text-gh-text-secondary mb-8">
             <Sparkles size={14} className="text-gh-warning-fg" />
             2021–2025 VCE Methods Exams Now Available
           </div>
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-gh-accent-blue via-purple-400 to-pink-500 bg-clip-text text-transparent leading-tight">
+          <h1 className="text-6xl md:text-7xl font-bold mb-6 text-white leading-tight">
             ATAR Master
           </h1>
           <p className="text-xl md:text-2xl text-gh-text-secondary mb-3 font-medium">

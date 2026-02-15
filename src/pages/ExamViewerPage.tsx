@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { type ExamPaper, type ExamQuestion, Topic, SKILL_TOPIC_COLORS } from '../types';
 import { getAllExams } from '../data/exams';
+import MathText from '../components/MathText';
 
 /* ───────── helpers ───────── */
 
@@ -287,7 +288,7 @@ function QuestionCard({ q }: { q: ExamQuestion }) {
         </span>
 
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-gh-text-primary leading-relaxed">{q.text}</p>
+          <p className="text-sm text-gh-text-primary leading-relaxed"><MathText text={q.text} /></p>
           <div className="flex flex-wrap items-center gap-2 mt-2">
             <span
               className="text-xs px-2 py-0.5 rounded-full font-medium"
@@ -345,7 +346,7 @@ function QuestionCard({ q }: { q: ExamQuestion }) {
                       {isCorrect ? <CheckCircle2 size={14} /> : opt.label}
                     </span>
                     <span className={isCorrect ? 'text-gh-success-fg font-medium' : 'text-gh-text-secondary'}>
-                      {opt.text}
+                      <MathText text={opt.text} />
                     </span>
                   </div>
                 );
@@ -356,7 +357,7 @@ function QuestionCard({ q }: { q: ExamQuestion }) {
           {/* Answer */}
           <div className="mt-3 bg-gh-inset rounded-lg p-3 border border-gh-border-muted">
             <p className="text-xs text-gh-text-muted uppercase tracking-wider mb-1.5">Answer</p>
-            <p className="text-sm font-semibold text-gh-success-fg">{q.answer}</p>
+            <p className="text-sm font-semibold text-gh-success-fg"><MathText text={q.answer} /></p>
           </div>
 
           {/* Marking guide */}
@@ -367,7 +368,7 @@ function QuestionCard({ q }: { q: ExamQuestion }) {
                 {q.markingGuide.map((step, i) => (
                   <p key={i} className="text-xs text-gh-text-secondary leading-relaxed">
                     <span className="text-gh-accent-blue font-mono mr-1">{i + 1}.</span>
-                    {step}
+                    <MathText text={step} />
                   </p>
                 ))}
               </div>

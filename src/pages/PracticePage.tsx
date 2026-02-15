@@ -4,6 +4,7 @@ import type { PracticeSession } from '../hooks/useProgress';
 import { getAllExams } from '../data/exams';
 import { type ExamQuestion, Topic, SKILL_TOPIC_COLORS } from '../types';
 import { Play, Shuffle, Target, TrendingUp, Eye, Lightbulb, Check, X, BarChart3, RotateCcw } from 'lucide-react';
+import MathText from '../components/MathText';
 
 type Mode = 'topic' | 'exam' | 'random' | 'weak';
 type Phase = 'select' | 'practice' | 'summary';
@@ -211,7 +212,7 @@ export default function PracticePage() {
             <span className="text-sm font-bold text-gh-text-secondary">Q{currentQ.number}</span>
             <span className="text-xs text-gh-text-secondary">({currentQ.marks} mark{currentQ.marks > 1 ? 's' : ''})</span>
           </div>
-          <div className="text-gh-text-primary whitespace-pre-wrap leading-relaxed">{currentQ.text}</div>
+          <div className="text-gh-text-primary whitespace-pre-wrap leading-relaxed"><MathText text={currentQ.text} /></div>
         </div>
 
         {/* MC options */}
@@ -235,7 +236,7 @@ export default function PracticePage() {
                   className={`w-full text-left p-4 rounded-xl border transition-all ${borderColor} ${bg}`}
                 >
                   <span className="font-bold mr-3 text-gh-text-secondary">{opt.label}.</span>
-                  <span className="text-gh-text-primary">{opt.text}</span>
+                  <span className="text-gh-text-primary"><MathText text={opt.text} /></span>
                   {showResult && isCorrect && <Check className="inline ml-2 text-green-400" size={16} />}
                   {showResult && isSelected && !isCorrect && <X className="inline ml-2 text-red-400" size={16} />}
                 </button>
@@ -260,7 +261,7 @@ export default function PracticePage() {
             {hintsShown > 0 && !answerShown && (
               <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-xl p-4 space-y-2">
                 {currentQ.markingGuide.slice(0, hintsShown).map((h, i) => (
-                  <div key={i} className="text-sm text-yellow-300">💡 {h}</div>
+                  <div key={i} className="text-sm text-yellow-300">💡 <MathText text={h} /></div>
                 ))}
               </div>
             )}
@@ -277,12 +278,12 @@ export default function PracticePage() {
             {answerShown && (
               <div className="bg-green-500/5 border border-green-500/20 rounded-xl p-4">
                 <div className="text-sm font-semibold text-green-400 mb-2">Answer:</div>
-                <div className="text-gh-text-primary whitespace-pre-wrap">{currentQ.answer}</div>
+                <div className="text-gh-text-primary whitespace-pre-wrap"><MathText text={currentQ.answer} /></div>
                 {currentQ.markingGuide.length > 0 && (
                   <div className="mt-3 pt-3 border-t border-gh-border">
                     <div className="text-sm font-semibold text-gh-text-secondary mb-1">Marking Guide:</div>
                     {currentQ.markingGuide.map((m, i) => (
-                      <div key={i} className="text-sm text-gh-text-secondary">• {m}</div>
+                      <div key={i} className="text-sm text-gh-text-secondary">• <MathText text={m} /></div>
                     ))}
                   </div>
                 )}
