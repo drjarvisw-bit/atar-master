@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect, useImperativeHandle, forwardRef, type MouseEvent, type WheelEvent, type TouchEvent } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { ALL_NODES } from '../data/skillTreeData';
 import { SKILL_TOPIC_COLORS, type Topic } from '../types';
 import type { UserProgress } from '../lib/progress';
@@ -14,353 +14,464 @@ export interface CivTreeViewRef {
   navigateTo: (x: number, y: number) => void;
 }
 
-// Layout constants
-const NODE_RADIUS = 32;
-const TIER_WIDTH = 240;
-const NODE_SPACING_Y = 90;
-const PADDING_X = 100;
-const PADDING_Y = 70;
-const LABEL_HEIGHT = 40;
-
-// Zoom bounds
-const MIN_SCALE = 0.4;
-const MAX_SCALE = 1.6;
-
 const TIER_LABELS = ['Year 8', 'Year 9', 'Year 10 / 10A', 'Year 11 (U1&2)', 'Year 12 (U3&4)', 'VCE Exam'];
+const TIER_COLORS = ['#6366F1', '#8B5CF6', '#A855F7', '#3B82F6', '#0EA5E9', '#F59E0B'];
 
-const STATUS_COLORS: Record<string, string> = {
-  locked: '#374151',
-  unlocked: '#4B5563',
-  'in-progress': '#3B82F6',
-  completed: '#22C55E',
-  mastered: '#F59E0B',
+const TOPIC_ICONS: Record<string, string> = {
+  FUNCTIONS: '📐',
+  CALCULUS: '∫',
+  PROBABILITY: '🎲',
 };
 
-const STATUS_BORDER: Record<string, string> = {
-  locked: '#1F2937',
-  unlocked: '#6B7280',
-  'in-progress': '#60A5FA',
-  completed: '#4ADE80',
-  mastered: '#FBBF24',
-};
-
-// Top-aligned layout: every column starts at the same Y
-function computeLayout() {
+// Organize nodes by tier for vertical layout
+function getNodesByTier() {
   const tiers: Record<number, typeof ALL_NODES> = {};
   ALL_NODES.forEach(n => {
     if (!tiers[n.tier]) tiers[n.tier] = [];
     tiers[n.tier].push(n);
   });
-
-  const positions: Record<string, { x: number; y: number }> = {};
-  let maxY = 0;
-  const startY = PADDING_Y + LABEL_HEIGHT;
-
-  Object.entries(tiers).forEach(([tierStr, nodes]) => {
-    const tier = Number(tierStr);
-    const cx = PADDING_X + tier * TIER_WIDTH;
-    nodes.forEach((n, i) => {
-      const y = startY + i * NODE_SPACING_Y;
-      positions[n.id] = { x: cx, y };
-      if (y > maxY) maxY = y;
-    });
-  });
-
-  const tierCount = Object.keys(tiers).length;
-  const totalWidth = PADDING_X * 2 + (tierCount - 1) * TIER_WIDTH;
-  const totalHeight = maxY + NODE_RADIUS + 60;
-
-  return { positions, totalWidth, totalHeight };
+  return tiers;
 }
 
-const { positions, totalWidth, totalHeight } = computeLayout();
+// Duolingo-style snake path layout
+function computePathLayout() {
+  const tiers = getNodesByTier();
+  const positions: Record<string, { x: number; y: number; tier: number }> = {};
+  
+  const H_SPACING = 100;
+  const V_SPACING = 100;
+  const TIER_GAP = 60;
+  const CENTER_X = 400;
+  
+  let currentY = 80;
+  
+  Object.entries(tiers).forEach(([tierStr, nodes]) => {
+    const tier = Number(tierStr);
+    
+    // Add tier label space
+    currentY += TIER_GAP;
+    
+    // Snake pattern: alternate left-to-right and right-to-left rows
+    // For each tier, lay out nodes in a snake within a centered area
+    const maxPerRow = 3;
+    const rows: (typeof ALL_NODES)[] = [];
+    
+    for (let i = 0; i < nodes.length; i += maxPerRow) {
+      rows.push(nodes.slice(i, i + maxPerRow));
+    }
+    
+    rows.forEach((row, rowIdx) => {
+      const isEvenRow = rowIdx % 2 === 0;
+      const rowWidth = (row.length - 1) * H_SPACING;
+      const startX = CENTER_X - rowWidth / 2;
+      
+      row.forEach((node, nodeIdx) => {
+        const idx = isEvenRow ? nodeIdx : (row.length - 1 - nodeIdx);
+        positions[node.id] = {
+          x: startX + idx * H_SPACING,
+          y: currentY,
+          tier,
+        };
+      });
+      
+      currentY += V_SPACING;
+    });
+    
+    currentY += 20; // Extra gap between tiers
+  });
+  
+  return { positions, totalHeight: currentY + 100, totalWidth: 800 };
+}
 
-const CivTreeView = forwardRef<CivTreeViewRef, Props>(function CivTreeView({ progress, onSelectNode, onViewportChange }, ref) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [scale, setScale] = useState(0.85);
-  const [dragging, setDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+const { positions: nodePositions, totalHeight, totalWidth } = computePathLayout();
+
+// Tier label Y positions
+function getTierLabelPositions() {
+  const tiers = getNodesByTier();
+  const labels: { label: string; y: number; color: string }[] = [];
+  
+  Object.entries(tiers).forEach(([tierStr]) => {
+    const tier = Number(tierStr);
+    const tierNodes = ALL_NODES.filter(n => n.tier === tier);
+    if (tierNodes.length === 0) return;
+    
+    const minY = Math.min(...tierNodes.map(n => nodePositions[n.id]?.y ?? 0));
+    labels.push({
+      label: TIER_LABELS[tier] ?? `Tier ${tier}`,
+      y: minY - 45,
+      color: TIER_COLORS[tier] ?? '#6B7280',
+    });
+  });
+  
+  return labels;
+}
+
+const tierLabels = getTierLabelPositions();
+
+// Find first available node for auto-scroll
+function findCurrentNode(progress: UserProgress): string | null {
+  for (const node of ALL_NODES) {
+    const status = computeNodeStatus(node.id, node.prerequisites, progress);
+    if (status === 'unlocked' || status === 'in-progress') return node.id;
+  }
+  return null;
+}
+
+export default function CivTreeView({ progress, onSelectNode }: Props) {
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
-
-  // Clamp pan so the tree can't be dragged too far off-screen
-  const clampPan = useCallback((px: number, py: number, s: number) => {
-    if (!containerRef.current) return { x: px, y: py };
-    const rect = containerRef.current.getBoundingClientRect();
-    const margin = 100;
-    const minX = -(totalWidth * s - margin);
-    const maxX = rect.width - margin;
-    const minY = -(totalHeight * s - margin);
-    const maxY = rect.height - margin;
-    return {
-      x: Math.min(maxX, Math.max(minX, px)),
-      y: Math.min(maxY, Math.max(minY, py)),
-    };
+  
+  // Auto-scroll to current node on mount
+  useEffect(() => {
+    const currentId = findCurrentNode(progress);
+    if (currentId && nodePositions[currentId] && scrollRef.current) {
+      const pos = nodePositions[currentId];
+      const containerHeight = scrollRef.current.clientHeight;
+      scrollRef.current.scrollTo({
+        top: Math.max(0, pos.y - containerHeight / 3),
+        behavior: 'smooth',
+      });
+    }
   }, []);
 
-  // Report viewport
-  useEffect(() => {
-    if (!onViewportChange || !containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    onViewportChange({
-      x: -pan.x / scale,
-      y: -pan.y / scale,
-      w: rect.width / scale,
-      h: rect.height / scale,
-      scale,
-    });
-  }, [pan, scale, onViewportChange]);
+  const getStatus = useCallback((node: typeof ALL_NODES[0]) => {
+    return computeNodeStatus(node.id, node.prerequisites, progress);
+  }, [progress]);
 
-  const handleWheel = useCallback((e: WheelEvent) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? 0.92 : 1.08;
-    setScale(s => {
-      const ns = Math.min(MAX_SCALE, Math.max(MIN_SCALE, s * delta));
-      // Re-clamp pan after zoom
-      setPan(p => clampPan(p.x, p.y, ns));
-      return ns;
-    });
-  }, [clampPan]);
+  const getScore = useCallback((nodeId: string) => {
+    return progress.nodes[nodeId]?.score ?? 0;
+  }, [progress]);
 
-  const handleMouseDown = useCallback((e: MouseEvent) => {
-    if (e.button !== 0) return;
-    setDragging(true);
-    setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
-  }, [pan]);
-
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!dragging) return;
-    const nx = e.clientX - dragStart.x;
-    const ny = e.clientY - dragStart.y;
-    setPan(clampPan(nx, ny, scale));
-  }, [dragging, dragStart, scale, clampPan]);
-
-  const handleMouseUp = useCallback(() => setDragging(false), []);
-
-  // Touch support
-  const touchRef = useRef<{ x: number; y: number } | null>(null);
-  const handleTouchStart = useCallback((e: TouchEvent) => {
-    if (e.touches.length === 1) {
-      const t = e.touches[0];
-      touchRef.current = { x: t.clientX - pan.x, y: t.clientY - pan.y };
-    }
-  }, [pan]);
-
-  const handleTouchMove = useCallback((e: TouchEvent) => {
-    if (e.touches.length === 1 && touchRef.current) {
-      const t = e.touches[0];
-      const nx = t.clientX - touchRef.current.x;
-      const ny = t.clientY - touchRef.current.y;
-      setPan(clampPan(nx, ny, scale));
-    }
-  }, [scale, clampPan]);
-
-  // Navigate to position (called from minimap)
-  const navigateTo = useCallback((x: number, y: number) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const np = clampPan(
-      -x * scale + rect.width / 2,
-      -y * scale + rect.height / 2,
-      scale,
-    );
-    setPan(np);
-  }, [scale, clampPan]);
-
-  // Expose navigateTo through ref
-  useImperativeHandle(ref, () => ({
-    navigateTo,
-  }), [navigateTo]);
+  const getLevelsCompleted = useCallback((nodeId: string) => {
+    return progress.nodes[nodeId]?.levelsCompleted?.length ?? 0;
+  }, [progress]);
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-full overflow-hidden cursor-grab active:cursor-grabbing relative select-none"
-      onWheel={handleWheel}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={() => { touchRef.current = null; }}
-      style={{ touchAction: 'none' }}
+    <div 
+      ref={scrollRef}
+      className="w-full h-full overflow-y-auto overflow-x-hidden scroll-smooth"
+      style={{ 
+        background: 'linear-gradient(180deg, #0F172A 0%, #1E1B4B 50%, #0F172A 100%)',
+      }}
     >
-      <svg
-        width={totalWidth}
-        height={totalHeight}
-        style={{
-          transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})`,
-          transformOrigin: '0 0',
-        }}
-      >
-        {/* Tier column labels — top-aligned */}
-        {TIER_LABELS.map((label, i) => (
-          <text
+      {/* Animated background particles */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {[...Array(20)].map((_, i) => (
+          <div
             key={i}
-            x={PADDING_X + i * TIER_WIDTH}
-            y={PADDING_Y - 10}
-            textAnchor="middle"
-            fill="#6B7280"
-            fontSize={13}
-            fontFamily="system-ui, sans-serif"
-            fontWeight="700"
-            letterSpacing="0.5"
-          >
-            {label}
-          </text>
-        ))}
-
-        {/* Subtle vertical separator lines for each tier */}
-        {TIER_LABELS.map((_, i) => (
-          <line
-            key={`sep-${i}`}
-            x1={PADDING_X + i * TIER_WIDTH}
-            y1={PADDING_Y + 5}
-            x2={PADDING_X + i * TIER_WIDTH}
-            y2={totalHeight - 20}
-            stroke="#1F2937"
-            strokeWidth={1}
-            opacity={0.4}
+            className="absolute rounded-full opacity-10"
+            style={{
+              width: `${Math.random() * 4 + 2}px`,
+              height: `${Math.random() * 4 + 2}px`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              background: '#3B82F6',
+              animation: `float ${8 + Math.random() * 12}s ease-in-out infinite`,
+              animationDelay: `${Math.random() * 5}s`,
+            }}
           />
         ))}
+      </div>
 
-        {/* Dependency lines — straight */}
-        {ALL_NODES.map(node =>
-          node.prerequisites.map(preId => {
-            const from = positions[preId];
-            const to = positions[node.id];
-            if (!from || !to) return null;
-            const fromStatus = computeNodeStatus(preId, ALL_NODES.find(n => n.id === preId)?.prerequisites ?? [], progress);
-            const isActive = fromStatus === 'completed' || fromStatus === 'mastered';
-            return (
-              <line
-                key={`${preId}-${node.id}`}
-                x1={from.x + NODE_RADIUS}
-                y1={from.y}
-                x2={to.x - NODE_RADIUS}
-                y2={to.y}
-                stroke={isActive ? '#4B5563' : '#1F2937'}
-                strokeWidth={1.5}
-                strokeDasharray={isActive ? 'none' : '6 4'}
-                opacity={0.5}
-              />
-            );
-          })
-        )}
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0) translateX(0); }
+          25% { transform: translateY(-20px) translateX(10px); }
+          50% { transform: translateY(-10px) translateX(-10px); }
+          75% { transform: translateY(-30px) translateX(5px); }
+        }
+        @keyframes pulseGlow {
+          0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), 0 0 40px rgba(59, 130, 246, 0.1); }
+          50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.5), 0 0 60px rgba(59, 130, 246, 0.2); }
+        }
+        @keyframes completedShine {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        @keyframes dashFlow {
+          to { stroke-dashoffset: -20; }
+        }
+        @keyframes nodeAppear {
+          from { transform: scale(0.8); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+        .node-enter { animation: nodeAppear 0.3s ease-out both; }
+        .progress-ring { transition: stroke-dasharray 0.8s ease-out; }
+      `}</style>
+
+      <div className="relative mx-auto" style={{ width: totalWidth, minHeight: totalHeight }}>
+        {/* SVG for connections */}
+        <svg 
+          className="absolute inset-0 pointer-events-none" 
+          width={totalWidth} 
+          height={totalHeight}
+          style={{ zIndex: 0 }}
+        >
+          {ALL_NODES.map(node =>
+            node.prerequisites.map(preId => {
+              const from = nodePositions[preId];
+              const to = nodePositions[node.id];
+              if (!from || !to) return null;
+              
+              const fromStatus = computeNodeStatus(preId, ALL_NODES.find(n => n.id === preId)?.prerequisites ?? [], progress);
+              const isActive = fromStatus === 'completed' || fromStatus === 'mastered';
+              
+              // Curved path for visual interest
+              const midY = (from.y + to.y) / 2;
+              const dx = to.x - from.x;
+              const controlOffset = Math.abs(dx) < 10 ? 40 : 0;
+              
+              return (
+                <g key={`${preId}-${node.id}`}>
+                  <path
+                    d={`M ${from.x} ${from.y + 36} C ${from.x + controlOffset} ${midY}, ${to.x - controlOffset} ${midY}, ${to.x} ${to.y - 36}`}
+                    fill="none"
+                    stroke={isActive ? '#3B82F6' : '#1E293B'}
+                    strokeWidth={isActive ? 3 : 2}
+                    strokeDasharray={isActive ? 'none' : '8 6'}
+                    opacity={isActive ? 0.7 : 0.3}
+                    style={isActive ? {} : { animation: 'dashFlow 1.5s linear infinite' }}
+                  />
+                  {isActive && (
+                    <path
+                      d={`M ${from.x} ${from.y + 36} C ${from.x + controlOffset} ${midY}, ${to.x - controlOffset} ${midY}, ${to.x} ${to.y - 36}`}
+                      fill="none"
+                      stroke="#60A5FA"
+                      strokeWidth={1}
+                      opacity={0.3}
+                      filter="blur(4px)"
+                    />
+                  )}
+                </g>
+              );
+            })
+          )}
+        </svg>
+
+        {/* Tier labels */}
+        {tierLabels.map(({ label, y, color }) => (
+          <div
+            key={label}
+            className="absolute left-0 right-0 flex items-center justify-center"
+            style={{ top: y }}
+          >
+            <div className="flex items-center gap-3">
+              <div className="h-px w-16 opacity-30" style={{ background: `linear-gradient(to right, transparent, ${color})` }} />
+              <span 
+                className="text-sm font-bold tracking-wider uppercase px-4 py-1.5 rounded-full"
+                style={{ 
+                  color,
+                  background: `${color}15`,
+                  border: `1px solid ${color}30`,
+                }}
+              >
+                {label}
+              </span>
+              <div className="h-px w-16 opacity-30" style={{ background: `linear-gradient(to left, transparent, ${color})` }} />
+            </div>
+          </div>
+        ))}
 
         {/* Nodes */}
-        {ALL_NODES.map(node => {
-          const pos = positions[node.id];
+        {ALL_NODES.map((node, i) => {
+          const pos = nodePositions[node.id];
           if (!pos) return null;
-          const status = computeNodeStatus(node.id, node.prerequisites, progress);
-          const np = progress.nodes[node.id];
-          const score = np?.score ?? 0;
-          const topicColor = SKILL_TOPIC_COLORS[node.topic as Topic];
-          const isHovered = hoveredNode === node.id;
+          
+          const status = getStatus(node);
+          const score = getScore(node.id);
+          const levelsCompleted = getLevelsCompleted(node.id);
           const isLocked = status === 'locked';
-
+          const isCompleted = status === 'completed' || status === 'mastered';
+          const isInProgress = status === 'in-progress';
+          const isHovered = hoveredNode === node.id;
+          const isCurrent = findCurrentNode(progress) === node.id;
+          const topicColor = SKILL_TOPIC_COLORS[node.topic as Topic];
+          const nodeSize = 72;
+          const icon = TOPIC_ICONS[node.topic] ?? '📐';
+          
+          const progressPct = levelsCompleted / 4;
+          const circumference = 2 * Math.PI * (nodeSize / 2 + 4);
+          
           return (
-            <g
+            <div
               key={node.id}
-              transform={`translate(${pos.x}, ${pos.y})`}
-              onClick={() => !isLocked && onSelectNode(node.id)}
-              onMouseEnter={() => setHoveredNode(node.id)}
-              onMouseLeave={() => setHoveredNode(null)}
-              style={{ cursor: isLocked ? 'not-allowed' : 'pointer' }}
+              className="absolute node-enter"
+              style={{
+                left: pos.x - nodeSize / 2,
+                top: pos.y - nodeSize / 2,
+                width: nodeSize,
+                zIndex: isHovered ? 20 : 10,
+                animationDelay: `${i * 0.03}s`,
+              }}
             >
-              {/* Glow for active/hovered */}
-              {(status === 'in-progress' || isHovered) && !isLocked && (
-                <circle
-                  r={NODE_RADIUS + 6}
-                  fill="none"
-                  stroke={topicColor?.glow ?? '#60A5FA'}
-                  strokeWidth={2}
-                  opacity={0.4}
-                >
-                  <animate attributeName="r" values={`${NODE_RADIUS + 4};${NODE_RADIUS + 8};${NODE_RADIUS + 4}`} dur="2s" repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="0.4;0.2;0.4" dur="2s" repeatCount="indefinite" />
-                </circle>
-              )}
-
-              {/* Progress ring */}
-              {(status === 'completed' || status === 'mastered' || status === 'in-progress') && (
-                <circle
-                  r={NODE_RADIUS + 2}
-                  fill="none"
-                  stroke={STATUS_BORDER[status]}
-                  strokeWidth={3}
-                  strokeDasharray={`${(2 * Math.PI * (NODE_RADIUS + 2) * score) / 100} ${2 * Math.PI * (NODE_RADIUS + 2)}`}
-                  strokeLinecap="round"
-                  transform="rotate(-90)"
-                  opacity={0.8}
+              {/* Current node indicator */}
+              {isCurrent && !isLocked && (
+                <div 
+                  className="absolute -inset-3 rounded-full"
+                  style={{ animation: 'pulseGlow 2s ease-in-out infinite' }}
                 />
               )}
-
-              {/* Main circle */}
-              <circle
-                r={NODE_RADIUS}
-                fill={isLocked ? '#111827' : (topicColor?.bg ?? STATUS_COLORS[status])}
-                stroke={isLocked ? '#374151' : (topicColor?.primary ?? STATUS_BORDER[status])}
-                strokeWidth={isHovered ? 3 : 2}
-                opacity={isLocked ? 0.5 : 1}
-              />
-
-              {/* Icon */}
-              <text
-                textAnchor="middle"
-                dominantBaseline="central"
-                fontSize={isLocked ? 16 : 13}
-                fill={isLocked ? '#4B5563' : '#E5E7EB'}
-                fontFamily="monospace"
-                fontWeight="bold"
+              
+              <button
+                className="relative w-full group"
+                style={{ height: nodeSize }}
+                onClick={() => !isLocked && onSelectNode(node.id)}
+                onMouseEnter={() => setHoveredNode(node.id)}
+                onMouseLeave={() => setHoveredNode(null)}
+                disabled={isLocked}
               >
-                {isLocked ? '🔒' : ''}
-              </text>
-
-              {/* Title inside node (when unlocked) */}
-              {!isLocked && (
-                <text
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                  fontSize={9}
-                  fill="#E5E7EB"
-                  fontFamily="system-ui, sans-serif"
-                  fontWeight="600"
+                {/* Progress ring (SVG) */}
+                <svg
+                  className="absolute -inset-2 progress-ring"
+                  width={nodeSize + 16}
+                  height={nodeSize + 16}
+                  viewBox={`0 0 ${nodeSize + 16} ${nodeSize + 16}`}
                 >
-                  {node.title.length > 12 ? node.title.slice(0, 11) + '…' : node.title}
-                </text>
-              )}
+                  {/* Background ring */}
+                  <circle
+                    cx={(nodeSize + 16) / 2}
+                    cy={(nodeSize + 16) / 2}
+                    r={nodeSize / 2 + 4}
+                    fill="none"
+                    stroke={isLocked ? '#1E293B' : '#334155'}
+                    strokeWidth={3}
+                  />
+                  {/* Progress arc */}
+                  {(isInProgress || isCompleted) && (
+                    <circle
+                      cx={(nodeSize + 16) / 2}
+                      cy={(nodeSize + 16) / 2}
+                      r={nodeSize / 2 + 4}
+                      fill="none"
+                      stroke={isCompleted ? '#22C55E' : '#3B82F6'}
+                      strokeWidth={3}
+                      strokeLinecap="round"
+                      strokeDasharray={`${circumference * progressPct} ${circumference}`}
+                      transform={`rotate(-90 ${(nodeSize + 16) / 2} ${(nodeSize + 16) / 2})`}
+                    />
+                  )}
+                  {/* Mastered golden ring */}
+                  {status === 'mastered' && (
+                    <circle
+                      cx={(nodeSize + 16) / 2}
+                      cy={(nodeSize + 16) / 2}
+                      r={nodeSize / 2 + 4}
+                      fill="none"
+                      stroke="#F59E0B"
+                      strokeWidth={3}
+                      strokeLinecap="round"
+                    />
+                  )}
+                </svg>
 
-              {/* Title below node */}
-              <text
-                y={NODE_RADIUS + 16}
-                textAnchor="middle"
-                fontSize={10}
-                fill={isLocked ? '#4B5563' : '#9CA3AF'}
-                fontFamily="system-ui, sans-serif"
-              >
-                {node.title.length > 20 ? node.title.slice(0, 19) + '…' : node.title}
-              </text>
-
-              {/* Stars for completed */}
-              {(status === 'completed' || status === 'mastered') && (
-                <text
-                  y={NODE_RADIUS + 28}
-                  textAnchor="middle"
-                  fontSize={10}
+                {/* Main node circle */}
+                <div
+                  className={`
+                    w-full h-full rounded-full flex items-center justify-center
+                    transition-all duration-300 relative overflow-hidden
+                    ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer'}
+                    ${isHovered && !isLocked ? 'scale-110' : ''}
+                  `}
+                  style={{
+                    background: isLocked
+                      ? '#0F172A'
+                      : isCompleted
+                        ? `linear-gradient(135deg, ${topicColor?.primary ?? '#22C55E'}, ${topicColor?.bg ?? '#16A34A'})`
+                        : isInProgress
+                          ? `linear-gradient(135deg, #1E40AF, #3B82F6)`
+                          : `linear-gradient(135deg, #1E293B, #334155)`,
+                    border: isLocked
+                      ? '2px solid #1E293B'
+                      : isCompleted
+                        ? `2px solid ${topicColor?.primary ?? '#22C55E'}`
+                        : isInProgress
+                          ? '2px solid #3B82F6'
+                          : '2px solid #475569',
+                    boxShadow: isHovered && !isLocked
+                      ? `0 0 20px ${topicColor?.glow ?? '#3B82F640'}`
+                      : isCompleted
+                        ? `0 0 12px ${topicColor?.glow ?? '#22C55E30'}`
+                        : 'none',
+                    opacity: isLocked ? 0.5 : 1,
+                  }}
                 >
-                  {score >= 90 ? '⭐⭐⭐' : score >= 70 ? '⭐⭐' : '⭐'}
-                </text>
+                  {/* Shine effect for completed */}
+                  {isCompleted && (
+                    <div
+                      className="absolute inset-0 rounded-full"
+                      style={{
+                        background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)',
+                        backgroundSize: '200% 100%',
+                        animation: 'completedShine 3s ease-in-out infinite',
+                      }}
+                    />
+                  )}
+                  
+                  {/* Icon */}
+                  <span className="text-2xl relative z-10" style={{ filter: isLocked ? 'grayscale(1)' : 'none' }}>
+                    {isLocked ? '🔒' : icon}
+                  </span>
+                </div>
+              </button>
+              
+              {/* Title */}
+              <div className="mt-2 text-center">
+                <span 
+                  className={`text-[11px] font-medium leading-tight block ${
+                    isLocked ? 'text-gray-600' : isCompleted ? 'text-gray-200' : 'text-gray-400'
+                  }`}
+                  style={{ 
+                    maxWidth: nodeSize + 20,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {node.title}
+                </span>
+              </div>
+              
+              {/* Stars */}
+              {isCompleted && (
+                <div className="flex justify-center mt-0.5 gap-0.5">
+                  {[1, 2, 3].map(star => (
+                    <span
+                      key={star}
+                      className="text-[10px]"
+                      style={{ 
+                        opacity: score >= (star === 1 ? 1 : star === 2 ? 70 : 90) ? 1 : 0.2,
+                        filter: score >= (star === 1 ? 1 : star === 2 ? 70 : 90) ? 'none' : 'grayscale(1)',
+                      }}
+                    >
+                      ⭐
+                    </span>
+                  ))}
+                </div>
               )}
-            </g>
+              
+              {/* Level dots */}
+              {!isLocked && !isCompleted && isInProgress && (
+                <div className="flex justify-center mt-1 gap-1">
+                  {[0, 1, 2, 3].map(lvl => (
+                    <div
+                      key={lvl}
+                      className="w-1.5 h-1.5 rounded-full"
+                      style={{
+                        background: (progress.nodes[node.id]?.levelsCompleted ?? []).includes(lvl)
+                          ? '#3B82F6'
+                          : '#334155',
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           );
         })}
-      </svg>
+      </div>
     </div>
   );
-});
+}
 
-export default CivTreeView;
-
-export { positions, totalWidth, totalHeight };
+export { nodePositions as positions, totalWidth, totalHeight };

@@ -3,7 +3,6 @@ import { RotateCcw, Zap, Flame, Trophy } from 'lucide-react';
 import { ALL_NODES } from '../data/skillTreeData';
 import { getNodeQuestionCounts } from '../data/questionMatcher';
 import CivTreeView from '../components/CivTreeView';
-import MiniMap from '../components/MiniMap';
 import SkillNodePanel from '../components/SkillNodePanel';
 import TopicSubTree from '../components/TopicSubTree';
 import TrainingSession from '../components/TrainingSession';
@@ -17,7 +16,6 @@ export default function SkillTreePage() {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [activeSubTreeId, setActiveSubTreeId] = useState<string | null>(null);
   const [sessionLevel, setSessionLevel] = useState<number>(0);
-  const [viewport, setViewport] = useState({ x: 0, y: 0, w: 1000, h: 600, scale: 1 });
   const treeContainerRef = useRef<HTMLDivElement>(null);
 
   // Persist
@@ -103,14 +101,6 @@ export default function SkillTreePage() {
     }
   }, []);
 
-  const handleMiniMapNavigate = useCallback((x: number, y: number) => {
-    // Find the CivTreeView container and call navigateTo
-    const container = document.querySelector('[data-civ-tree]');
-    if (container && (container as any).__navigateTo) {
-      (container as any).__navigateTo(x, y);
-    }
-  }, []);
-
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col">
       {/* XP Header Bar */}
@@ -181,19 +171,12 @@ export default function SkillTreePage() {
       <div className="flex-1 overflow-hidden relative">
         {view === 'tree' ? (
           <>
-            <div ref={treeContainerRef} className="w-full h-full" data-civ-tree>
+            <div ref={treeContainerRef} className="w-full h-full">
               <CivTreeView
                 progress={progress}
                 onSelectNode={handleSelectNode}
-                onViewportChange={setViewport}
               />
             </div>
-
-            <MiniMap
-              progress={progress}
-              viewport={viewport}
-              onNavigate={handleMiniMapNavigate}
-            />
 
             {selectedNodeId && (
               <SkillNodePanel
