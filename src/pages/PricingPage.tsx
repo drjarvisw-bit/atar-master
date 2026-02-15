@@ -1,0 +1,68 @@
+import { useState } from 'react'
+import { ChevronDown } from 'lucide-react'
+import PricingSection from '../components/PricingSection'
+
+const faqs = [
+  {
+    q: 'Can I cancel anytime?',
+    a: "Yes! You can cancel your subscription at any time from your account settings. You'll keep Pro access until the end of your billing period.",
+  },
+  {
+    q: 'What payment methods do you accept?',
+    a: 'We accept all major credit and debit cards (Visa, Mastercard, Amex) through our secure payment provider Stripe.',
+  },
+  {
+    q: 'Will I be charged automatically?',
+    a: "Yes, subscriptions renew automatically. You'll receive an email reminder before each renewal.",
+  },
+  {
+    q: 'Can I switch between monthly and yearly?',
+    a: "Absolutely. You can switch plans at any time. If upgrading to yearly, we'll prorate the remaining balance.",
+  },
+  {
+    q: 'Is there a student discount?',
+    a: 'Our pricing is already designed to be affordable for students. The yearly plan saves you ~25% compared to monthly billing.',
+  },
+]
+
+export default function PricingPage() {
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
+
+  return (
+    <div className="min-h-screen bg-gray-950">
+      <div className="pt-12 pb-4 text-center">
+        <h1 className="text-4xl font-bold text-white">Pricing</h1>
+        <p className="text-gray-400 mt-2">Simple, transparent pricing for every student</p>
+      </div>
+
+      <PricingSection />
+
+      {/* FAQ */}
+      <section className="max-w-2xl mx-auto px-4 py-16">
+        <h2 className="text-2xl font-bold text-white text-center mb-8">
+          Frequently Asked Questions
+        </h2>
+        <div className="space-y-3">
+          {faqs.map((faq, i) => (
+            <div key={i} className="rounded-xl border border-gray-700 bg-gray-900">
+              <button
+                onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                className="w-full flex items-center justify-between px-5 py-4 text-left"
+              >
+                <span className="text-sm font-medium text-white">{faq.q}</span>
+                <ChevronDown
+                  className={`w-4 h-4 text-gray-400 transition-transform ${
+                    openFaq === i ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+              {openFaq === i && (
+                <p className="px-5 pb-4 text-sm text-gray-400">{faq.a}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  )
+}
