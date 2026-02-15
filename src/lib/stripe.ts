@@ -2,7 +2,7 @@ import { supabase } from './supabase'
 
 // Replace with real Stripe publishable key
 export const STRIPE_PUBLISHABLE_KEY =
-  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ?? 'pk_test_REPLACE_WITH_REAL_KEY'
+  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ?? 'pk_test_51T0u3lHSAr1sei7P08RrJGDKoELHeWl0XGFN73p6LG4kZqTKW1xtAQjJL1DijEYY1B4RVCw2KaVOQ1yDRmqCKND500rKjOhng6'
 
 // Replace with real Stripe price IDs
 export const PRICE_PRO_MONTHLY = 'price_1T0uCuHSAr1sei7PG749auuc' as const
