@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { GitBranch, BookOpen, BarChart3, ChevronDown, ChevronRight, Check, X, Sparkles, ArrowRight, Zap } from 'lucide-react';
+import { GitBranch, BookOpen, BarChart3, ChevronDown, ChevronRight, Check, X, ArrowRight, Zap } from 'lucide-react';
 
 const stats = [
   { value: '10', label: 'Past Exams' },
@@ -13,7 +13,7 @@ const features = [
     emoji: '🌳',
     icon: <GitBranch size={28} />,
     title: 'Skill Tree',
-    desc: 'Like a Civilization tech tree — unlock topics step by step, from foundations to exam mastery. See your learning path laid out visually.',
+    desc: 'Unlock topics step by step, from foundations to exam mastery. See your learning path laid out visually — like a tech tree for VCE.',
   },
   {
     emoji: '📝',
@@ -32,7 +32,7 @@ const features = [
 const steps = [
   { num: '01', title: 'Pick a Topic', desc: 'Choose from the skill tree or jump into a past exam.', icon: <ChevronRight size={20} /> },
   { num: '02', title: 'Practice', desc: 'Solve real exam questions with hints and detailed solutions.', icon: <Zap size={20} /> },
-  { num: '03', title: 'Master', desc: 'Track your progress and unlock advanced topics as you improve.', icon: <Sparkles size={20} /> },
+  { num: '03', title: 'Master', desc: 'Track your progress and unlock advanced topics as you improve.', icon: <Check size={20} /> },
 ];
 
 const plans = [
@@ -44,10 +44,10 @@ const plans = [
     cta: 'Get Started Free',
     highlight: false,
     features: [
-      { text: '3 past exams', included: true },
+      { text: '3 past exams (2021–2023)', included: true },
       { text: 'Basic progress tracking', included: true },
       { text: 'Full skill tree access', included: false },
-      { text: 'AI-powered explanations', included: false },
+      { text: 'Step-by-step solutions', included: false },
       { text: 'All 10 past exams', included: false },
     ],
   },
@@ -62,7 +62,7 @@ const plans = [
       { text: 'All 10 past exams (2021–2025)', included: true },
       { text: 'Full skill tree with unlocks', included: true },
       { text: 'Advanced progress analytics', included: true },
-      { text: 'AI-powered step-by-step help', included: true },
+      { text: 'Step-by-step worked solutions', included: true },
       { text: 'Priority new content access', included: true },
     ],
   },
@@ -79,7 +79,7 @@ const faqs = [
   },
   {
     q: 'How does the skill tree work?',
-    a: 'Topics are arranged in a dependency graph — just like a tech tree in Civilization. Master foundational concepts to unlock advanced ones, building a solid understanding from the ground up.',
+    a: 'Topics are arranged in a dependency graph. Master foundational concepts to unlock advanced ones, building a solid understanding from the ground up.',
   },
   {
     q: 'Can I cancel my Pro subscription?',
@@ -87,7 +87,7 @@ const faqs = [
   },
   {
     q: 'Is this suitable for all VCE Methods students?',
-    a: 'Yes! Whether you\'re aiming for a 25 or a 50, the skill tree adapts to your level. Start from basics or jump straight to exam-level problems.',
+    a: "Yes! Whether you're aiming for a 25 or a 50, the skill tree adapts to your level. Start from basics or jump straight to exam-level problems.",
   },
 ];
 
@@ -115,25 +115,24 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="mx-auto max-w-5xl px-6 pt-24 pb-20 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gh-border bg-gh-surface/80 text-sm text-gh-text-secondary mb-8">
-            <Sparkles size={14} className="text-gh-warning-fg" />
-            2021–2025 VCE Methods Exams Now Available
+      <section className="relative">
+        <div className="mx-auto max-w-4xl px-6 pt-24 pb-20 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gh-border bg-gh-surface text-sm text-gh-text-secondary mb-8">
+            📐 2021–2025 VCE Methods Exams Now Available
           </div>
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 text-white leading-tight">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white leading-tight tracking-tight">
             ATAR Master
           </h1>
-          <p className="text-xl md:text-2xl text-gh-text-secondary mb-3 font-medium">
-            The Ultimate VCE Maths Exam Prep Tool
+          <p className="text-xl text-gh-text-secondary mb-3">
+            VCE Maths Exam Prep — Built for Results
           </p>
-          <p className="text-gh-text-muted max-w-2xl mx-auto mb-10 leading-relaxed">
-            Conquer Mathematical Methods with a structured skill tree, real past exams, and intelligent progress tracking. Built by students, for students.
+          <p className="text-gh-text-muted max-w-xl mx-auto mb-10 leading-relaxed">
+            Real past exams. Structured skill trees. Progress tracking that shows exactly where to focus. Built by students who've been through it.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               to="/skill-tree"
-              className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3.5 rounded-xl transition-colors"
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-8 py-3.5 rounded-xl transition-colors"
             >
               <GitBranch size={18} />
               Start Learning Free
@@ -166,17 +165,17 @@ export default function LandingPage() {
       {/* Features */}
       <section id="features" className="mx-auto max-w-5xl px-6 py-24">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Everything You Need to Ace Methods</h2>
-          <p className="text-gh-text-secondary max-w-2xl mx-auto">Three powerful tools working together to take you from confused to confident.</p>
+          <h2 className="text-3xl font-bold mb-4 text-white">Everything You Need to Ace Methods</h2>
+          <p className="text-gh-text-secondary max-w-2xl mx-auto">Three tools working together to take you from confused to confident.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {features.map((f) => (
             <div
               key={f.title}
-              className="group relative border border-gh-border rounded-2xl p-8 bg-gh-surface transition-all duration-300 hover:border-blue-500/40 hover:-translate-y-1"
+              className="border border-gh-border rounded-2xl p-8 bg-gh-surface hover:border-gh-text-muted transition-colors"
             >
               <div className="text-4xl mb-4">{f.emoji}</div>
-              <h3 className="text-xl font-bold mb-3 text-white">{f.title}</h3>
+              <h3 className="text-lg font-semibold mb-3 text-white">{f.title}</h3>
               <p className="text-gh-text-secondary text-sm leading-relaxed">{f.desc}</p>
             </div>
           ))}
@@ -187,16 +186,16 @@ export default function LandingPage() {
       <section className="bg-gh-surface/30 border-y border-gh-border">
         <div className="mx-auto max-w-5xl px-6 py-24">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
-            <p className="text-gh-text-secondary">Three simple steps to exam mastery.</p>
+            <h2 className="text-3xl font-bold mb-4 text-white">How It Works</h2>
+            <p className="text-gh-text-secondary">Three steps to exam mastery.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {steps.map((s) => (
               <div key={s.num} className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gh-accent-blue-bold/15 border border-gh-accent-blue-bold/30 text-gh-accent-blue mb-6">
-                  <span className="text-2xl font-bold">{s.num}</span>
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-blue-600/15 border border-blue-600/30 text-blue-500 mb-6">
+                  <span className="text-xl font-bold">{s.num}</span>
                 </div>
-                <h3 className="text-lg font-semibold mb-2">{s.title}</h3>
+                <h3 className="text-lg font-semibold mb-2 text-white">{s.title}</h3>
                 <p className="text-gh-text-secondary text-sm">{s.desc}</p>
               </div>
             ))}
@@ -207,35 +206,35 @@ export default function LandingPage() {
       {/* Pricing */}
       <section className="mx-auto max-w-4xl px-6 py-24">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Simple, Student-Friendly Pricing</h2>
-          <p className="text-gh-text-secondary">Start free. Upgrade when you're ready to go all-in.</p>
+          <h2 className="text-3xl font-bold mb-4 text-white">Simple, Student-Friendly Pricing</h2>
+          <p className="text-gh-text-secondary">Start free. Upgrade when you're ready.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative rounded-2xl p-8 border transition-all ${
+              className={`relative rounded-2xl p-8 border transition-colors ${
                 plan.highlight
-                  ? 'border-blue-500 bg-gh-surface'
+                  ? 'border-blue-600 bg-gh-surface'
                   : 'border-gh-border bg-gh-surface'
               }`}
             >
               {plan.highlight && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-blue-500 text-xs font-semibold text-white">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-blue-600 text-xs font-semibold text-white">
                   MOST POPULAR
                 </div>
               )}
-              <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
+              <h3 className="text-xl font-bold mb-1 text-white">{plan.name}</h3>
               <p className="text-gh-text-muted text-sm mb-4">{plan.desc}</p>
               <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-4xl font-bold">{plan.price}</span>
+                <span className="text-4xl font-bold text-white">{plan.price}</span>
                 <span className="text-gh-text-muted text-sm">{plan.period}</span>
               </div>
               <Link
-                to="/skill-tree"
-                className={`block w-full text-center py-3 rounded-xl font-semibold transition-all ${
+                to={plan.highlight ? "/pricing" : "/skill-tree"}
+                className={`block w-full text-center py-3 rounded-xl font-semibold transition-colors ${
                   plan.highlight
-                    ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                    ? 'bg-blue-600 hover:bg-blue-500 text-white'
                     : 'border border-gh-border hover:border-gh-text-muted text-gh-text-primary'
                 }`}
               >
@@ -245,7 +244,7 @@ export default function LandingPage() {
                 {plan.features.map((f) => (
                   <li key={f.text} className="flex items-start gap-3 text-sm">
                     {f.included ? (
-                      <Check size={16} className="text-gh-success-fg shrink-0 mt-0.5" />
+                      <Check size={16} className="text-green-500 shrink-0 mt-0.5" />
                     ) : (
                       <X size={16} className="text-gh-text-muted shrink-0 mt-0.5" />
                     )}
@@ -262,7 +261,7 @@ export default function LandingPage() {
       <section className="bg-gh-surface/30 border-y border-gh-border">
         <div className="mx-auto max-w-3xl px-6 py-24">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-3xl font-bold mb-4 text-white">Frequently Asked Questions</h2>
           </div>
           <div className="space-y-3">
             {faqs.map((faq) => (
@@ -274,13 +273,13 @@ export default function LandingPage() {
 
       {/* CTA */}
       <section className="mx-auto max-w-5xl px-6 py-24 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Master Methods?</h2>
+        <h2 className="text-3xl font-bold mb-4 text-white">Ready to Master Methods?</h2>
         <p className="text-gh-text-secondary mb-8 max-w-xl mx-auto">
-          Join students across Victoria who are using ATAR Master to prepare smarter, not harder.
+          Join students across Victoria who are preparing smarter, not harder.
         </p>
         <Link
           to="/skill-tree"
-          className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3.5 rounded-xl transition-colors"
+          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-8 py-3.5 rounded-xl transition-colors"
         >
           <GitBranch size={18} />
           Start Learning Free
@@ -291,8 +290,8 @@ export default function LandingPage() {
       <footer className="border-t border-gh-border">
         <div className="mx-auto max-w-5xl px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <GitBranch size={18} className="text-gh-accent-blue" />
-            <span className="font-semibold">ATAR Master</span>
+            <GitBranch size={18} className="text-blue-500" />
+            <span className="font-semibold text-white">ATAR Master</span>
           </div>
           <p className="text-gh-text-muted text-sm">
             © 2025 ATAR Master. Built for VCE students in Victoria, Australia.
