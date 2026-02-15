@@ -6,15 +6,17 @@ import CivTreeView from '../components/CivTreeView';
 import MiniMap from '../components/MiniMap';
 import SkillNodePanel from '../components/SkillNodePanel';
 import TopicSubTree from '../components/TopicSubTree';
+import TrainingSession from '../components/TrainingSession';
 import { loadProgress, saveProgress, xpForLevel, computeNodeStatus, type UserProgress } from '../lib/progress';
 
-type View = 'tree' | 'subtree';
+type View = 'tree' | 'subtree' | 'session';
 
 export default function SkillTreePage() {
   const [progress, setProgress] = useState<UserProgress>(loadProgress);
   const [view, setView] = useState<View>('tree');
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [activeSubTreeId, setActiveSubTreeId] = useState<string | null>(null);
+  const [sessionLevel, setSessionLevel] = useState<number>(0);
   const [viewport, setViewport] = useState({ x: 0, y: 0, w: 1000, h: 600, scale: 1 });
   const treeContainerRef = useRef<HTMLDivElement>(null);
 
@@ -54,19 +56,43 @@ export default function SkillTreePage() {
     setActiveSubTreeId(null);
   }, []);
 
-  const handleStartLevel = useCallback((nodeId: string, _level: number) => {
-    // For now, mark level as started (in-progress)
+  const handleStartLevel = useCallback((_nodeId: string, level: number) => {
+    setSessionLevel(level);
+    setView('session');
+  }, []);
+
+  const handleSessionComplete = useCallback((nodeId: string, level: number, score: number, total: number) => {
+    const pct = total > 0 ? Math.round((score / total) * 100) : 0;
+    const passed = pct >= 70;
+
     setProgress(prev => {
       const np = prev.nodes[nodeId] ?? { status: 'unlocked', levelsCompleted: [], score: 0 };
+      const levelsCompleted = passed && !np.levelsCompleted.includes(level)
+        ? [...np.levelsCompleted, level].sort()
+        : np.levelsCompleted;
+      const avgScore = levelsCompleted.length > 0
+        ? Math.round((levelsCompleted.length / 5) * 100)
+        : np.score;
+      const allDone = levelsCompleted.length === 5;
+      const xpGain = passed ? (level * 10 + Math.round(pct / 10)) : 0;
+
       return {
         ...prev,
+        totalXP: prev.totalXP + xpGain,
         nodes: {
           ...prev.nodes,
-          [nodeId]: { ...np, status: 'in-progress' },
+          [nodeId]: {
+            status: allDone ? 'completed' : levelsCompleted.length > 0 ? 'in-progress' : 'unlocked',
+            levelsCompleted,
+            score: avgScore,
+          },
         },
       };
     });
-    // TODO: Navigate to practice session
+
+    // Go back to subtree view
+    setView('subtree');
+    setSessionLevel(0);
   }, []);
 
   const handleReset = useCallback(() => {
@@ -178,6 +204,13 @@ export default function SkillTreePage() {
               />
             )}
           </>
+        ) : view === 'session' && activeSubTreeId ? (
+          <TrainingSession
+            nodeId={activeSubTreeId}
+            level={sessionLevel}
+            onComplete={handleSessionComplete}
+            onBack={() => { setView('subtree'); setSessionLevel(0); }}
+          />
         ) : activeSubTreeId ? (
           <TopicSubTree
             nodeId={activeSubTreeId}
