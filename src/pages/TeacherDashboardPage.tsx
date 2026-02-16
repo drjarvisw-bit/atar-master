@@ -3,8 +3,7 @@ import { Navigate } from 'react-router-dom';
 import {
   Users, Crown, UserPlus, ExternalLink, BarChart3, Shield,
 } from 'lucide-react';
-
-const ADMIN_EMAILS = ['wangmengjames@gmail.com', 'drjarvisw@gmail.com'];
+import { isAdminUser } from '../lib/constants';
 
 const MOCK_RECENT_SIGNUPS = [
   { email: 'student1@example.com', date: '2025-02-14', plan: 'Free' },
@@ -17,7 +16,7 @@ const MOCK_RECENT_SIGNUPS = [
 export default function TeacherDashboardPage() {
   const { user } = useAuth();
 
-  if (!user || !ADMIN_EMAILS.includes(user.email || '')) {
+  if (!isAdminUser(user)) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -40,7 +39,7 @@ export default function TeacherDashboardPage() {
         <Shield size={28} className="text-gh-accent-blue" />
         <div>
           <h1 className="text-2xl font-bold">Teacher Dashboard</h1>
-          <p className="text-sm text-gh-text-secondary">Admin panel — {user.email}</p>
+          <p className="text-sm text-gh-text-secondary">Admin panel — {user?.email}</p>
         </div>
       </div>
 

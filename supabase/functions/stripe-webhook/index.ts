@@ -2,20 +2,25 @@ import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import Stripe from 'https://esm.sh/stripe@13?target=deno'
 
-// Replace with real Stripe secret key
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? 'sk_test_REPLACE_WITH_REAL_KEY', {
+function requiredEnv(name: string): string {
+  const value = Deno.env.get(name)
+  if (!value) throw new Error(`Missing required env: ${name}`)
+  return value
+}
+
+const stripe = new Stripe(requiredEnv('STRIPE_SECRET_KEY'), {
   apiVersion: '2023-10-16',
 })
 
-// Replace with real Stripe webhook signing secret
-const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET') ?? 'whsec_REPLACE_WITH_REAL_SECRET'
+const webhookSecret = requiredEnv('STRIPE_WEBHOOK_SECRET')
 
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL')!,
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
-)
+const supabase = createClient(requiredEnv('SUPABASE_URL'), requiredEnv('SUPABASE_SERVICE_ROLE_KEY'))
 
 serve(async (req) => {
+  if (req.method !== 'POST') {
+    return new Response('Method not allowed', { status: 405 })
+  }
+
   const signature = req.headers.get('stripe-signature')
   if (!signature) return new Response('Missing signature', { status: 400 })
 
@@ -53,22 +58,14 @@ serve(async (req) => {
 
     case 'customer.subscription.updated': {
       const subscription = event.data.object as Stripe.Subscription
-      const { data } = await supabase
+      await supabase
         .from('subscriptions')
-        .select('user_id')
+        .update({
+          status: subscription.status,
+          current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+          updated_at: new Date().toISOString(),
+        })
         .eq('stripe_subscription_id', subscription.id)
-        .single()
-
-      if (data) {
-        await supabase
-          .from('subscriptions')
-          .update({
-            status: subscription.status,
-            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
-            updated_at: new Date().toISOString(),
-          })
-          .eq('stripe_subscription_id', subscription.id)
-      }
       break
     }
 

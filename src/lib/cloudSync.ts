@@ -205,9 +205,30 @@ function applyAchievementsToLocal(data: AchievementsData) {
 // ── Public API ────────────────────────────────────────────────
 
 export async function syncToCloud(userId: string): Promise<void> {
-  const progress_data = gatherProgressData();
-  const streak_data = gatherStreakData();
-  const achievements_data = gatherAchievementsData();
+  const localProgress = gatherProgressData();
+  const localStreak = gatherStreakData();
+  const localAchievements = gatherAchievementsData();
+
+  // Read latest cloud snapshot first to avoid overwrite on multi-device sessions.
+  const { data: existing, error: readError } = await supabase
+    .from('user_progress')
+    .select('progress_data, streak_data, achievements_data')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (readError) {
+    console.error('[cloudSync] syncToCloud pre-read failed:', readError);
+  }
+
+  const progress_data = existing
+    ? mergeProgress(localProgress, existing.progress_data as ProgressData)
+    : localProgress;
+  const streak_data = existing
+    ? mergeStreak(localStreak, existing.streak_data as StreakCloudData)
+    : localStreak;
+  const achievements_data = existing
+    ? mergeAchievements(localAchievements, existing.achievements_data as AchievementsData)
+    : localAchievements;
 
   const { error } = await supabase.from('user_progress').upsert(
     {

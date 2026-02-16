@@ -3,7 +3,7 @@ import { GitBranch, FileText, Dumbbell, BarChart3, DollarSign, LogIn, LogOut, Us
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { getDailyChallengeState } from '../lib/dailyChallenge';
-import { ADMIN_EMAILS } from '../lib/constants';
+import { isAdminUser } from '../lib/constants';
 import StreakBadge from './StreakBadge';
 import ThemeSwitcher from './ThemeSwitcher';
 
@@ -12,7 +12,7 @@ function UserDropdown() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const isAdmin = ADMIN_EMAILS.includes(user?.email || '');
+  const isAdmin = isAdminUser(user);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {

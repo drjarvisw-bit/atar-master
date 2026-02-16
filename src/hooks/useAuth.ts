@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { syncFromCloud, scheduleSyncToCloud } from '../lib/cloudSync'
-import { ADMIN_EMAILS } from '../lib/constants'
+import { isAdminEmail, isAdminUser } from '../lib/constants'
 import type { User, AuthError } from '@supabase/supabase-js'
 
 interface AuthContextType {
@@ -28,14 +28,12 @@ export function useAuthProvider(): AuthContextType {
   const [loading, setLoading] = useState(true)
   const [isPro, setIsPro] = useState(false)
 
-  const isAdmin = useMemo(() => {
-    return !!user?.email && ADMIN_EMAILS.includes(user.email)
-  }, [user])
+  const isAdmin = useMemo(() => isAdminUser(user), [user])
 
   const checkPro = useCallback(async (u: User | null) => {
     if (!u) { setIsPro(false); return }
     // Admin emails always get Pro
-    if (u.email && ADMIN_EMAILS.includes(u.email)) { setIsPro(true); return }
+    if (isAdminEmail(u.email) || isAdminUser(u)) { setIsPro(true); return }
     // Check user metadata first
     if (u.user_metadata?.is_pro) { setIsPro(true); return }
     // Then check subscriptions table
