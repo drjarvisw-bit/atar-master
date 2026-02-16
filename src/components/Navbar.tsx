@@ -102,7 +102,8 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-black/10 bg-white/90 backdrop-blur-md">
       <div className="mx-auto max-w-6xl flex items-center justify-between px-4 sm:px-6 py-3">
         <NavLink to="/" className="flex items-center gap-2 text-lg font-bold text-gh-text-primary">
-          <span className="text-2xl">🎓</span> ATAR Master
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-black/15 bg-black/[0.03] text-[10px] font-semibold tracking-wide">AM</span>
+          ATAR Master
         </NavLink>
 
         {/* Desktop nav */}

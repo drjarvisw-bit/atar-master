@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Flame, Trophy, Gem } from 'lucide-react';
 import { getStreakData, type StreakInfo } from '../lib/streak';
 
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -61,9 +62,7 @@ export default function StreakBadge() {
         className={`flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-gh-surface/50 transition group`}
         title={`${currentStreak} day streak`}
       >
-        <span className={`text-lg transition-transform group-hover:scale-110 ${streakColor(currentStreak)} ${streakGlow(currentStreak)} ${currentStreak > 0 ? 'animate-pulse' : ''}`}>
-          🔥
-        </span>
+        <Flame className={`h-4 w-4 transition-transform group-hover:scale-110 ${streakColor(currentStreak)} ${streakGlow(currentStreak)} ${currentStreak > 0 ? 'animate-pulse' : ''}`} />
         <span className={`text-sm font-bold ${streakColor(currentStreak)}`}>
           {currentStreak}
         </span>
@@ -73,7 +72,9 @@ export default function StreakBadge() {
         <div className="absolute right-0 top-full mt-1 w-64 bg-gh-surface border border-gh-border rounded-xl shadow-lg p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
           {/* Header */}
           <div className="text-center mb-3">
-            <div className={`text-4xl mb-1 ${streakGlow(currentStreak)}`}>🔥</div>
+            <div className="mb-1 flex justify-center">
+              <Flame className={`h-8 w-8 ${streakColor(currentStreak)} ${streakGlow(currentStreak)}`} />
+            </div>
             <div className={`text-2xl font-bold ${streakColor(currentStreak)}`}>
               {currentStreak} Day{currentStreak !== 1 ? 's' : ''}
             </div>
@@ -115,18 +116,18 @@ export default function StreakBadge() {
 
           {/* Milestone hints */}
           {currentStreak > 0 && currentStreak < 7 && (
-            <div className="mt-3 text-[11px] text-gh-text-secondary text-center">
-              🏆 {7 - currentStreak} more day{7 - currentStreak !== 1 ? 's' : ''} to gold streak!
+            <div className="mt-3 flex items-center justify-center gap-1 text-[11px] text-gh-text-secondary">
+              <Trophy className="h-3 w-3" /> {7 - currentStreak} more day{7 - currentStreak !== 1 ? 's' : ''} to gold streak.
             </div>
           )}
           {currentStreak >= 7 && currentStreak < 30 && (
-            <div className="mt-3 text-[11px] text-yellow-400/70 text-center">
-              💎 {30 - currentStreak} more day{30 - currentStreak !== 1 ? 's' : ''} to diamond!
+            <div className="mt-3 flex items-center justify-center gap-1 text-[11px] text-yellow-400/70">
+              <Gem className="h-3 w-3" /> {30 - currentStreak} more day{30 - currentStreak !== 1 ? 's' : ''} to diamond.
             </div>
           )}
           {currentStreak >= 30 && (
-            <div className="mt-3 text-[11px] text-cyan-300/70 text-center">
-              💎 Diamond streak! You're unstoppable!
+            <div className="mt-3 flex items-center justify-center gap-1 text-[11px] text-cyan-300/70">
+              <Gem className="h-3 w-3" /> Diamond streak. You're unstoppable.
             </div>
           )}
         </div>

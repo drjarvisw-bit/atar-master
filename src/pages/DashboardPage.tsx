@@ -105,7 +105,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {([
           { icon: <CheckCircle2 size={20} className="text-green-400" />, value: `${overall.completed}/${overall.total}`, label: 'Questions Done' },
-          { icon: <Flame size={20} className="text-orange-400" />, value: `${streak}`, label: 'Day Streak 🔥' },
+          { icon: <Flame size={20} className="text-orange-400" />, value: `${streak}`, label: 'Day Streak' },
           { icon: <Clock size={20} className="text-blue-400" />, value: `${Math.round(practiceTime)}m`, label: 'Practice Time' },
           { icon: <TrendingUp size={20} className="text-purple-400" />, value: `${skillTreeProgress}/31`, label: 'Skills Completed' },
         ]).map((s, i) => (
@@ -122,7 +122,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold flex items-center gap-2 text-yellow-400">
-              ⚡ Daily Challenge
+              <Flame size={16} /> Daily Challenge
             </h2>
             {dailyState?.completed ? (
               <p className="text-sm text-gray-400 mt-1">
