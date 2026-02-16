@@ -78,6 +78,10 @@ export function useAuthProvider(): AuthContextType {
           window.location.href = '/skill-tree'
         }
       }
+
+      if (_event === 'SIGNED_OUT') {
+        window.location.replace('/auth')
+      }
     })
 
     return () => subscription.unsubscribe()
@@ -114,14 +118,24 @@ export function useAuthProvider(): AuthContextType {
   }, [])
 
   const signOut = useCallback(async () => {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined
+    const projectRef = supabaseUrl?.match(/^https:\/\/([^.]+)\.supabase\.co/)?.[1]
+
     try {
-      await supabase.auth.signOut()
-    } catch (_) {
-      // ignore signOut errors
+      await supabase.auth.signOut({ scope: 'global' })
+    } catch (error) {
+      console.error('[auth] signOut failed, clearing local session anyway:', error)
     }
+
+    // Force-clear local auth cache in case provider/session sticks
+    if (projectRef) {
+      localStorage.removeItem(`sb-${projectRef}-auth-token`)
+      sessionStorage.removeItem(`sb-${projectRef}-auth-token`)
+    }
+
     setUser(null)
     setIsPro(false)
-    window.location.href = '/'
+    window.location.replace('/auth')
   }, [])
 
   return useMemo(() => ({
