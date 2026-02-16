@@ -108,7 +108,7 @@ export default function LandingPage() {
             </h2>
             <p className="mt-6 max-w-md text-base leading-relaxed text-black/60 sm:text-lg">
               We keep the top clean and premium, then reveal the rest progressively as you scroll —
-              like OpenAI and SuperWhisper style landing flow.
+              so students focus on study first, details second.
             </p>
           </div>
 
@@ -132,7 +132,7 @@ export default function LandingPage() {
         <div className={`mx-auto max-w-3xl ${cta.visible ? 'fade-in' : 'opacity-0'}`}>
           <h3 className="text-4xl font-semibold tracking-tight sm:text-5xl">Ready when you are.</h3>
           <p className="mx-auto mt-5 max-w-xl text-black/60 sm:text-lg">
-            Same ATAR Master power, cleaner OpenAI-like tone.
+            Built for VCE Methods students: clear, calm, and exam-focused.
           </p>
           <div className="mt-9">
             <Link
