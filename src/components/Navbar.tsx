@@ -64,7 +64,7 @@ function UserDropdown() {
           )}
           <div className="border-t border-gh-border my-1" />
           <button
-            onClick={() => { signOut(); setOpen(false); }}
+            onClick={async () => { await signOut(); setOpen(false); }}
             className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-400 hover:bg-gh-canvas transition"
           >
             <LogOut size={14} /> Sign Out

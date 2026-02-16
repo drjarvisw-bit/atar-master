@@ -114,7 +114,11 @@ export function useAuthProvider(): AuthContextType {
   }, [])
 
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut()
+    try {
+      await supabase.auth.signOut()
+    } catch (_) {
+      // ignore signOut errors
+    }
     setUser(null)
     setIsPro(false)
     window.location.href = '/'
