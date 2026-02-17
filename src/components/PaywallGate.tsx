@@ -38,7 +38,7 @@ export default function PaywallGate({ requirePro, children }: PaywallGateProps) 
           <div className="text-3xl font-bold text-gh-text-primary mb-1">
             $9.99<span className="text-base font-normal text-gh-text-secondary">/month</span>
           </div>
-          <p className="text-sm text-gh-text-secondary mb-4">or $79.99/year (save 33%)</p>
+          <p className="text-sm text-gh-text-secondary mb-4">or $89.99/year (save ~25%)</p>
 
           <ul className="text-left space-y-2 text-sm text-gh-text-secondary">
             {[
