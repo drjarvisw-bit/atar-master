@@ -7,9 +7,9 @@ import { getAllExams } from '../data/exams'
 import type { ExamPaper, ExamQuestion } from '../types'
 import { SKILL_TOPIC_COLORS } from '../types'
 import { formatEstimatedTime } from '../lib/utils'
+import { FREE_YEARS } from '../lib/constants'
 
 const ALL_YEARS = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016]
-const FREE_YEARS = new Set([2018, 2019, 2020])
 const RECOMMENDED_YEARS = new Set([2021, 2022, 2023, 2024, 2025])
 
 const DIFFICULTY_RATINGS: Record<number, { label: string }> = {

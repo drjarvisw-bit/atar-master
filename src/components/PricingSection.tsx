@@ -28,7 +28,6 @@ export default function PricingSection({ currentPlan = 'free' }: PricingSectionP
       window.location.href = url
     } catch (err) {
       console.error('Checkout error:', err)
-      alert('Failed to start checkout. Please try again.')
     } finally {
       setLoading(false)
     }

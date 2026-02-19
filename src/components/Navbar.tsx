@@ -5,7 +5,6 @@ import { useAuth } from '../hooks/useAuth';
 import { getDailyChallengeState } from '../lib/dailyChallenge';
 import { isAdminUser } from '../lib/constants';
 import StreakBadge from './StreakBadge';
-import ThemeSwitcher from './ThemeSwitcher';
 
 function UserDropdown() {
   const { user, isPro, signOut } = useAuth();
@@ -131,7 +130,6 @@ export default function Navbar() {
             </NavLink>
           ))}
           <div className="ml-2 pl-2 border-l border-black/10 flex items-center gap-2">
-            <ThemeSwitcher />
             {user && <StreakBadge />}
             {user ? (
               <UserDropdown />

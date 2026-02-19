@@ -2,15 +2,15 @@ import { CheckCircle, XCircle, Info, X } from 'lucide-react';
 import { useToast } from '../hooks/useToast';
 
 const icons = {
-  success: <CheckCircle size={18} className="text-gh-success-fg shrink-0" />,
-  error: <XCircle size={18} className="text-gh-danger-fg shrink-0" />,
-  info: <Info size={18} className="text-gh-accent-blue shrink-0" />,
+  success: <CheckCircle size={18} className="text-green-600 shrink-0" />,
+  error: <XCircle size={18} className="text-red-500 shrink-0" />,
+  info: <Info size={18} className="text-black/50 shrink-0" />,
 };
 
 const borders = {
-  success: 'border-gh-success-fg/30',
-  error: 'border-gh-danger-fg/30',
-  info: 'border-gh-accent-blue/30',
+  success: 'border-green-200',
+  error: 'border-red-200',
+  info: 'border-black/10',
 };
 
 export default function ToastContainer() {
@@ -23,13 +23,13 @@ export default function ToastContainer() {
       {toasts.map(toast => (
         <div
           key={toast.id}
-          className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl bg-gh-surface/95 backdrop-blur border ${borders[toast.type]} shadow-lg ${toast.exiting ? 'toast-exit' : 'toast-enter'}`}
+          className={`pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl bg-white/95 backdrop-blur border ${borders[toast.type]} shadow-lg ${toast.exiting ? 'toast-exit' : 'toast-enter'}`}
         >
           {icons[toast.type]}
-          <span className="text-sm text-gh-text-primary flex-1">{toast.message}</span>
+          <span className="text-sm text-black flex-1">{toast.message}</span>
           <button
             onClick={() => removeToast(toast.id)}
-            className="text-gh-text-secondary hover:text-gh-text-primary transition shrink-0"
+            className="text-black/30 hover:text-black/60 transition shrink-0"
           >
             <X size={14} />
           </button>

@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, Component } from 'react';
+import type { ReactNode, ErrorInfo } from 'react';
 import { AuthContext, useAuthProvider } from './hooks/useAuth';
 import { ToastContext, useToastProvider } from './hooks/useToast';
 import AuthGuard from './components/AuthGuard';
@@ -8,6 +9,42 @@ import Footer from './components/Footer';
 import LoadingSpinner from './components/LoadingSpinner';
 import ToastContainer from './components/Toast';
 import './index.css';
+
+// ── Error Boundary ───────────────────────────────────────────
+class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error('ErrorBoundary caught:', error, info);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-[60vh] flex items-center justify-center p-6">
+          <div className="text-center max-w-md">
+            <h2 className="text-2xl font-bold text-black mb-2">Something went wrong</h2>
+            <p className="text-black/50 mb-6">An unexpected error occurred. Please try refreshing the page.</p>
+            <button
+              onClick={() => { this.setState({ hasError: false }); window.location.href = '/'; }}
+              className="px-6 py-3 bg-black text-white rounded-xl hover:bg-black/85 transition text-sm font-medium"
+            >
+              Back to Home
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 // Lazy-loaded pages for code splitting
 const LandingPage = lazy(() => import('./pages/LandingPage'));
@@ -43,6 +80,7 @@ function AppLayout() {
       {/* Spacer for fixed navbar */}
       {!isLanding && <div className="h-[57px]" />}
       <main className="flex-1">
+        <ErrorBoundary>
         <Suspense fallback={<LoadingSpinner />}>
           <PageWrapper>
             <Routes>
@@ -64,6 +102,7 @@ function AppLayout() {
             </Routes>
           </PageWrapper>
         </Suspense>
+        </ErrorBoundary>
       </main>
       {showFooter && <Footer />}
       <ToastContainer />

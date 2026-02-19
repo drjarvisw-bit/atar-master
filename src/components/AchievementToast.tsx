@@ -24,12 +24,12 @@ export default function AchievementToast({ achievement, onDone }: Props) {
         visible ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'
       }`}
     >
-      <div className="flex items-center gap-3 px-5 py-4 rounded-xl border-2 border-yellow-500/70 bg-gh-surface shadow-lg shadow-yellow-500/20">
+      <div className="flex items-center gap-3 px-5 py-4 rounded-xl border-2 border-yellow-300 bg-white shadow-lg shadow-yellow-500/10">
         <span className="text-3xl">{achievement.icon}</span>
         <div>
-          <div className="text-xs font-bold text-yellow-400 uppercase tracking-wider">Achievement Unlocked!</div>
-          <div className="text-sm font-semibold text-gh-text-primary">{achievement.title}</div>
-          <div className="text-xs text-gh-text-secondary">{achievement.description}</div>
+          <div className="text-xs font-bold text-yellow-600 uppercase tracking-wider">Achievement Unlocked!</div>
+          <div className="text-sm font-semibold text-black">{achievement.title}</div>
+          <div className="text-xs text-black/45">{achievement.description}</div>
         </div>
       </div>
     </div>

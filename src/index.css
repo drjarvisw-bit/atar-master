@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  /* OpenAI-inspired dark theme colors */
-  --color-gh-canvas: #0a0a0a;
-  --color-gh-surface: #1a1a1a;
-  --color-gh-overlay: #262626;
-  --color-gh-inset: #0f0f0f;
-  --color-gh-border: #333333;
-  --color-gh-border-muted: #2a2a2a;
-  --color-gh-text-primary: #ffffff;
-  --color-gh-text-secondary: #a1a1a1;
-  --color-gh-text-muted: #6b6b6b;
-  --color-gh-accent-blue: #10a37f;
-  --color-gh-accent-blue-bold: #0e8c6b;
-  --color-gh-success: #10a37f;
-  --color-gh-success-fg: #10a37f;
+  /* Design token overrides (kept for components that reference gh-* classes) */
+  --color-gh-canvas: #fafafa;
+  --color-gh-surface: #ffffff;
+  --color-gh-overlay: #f5f5f5;
+  --color-gh-inset: #fafafa;
+  --color-gh-border: rgba(0,0,0,0.10);
+  --color-gh-border-muted: rgba(0,0,0,0.06);
+  --color-gh-text-primary: #000000;
+  --color-gh-text-secondary: rgba(0,0,0,0.50);
+  --color-gh-text-muted: rgba(0,0,0,0.35);
+  --color-gh-accent-blue: #000000;
+  --color-gh-accent-blue-bold: #000000;
+  --color-gh-success: #22c55e;
+  --color-gh-success-fg: #22c55e;
   --color-gh-warning: #d97706;
   --color-gh-warning-fg: #d97706;
   --color-gh-danger: #ef4444;
@@ -23,90 +23,31 @@
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
-/* ===== Theme system ===== */
-:root,
-[data-theme="midnight"] {
-  /* White/minimal theme */
-  --bg-primary: #fafafa;
-  --bg-secondary: #ffffff;
-  --card-bg: #ffffff;
-  --card-border: rgba(0,0,0,0.10);
-  --text-primary: #000000;
-  --text-secondary: rgba(0,0,0,0.50);
-  --accent: #000000;
-  --nav-bg: rgba(255,255,255,0.92);
-  --nav-border: rgba(0,0,0,0.10);
-}
-
-[data-theme="aurora"] {
-  --bg-primary: #0F0B2E;
-  --bg-secondary: #1A0B3E;
-  --card-bg: rgba(168,85,247,0.06);
-  --card-border: rgba(192,132,252,0.12);
-  --text-primary: #faf5ff;
-  --text-secondary: #d8b4fe;
-  --accent: #c084fc;
-  --nav-bg: rgba(15,11,46,0.85);
-  --nav-border: rgba(192,132,252,0.15);
-  --color-gh-canvas: #0F0B2E;
-  --color-gh-surface: rgba(168,85,247,0.08);
-  --color-gh-border: rgba(192,132,252,0.15);
-  --color-gh-text-primary: #faf5ff;
-  --color-gh-text-secondary: #d8b4fe;
-}
-
-[data-theme="slate"] {
-  --bg-primary: #111318;
-  --bg-secondary: #1A1D24;
-  --card-bg: rgba(30,41,59,0.6);
-  --card-border: rgba(51,65,85,0.5);
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --accent: #3b82f6;
-  --nav-bg: rgba(17,19,24,0.95);
-  --nav-border: rgba(51,65,85,0.5);
-  --color-gh-canvas: #111318;
-  --color-gh-surface: rgba(30,41,59,0.6);
-  --color-gh-border: rgba(51,65,85,0.5);
-  --color-gh-text-primary: #f1f5f9;
-  --color-gh-text-secondary: #94a3b8;
-}
-
 body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  background: #fafafa;
+  color: #000000;
   min-height: 100vh;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ===== OpenAI-style components ===== */
+/* ===== Minimal components ===== */
 
-/* Glass morphism base */
-.glass {
-  background: rgba(26, 26, 26, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-/* OpenAI-style cards */
 .card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.10);
   border-radius: 12px;
   transition: all 0.2s ease;
 }
 
 .card:hover {
-  border-color: rgba(16, 163, 127, 0.3);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  border-color: rgba(0,0,0,0.18);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
 }
 
-/* Primary button - OpenAI green */
 .btn-primary {
-  background: #10a37f;
+  background: #000000;
   color: white;
   padding: 10px 20px;
   border-radius: 8px;
@@ -117,67 +58,52 @@ body {
 }
 
 .btn-primary:hover {
-  background: #0e8c6b;
+  background: rgba(0,0,0,0.85);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 163, 127, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .btn-primary:active {
   transform: translateY(0);
 }
 
-/* Secondary button */
 .btn-secondary {
   background: transparent;
-  color: var(--text-primary);
+  color: #000000;
   padding: 10px 20px;
   border-radius: 8px;
   font-weight: 500;
   transition: all 0.15s ease;
-  border: 1px solid var(--card-border);
+  border: 1px solid rgba(0,0,0,0.10);
   cursor: pointer;
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--text-secondary);
-}
-
-/* Subtle glow effect */
-.glow {
-  box-shadow: 0 0 40px rgba(16, 163, 127, 0.15);
+  background: rgba(0,0,0,0.03);
+  border-color: rgba(0,0,0,0.18);
 }
 
 /* Smooth focus states */
 *:focus-visible {
-  outline: 2px solid #10a37f;
+  outline: 2px solid #000000;
   outline-offset: 2px;
 }
 
-/* Input fields — minimal overrides, let Tailwind handle the rest */
 input::placeholder {
   color: rgba(0,0,0,0.30);
 }
 
 /* ===== Animations ===== */
 
-/* Smooth page transitions */
 .page-enter {
   animation: pageEnter 0.3s ease-out;
 }
 
 @keyframes pageEnter {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* Stagger children animation */
 .stagger-children > * {
   opacity: 0;
   animation: fadeInUp 0.4s ease-out forwards;
@@ -191,67 +117,28 @@ input::placeholder {
 .stagger-children > *:nth-child(6) { animation-delay: 250ms; }
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* Hover lift effect */
 .hover-lift {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .hover-lift:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
-}
-
-/* Aurora ambient glow */
-[data-theme="aurora"] body::before {
-  content: '';
-  position: fixed;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(ellipse at 30% 20%, rgba(139,92,246,0.08) 0%, transparent 50%),
-              radial-gradient(ellipse at 70% 80%, rgba(236,72,153,0.06) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Override nav for themes */
-[data-theme="aurora"] nav.fixed,
-[data-theme="slate"] nav.fixed {
-  background: var(--nav-bg) !important;
-  border-color: var(--nav-border) !important;
-  backdrop-filter: blur(12px);
-}
-
-[data-theme="aurora"] .bg-gh-surface,
-[data-theme="aurora"] .bg-gray-900 {
-  background: rgba(168,85,247,0.08);
-}
-
-[data-theme="slate"] .bg-gh-surface,
-[data-theme="slate"] .bg-gray-900 {
-  background: rgba(30,41,59,0.6);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
 }
 
 /* Skill tree connection lines */
 .skill-edge {
-  stroke: var(--color-gh-border);
+  stroke: rgba(0,0,0,0.10);
   stroke-width: 2;
   fill: none;
 }
 .skill-edge.completed {
-  stroke: var(--color-gh-success-fg);
-  filter: drop-shadow(0 0 4px var(--color-gh-success-fg));
+  stroke: #22c55e;
+  filter: drop-shadow(0 0 4px #22c55e);
 }
 
 /* Civ tree animations */

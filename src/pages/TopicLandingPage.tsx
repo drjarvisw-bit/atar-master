@@ -37,36 +37,36 @@ export default function TopicLandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gh-canvas text-gh-text-primary">
+    <div className="min-h-screen bg-[#FAFAFA] text-black">
       <div className="max-w-3xl mx-auto px-4 py-16">
         {/* Breadcrumb */}
-        <nav className="text-sm text-gh-text-secondary mb-8">
-          <Link to="/" className="hover:text-gh-accent-fg">Home</Link>
+        <nav className="text-sm text-black/40 mb-8">
+          <Link to="/" className="hover:text-black transition">Home</Link>
           <span className="mx-2">/</span>
           <span>Topics</span>
           <span className="mx-2">/</span>
-          <span className="text-gh-text-primary">{node.title}</span>
+          <span className="text-black">{node.title}</span>
         </nav>
 
         {/* H1 */}
-        <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-gh-accent-fg to-purple-400 bg-clip-text text-transparent">
+        <h1 className="text-4xl font-bold mb-6 text-black">
           {page.h1}
         </h1>
 
         {/* Intro paragraph */}
-        <p className="text-lg text-gh-text-secondary leading-relaxed mb-8">
+        <p className="text-lg text-black/55 leading-relaxed mb-8">
           {page.intro}
         </p>
 
         {/* Topic details card */}
-        <div className="rounded-xl border border-gh-border bg-gh-canvas-subtle p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-3">What You'll Learn</h2>
-          <p className="text-gh-text-secondary mb-4">{node.description}</p>
+        <div className="rounded-xl border border-black/10 bg-white p-6 mb-8">
+          <h2 className="text-xl font-semibold text-black mb-3">What You'll Learn</h2>
+          <p className="text-black/50 mb-4">{node.description}</p>
           <div className="flex flex-wrap gap-2">
             {page.keywords.map((kw) => (
               <span
                 key={kw}
-                className="px-3 py-1 rounded-full text-xs font-medium bg-gh-accent-subtle text-gh-accent-fg border border-gh-accent-emphasis/20"
+                className="px-3 py-1 rounded-full text-xs font-medium bg-black/[0.04] text-black/55 border border-black/8"
               >
                 {kw}
               </span>
@@ -76,9 +76,9 @@ export default function TopicLandingPage() {
 
         {/* Prerequisites */}
         {node.prerequisites.length > 0 && (
-          <div className="rounded-xl border border-gh-border bg-gh-canvas-subtle p-6 mb-8">
-            <h2 className="text-xl font-semibold mb-3">Prerequisites</h2>
-            <ul className="list-disc list-inside text-gh-text-secondary space-y-1">
+          <div className="rounded-xl border border-black/10 bg-white p-6 mb-8">
+            <h2 className="text-xl font-semibold text-black mb-3">Prerequisites</h2>
+            <ul className="list-disc list-inside text-black/50 space-y-1">
               {node.prerequisites.map((preId) => {
                 const preNode = ALL_NODES.find((n) => n.id === preId);
                 return (
@@ -90,14 +90,14 @@ export default function TopicLandingPage() {
         )}
 
         {/* CTA */}
-        <div className="text-center py-12 rounded-xl border border-gh-accent-emphasis/30 bg-gradient-to-b from-gh-accent-subtle/20 to-transparent">
-          <h2 className="text-2xl font-bold mb-3">Ready to master {node.title}?</h2>
-          <p className="text-gh-text-secondary mb-6">
+        <div className="text-center py-12 rounded-xl border border-black/10 bg-white">
+          <h2 className="text-2xl font-bold text-black mb-3">Ready to master {node.title}?</h2>
+          <p className="text-black/50 mb-6">
             Practice with AI-generated questions tailored to the VCAA curriculum.
           </p>
           <Link
             to="/auth"
-            className="inline-block px-8 py-3 rounded-lg bg-gh-accent-emphasis text-white font-semibold hover:opacity-90 transition-opacity"
+            className="inline-block px-8 py-3 rounded-lg bg-black text-white font-semibold hover:bg-black/85 transition"
           >
             Get Started Free
           </Link>

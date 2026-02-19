@@ -8,11 +8,11 @@ export default function LoadingSpinner({ size = 40, label = 'Loading…' }: { si
           cy="25"
           r="20"
           fill="none"
-          stroke="var(--color-gh-accent-blue)"
+          stroke="rgba(0,0,0,0.25)"
           strokeWidth="4"
         />
       </svg>
-      <p className="text-sm text-gh-text-secondary animate-pulse">{label}</p>
+      <p className="text-sm text-black/40 animate-pulse">{label}</p>
     </div>
   );
 }

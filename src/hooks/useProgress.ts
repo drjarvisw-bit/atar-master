@@ -1,13 +1,12 @@
 import { useCallback, useSyncExternalStore } from 'react';
 import { Topic, type ExamQuestion } from '../types';
 import { getAllExams } from '../data/exams';
+import { getStreakData } from '../lib/streak';
 
 // ── Storage keys ──────────────────────────────────────────────
 const KEYS = {
   completed: 'atar-completed',
   weak: 'atar-weak',
-  streak: 'atar-streak',
-  lastPracticeDate: 'atar-last-practice-date',
   practiceMinutes: 'atar-practice-minutes',
   timerStart: 'atar-timer-start',
   recentSessions: 'atar-recent-sessions',
@@ -38,9 +37,13 @@ const subscribe = (cb: () => void) => {
 };
 const getSnapshot = () => revision;
 
-// ── All questions helper ──────────────────────────────────────
+// ── All questions helper (cached at module scope) ─────────────
+let _cachedAllQuestions: ExamQuestion[] | null = null;
 function allQuestions(): ExamQuestion[] {
-  return getAllExams().flatMap((e) => e.questions);
+  if (!_cachedAllQuestions) {
+    _cachedAllQuestions = getAllExams().flatMap((e) => e.questions);
+  }
+  return _cachedAllQuestions;
 }
 
 // ── Public session type ───────────────────────────────────────
@@ -74,7 +77,6 @@ export function useProgress() {
     const weak = read<string[]>(KEYS.weak, []);
     const idx = weak.indexOf(questionId);
     if (idx >= 0) { weak.splice(idx, 1); write(KEYS.weak, weak); }
-    updateStreak();
   }, []);
 
   const markQuestionWeak = useCallback((questionId: string) => {
@@ -83,7 +85,6 @@ export function useProgress() {
       weak.push(questionId);
       write(KEYS.weak, weak);
     }
-    updateStreak();
   }, []);
 
   const getTopicProgress = useCallback((topic: Topic) => {
@@ -113,7 +114,7 @@ export function useProgress() {
   }, []);
 
   const getStreak = useCallback((): number => {
-    return read<number>(KEYS.streak, 0);
+    return getStreakData().currentStreak;
   }, []);
 
   const getTotalPracticeTime = useCallback((): number => {
@@ -168,20 +169,3 @@ export function useProgress() {
   };
 }
 
-// ── Internal streak logic ─────────────────────────────────────
-function updateStreak() {
-  const today = new Date().toISOString().slice(0, 10);
-  const last = read<string | null>(KEYS.lastPracticeDate, null);
-
-  if (last === today) return; // already counted today
-
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-  const streak = read<number>(KEYS.streak, 0);
-
-  if (last === yesterday) {
-    write(KEYS.streak, streak + 1);
-  } else {
-    write(KEYS.streak, 1);
-  }
-  write(KEYS.lastPracticeDate, today);
-}

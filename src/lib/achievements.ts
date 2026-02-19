@@ -4,6 +4,7 @@
 
 import { type UserProgress } from './progress';
 import { type StreakData } from './streak';
+import { ALL_NODES } from '../data/skillTreeData';
 
 export interface Achievement {
   id: string;
@@ -134,7 +135,7 @@ export function checkAchievements(ctx: AchievementContext): Achievement[] {
   }
 
   // Half Way: 50% nodes completed
-  const totalNodes = ctx.totalNodes || 31;
+  const totalNodes = ctx.totalNodes || ALL_NODES.length;
   if (completedNodes.length >= totalNodes / 2) {
     tryUnlock('half-way');
   }
