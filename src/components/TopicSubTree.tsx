@@ -77,7 +77,7 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
           <p className="text-sm text-black/45 mt-0.5">{node.description}</p>
         </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-black">{np.levelsCompleted.filter(l => l <= maxLevels).length}/{maxLevels}</div>
+          <div className="text-2xl font-bold text-black">{np.levelsCompleted.filter(l => l <= maxLevels).length}/{levels.filter(l => (l.isExamLevel ? l.examCount : l.training.length) > 0).length}</div>
           <div className="text-xs text-black/35">levels done</div>
         </div>
       </div>
@@ -90,6 +90,9 @@ export default function TopicSubTree({ nodeId, progress, onBack, onStartLevel }:
           const isUnlocked = levelNum === 1 || np.levelsCompleted.includes(levelNum - 1);
           const isLocked = !isUnlocked;
           const qCount = levelData.isExamLevel ? levelData.examCount : levelData.training.length;
+
+          // Don't show levels with no content
+          if (qCount === 0) return null;
 
           return (
             <div
