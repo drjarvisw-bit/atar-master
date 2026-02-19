@@ -1,11 +1,7 @@
 import { supabase } from './supabase'
 
 // Stripe publishable key from environment variables
-const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
-if (!stripeKey && import.meta.env.PROD) {
-  throw new Error('VITE_STRIPE_PUBLISHABLE_KEY is required in production');
-}
-export const STRIPE_PUBLISHABLE_KEY = stripeKey;
+export const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string | undefined;
 
 // Live mode price IDs
 export const PRICE_PRO_MONTHLY = 'price_1T12VEH3RCPIiRpCcMASHDhz' as const
