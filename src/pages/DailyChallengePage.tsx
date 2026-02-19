@@ -34,14 +34,12 @@ export default function DailyChallengePage() {
   const [completed, setCompleted] = useState(existingState?.completed || false);
   const [finalState, setFinalState] = useState(existingState);
 
-  // Countdown
   const [countdown, setCountdown] = useState(getSecondsUntilRefresh());
   useEffect(() => {
     const t = setInterval(() => setCountdown(getSecondsUntilRefresh()), 1000);
     return () => clearInterval(t);
   }, []);
 
-  // Quiz state
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
@@ -76,7 +74,6 @@ export default function DailyChallengePage() {
 
   const handleNext = useCallback(() => {
     if (currentIdx + 1 >= total) {
-      // Finish
       const timeSpent = Math.floor((Date.now() - startTime) / 1000);
       const finalCorrect = Object.values({ ...results, [currentIdx]: results[currentIdx] }).filter(Boolean).length;
       const state = saveDailyChallengeResult(finalCorrect, total, timeSpent);
@@ -93,7 +90,6 @@ export default function DailyChallengePage() {
     setShowHint(false);
   }, [currentIdx, total, results, startTime]);
 
-  // Keyboard shortcuts
   useEffect(() => {
     if (completed) return;
     const handler = (e: KeyboardEvent) => {
@@ -119,13 +115,13 @@ export default function DailyChallengePage() {
   // ── Header ──
   const header = (
     <div className="text-center mb-8">
-      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gh-overlay border border-gh-border text-gh-text-primary text-sm font-semibold mb-3">
+      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/[0.05] border border-black/10 text-black text-sm font-semibold mb-3">
         <Zap size={16} /> Daily Challenge
       </div>
-      <h1 className="text-2xl font-bold text-gh-text-primary mb-1">{todayStr}</h1>
-      <p className="text-sm text-gh-text-secondary flex items-center justify-center gap-2">
+      <h1 className="text-2xl font-bold text-black mb-1">{todayStr}</h1>
+      <p className="text-sm text-black/45 flex items-center justify-center gap-2">
         <Clock size={14} /> Refreshes in {formatCountdown(countdown)}
-        <span className="text-gh-text-muted">·</span>
+        <span className="text-black/25">·</span>
         <Clock size={14} /> {formatEstimatedTime(total * 1.5)}
       </p>
     </div>
@@ -138,14 +134,14 @@ export default function DailyChallengePage() {
     const strokeDash = (pct / 100) * circumference;
 
     return (
-      <div className="min-h-[calc(100vh-57px)] bg-gh-canvas flex items-center justify-center p-6">
+      <div className="min-h-[calc(100vh-57px)] bg-[#FAFAFA] flex items-center justify-center p-6">
         <div className="w-full max-w-lg">
           {header}
-          <div className="bg-gray-800/60 border border-gray-700/50 rounded-2xl p-8 text-center backdrop-blur">
+          <div className="bg-white border border-black/10 rounded-2xl p-8 text-center shadow-sm">
             {/* Circular progress */}
             <div className="relative w-40 h-40 mx-auto mb-6">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
-                <circle cx="60" cy="60" r="54" fill="none" stroke="#1f2937" strokeWidth="8" />
+                <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(0,0,0,0.07)" strokeWidth="8" />
                 <circle
                   cx="60" cy="60" r="54" fill="none"
                   stroke={pct >= 60 ? '#22c55e' : '#f97316'}
@@ -155,34 +151,34 @@ export default function DailyChallengePage() {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-3xl font-bold text-gh-text-primary">{finalState.score}/{finalState.total}</span>
-                <span className="text-sm text-gray-400">{pct}%</span>
+                <span className="text-3xl font-bold text-black">{finalState.score}/{finalState.total}</span>
+                <span className="text-sm text-black/40">{pct}%</span>
               </div>
             </div>
 
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold mb-4 bg-green-500/20 text-green-400">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold mb-4 bg-green-50 text-green-700 border border-green-200">
               <Trophy size={16} /> Challenge Complete!
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-2 gap-4 my-6">
-              <div className="bg-gray-900/50 rounded-xl p-4">
-                <Clock size={18} className="text-blue-400 mx-auto mb-1" />
-                <div className="text-lg font-bold text-gh-text-primary">{formatTime(finalState.timeSpent || 0)}</div>
-                <div className="text-xs text-gray-400">Time Spent</div>
+              <div className="bg-black/[0.03] rounded-xl p-4">
+                <Clock size={18} className="text-blue-500 mx-auto mb-1" />
+                <div className="text-lg font-bold text-black">{formatTime(finalState.timeSpent || 0)}</div>
+                <div className="text-xs text-black/40">Time Spent</div>
               </div>
-              <div className="bg-gray-900/50 rounded-xl p-4">
-                <Flame size={18} className="text-orange-400 mx-auto mb-1" />
-                <div className="text-lg font-bold text-gh-text-primary">{finalState.streak || 1}</div>
-                <div className="text-xs text-gray-400">Day Streak</div>
+              <div className="bg-black/[0.03] rounded-xl p-4">
+                <Flame size={18} className="text-orange-500 mx-auto mb-1" />
+                <div className="text-lg font-bold text-black">{finalState.streak || 1}</div>
+                <div className="text-xs text-black/40">Day Streak</div>
               </div>
             </div>
 
-            <p className="text-gray-400 mb-6">Come back tomorrow for a new challenge.</p>
+            <p className="text-black/45 mb-6">Come back tomorrow for a new challenge.</p>
 
             <Link
               to="/dashboard"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gh-overlay border border-gh-border hover:bg-gh-border text-gh-text-primary font-semibold rounded-xl transition"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-black text-white font-semibold rounded-xl hover:bg-black/85 transition"
             >
               Back to Dashboard
             </Link>
@@ -195,10 +191,10 @@ export default function DailyChallengePage() {
   // ── No questions ──
   if (!current) {
     return (
-      <div className="min-h-[calc(100vh-57px)] bg-gh-canvas flex items-center justify-center p-6">
+      <div className="min-h-[calc(100vh-57px)] bg-[#FAFAFA] flex items-center justify-center p-6">
         <div className="text-center">
           {header}
-          <p className="text-gray-400">No questions available today.</p>
+          <p className="text-black/40">No questions available today.</p>
         </div>
       </div>
     );
@@ -210,27 +206,27 @@ export default function DailyChallengePage() {
   const levelLabels = ['L1 · Easy', 'L2 · Basic', 'L3 · Medium', 'L4 · Hard', 'L5 · Expert'];
 
   return (
-    <div className="min-h-[calc(100vh-57px)] bg-gh-canvas flex flex-col">
+    <div className="min-h-[calc(100vh-57px)] bg-[#FAFAFA] flex flex-col">
       {/* Top bar */}
-      <div className="sticky top-[57px] z-20 bg-white/90 backdrop-blur border-b border-gh-border px-4 sm:px-6 pt-4 pb-3">
+      <div className="sticky top-[57px] z-20 bg-white/95 backdrop-blur border-b border-black/8 px-4 sm:px-6 pt-4 pb-3">
         <div className="max-w-3xl mx-auto">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <Zap size={16} className="text-yellow-400" />
-              <span className="text-sm font-semibold text-yellow-400">Daily Challenge</span>
+              <Zap size={16} className="text-black/50" />
+              <span className="text-sm font-semibold text-black/65">Daily Challenge</span>
             </div>
-            <span className="text-sm text-gray-300">
-              <span className="text-gh-text-primary font-bold">{currentIdx + 1}</span> / {total}
+            <span className="text-sm text-black/45">
+              <span className="text-black font-bold">{currentIdx + 1}</span> / {total}
             </span>
-            <span className="text-xs text-gray-500">{formatCountdown(countdown)}</span>
+            <span className="text-xs text-black/30 font-mono">{formatCountdown(countdown)}</span>
           </div>
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-1.5 mb-2">
             {questions.map((_, i) => (
               <div
                 key={i}
                 className={`flex-1 h-1.5 rounded-full transition-all ${
-                  i < currentIdx ? (results[i] ? 'bg-green-500' : 'bg-red-500')
-                    : i === currentIdx ? 'bg-blue-500' : 'bg-gray-700'
+                  i < currentIdx ? (results[i] ? 'bg-green-500' : 'bg-red-400')
+                    : i === currentIdx ? 'bg-black' : 'bg-black/[0.08]'
                 }`}
               />
             ))}
@@ -241,18 +237,18 @@ export default function DailyChallengePage() {
       {/* Question */}
       <div className="flex-1 px-4 sm:px-6 py-6 sm:py-8">
         <div className="max-w-3xl mx-auto">
-          <div className="bg-gray-800/50 border border-gray-700/40 rounded-2xl p-5 sm:p-7 mb-5">
+          <div className="bg-white border border-black/10 rounded-2xl p-5 sm:p-7 mb-5">
             <div className="flex items-center justify-between mb-4">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-yellow-500/20 text-yellow-400">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-black/[0.06] text-black/55">
                 {levelLabels[current.level - 1] || `L${current.level}`}
               </span>
               {current.marks && (
-                <span className="text-xs text-gray-400 bg-gray-700/60 px-2.5 py-0.5 rounded-full">
+                <span className="text-xs text-black/40 bg-black/[0.04] px-2.5 py-0.5 rounded-full">
                   {current.marks} {current.marks === 1 ? 'mark' : 'marks'}
                 </span>
               )}
             </div>
-            <div className="text-lg text-gh-text-primary leading-relaxed">
+            <div className="text-lg text-black leading-relaxed">
               <MathText text={current.text} />
             </div>
           </div>
@@ -262,27 +258,27 @@ export default function DailyChallengePage() {
             <div className="space-y-3 mb-5">
               {current.options.map((opt, idx) => {
                 const isSelected = selectedOption === opt.label;
-                let border = 'border-gray-700/40';
-                let bg = 'bg-gray-800/30';
-                let labelBg = 'bg-gray-700 text-gray-400';
-                let textColor = 'text-gray-300';
+                let border = 'border-black/10';
+                let bg = 'bg-white';
+                let labelBg = 'bg-black/[0.06] text-black/50';
+                let textColor = 'text-black/70';
                 let icon: React.ReactNode = opt.label;
                 let ringClass = '';
 
                 if (isAnswered) {
                   if (opt.correct) {
-                    border = 'border-green-500/60'; bg = 'bg-green-500/10';
-                    labelBg = 'bg-green-500 text-white'; textColor = 'text-green-200';
+                    border = 'border-green-200'; bg = 'bg-green-50';
+                    labelBg = 'bg-green-500 text-white'; textColor = 'text-green-700';
                     icon = <Check size={14} strokeWidth={3} />;
                   } else if (isSelected && !opt.correct) {
-                    border = 'border-red-500/60'; bg = 'bg-red-500/10';
-                    labelBg = 'bg-red-500 text-white'; textColor = 'text-red-200';
+                    border = 'border-red-200'; bg = 'bg-red-50';
+                    labelBg = 'bg-red-500 text-white'; textColor = 'text-red-600';
                     icon = <X size={14} strokeWidth={3} />;
-                  } else { textColor = 'text-gray-500'; }
+                  } else { textColor = 'text-black/30'; }
                 } else if (isSelected) {
-                  border = 'border-blue-500/60'; bg = 'bg-blue-500/10';
-                  labelBg = 'bg-blue-500 text-white'; textColor = 'text-blue-100';
-                  ringClass = 'ring-1 ring-blue-500/30';
+                  border = 'border-black/30'; bg = 'bg-black/[0.03]';
+                  labelBg = 'bg-black text-white'; textColor = 'text-black';
+                  ringClass = 'ring-1 ring-black/10';
                 }
 
                 return (
@@ -291,7 +287,7 @@ export default function DailyChallengePage() {
                     onClick={() => handleSelect(opt.label)}
                     disabled={isAnswered}
                     className={`w-full flex items-center gap-4 py-5 px-6 rounded-xl border transition-all duration-200 ${border} ${bg} ${ringClass} ${
-                      !isAnswered ? 'hover:border-blue-500/40 hover:bg-blue-500/5 cursor-pointer' : ''
+                      !isAnswered ? 'hover:border-black/20 hover:bg-black/[0.02] cursor-pointer' : ''
                     }`}
                   >
                     <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0 ${labelBg}`}>
@@ -301,7 +297,7 @@ export default function DailyChallengePage() {
                       <MathText text={opt.text} />
                     </span>
                     {!isAnswered && idx < OPTION_KEYS.length && (
-                      <span className="ml-auto text-xs text-gray-600 font-mono hidden sm:block">
+                      <span className="ml-auto text-xs text-black/25 font-mono hidden sm:block">
                         {OPTION_KEYS[idx].toUpperCase()}
                       </span>
                     )}
@@ -316,14 +312,14 @@ export default function DailyChallengePage() {
             <div className="mb-5">
               <button
                 onClick={() => setShowHint(prev => !prev)}
-                className="flex items-center gap-2 text-sm text-yellow-500/70 hover:text-yellow-400 transition-colors"
+                className="flex items-center gap-2 text-sm text-amber-500/80 hover:text-amber-600 transition-colors"
               >
                 <Lightbulb size={15} /> Need a hint?
                 {showHint ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
               </button>
               {showHint && (
-                <div className="mt-3 p-4 bg-yellow-500/5 border border-yellow-500/20 rounded-xl">
-                  <div className="text-sm text-yellow-200/80"><MathText text={current.hints[0]} /></div>
+                <div className="mt-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                  <div className="text-sm text-amber-700"><MathText text={current.hints[0]} /></div>
                 </div>
               )}
             </div>
@@ -333,17 +329,17 @@ export default function DailyChallengePage() {
           {isAnswered && (
             <div className={`mb-5 rounded-xl border p-5 transition-all duration-300 ${
               feedbackVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
-            } ${isCorrect ? 'bg-green-500/10 border-green-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
-              <div className={`text-base font-semibold mb-2 ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
-                {isCorrect ? 'Correct' : 'Incorrect'}
+            } ${isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+              <div className={`text-base font-semibold mb-2 ${isCorrect ? 'text-green-700' : 'text-red-600'}`}>
+                {isCorrect ? 'Correct!' : 'Incorrect'}
               </div>
               {!isCorrect && correctOption && (
-                <p className="text-sm text-gray-300 mb-2">
-                  The answer is <span className="font-bold text-gh-text-primary">{correctOption.label}</span>
+                <p className="text-sm text-black/55 mb-2">
+                  The answer is <span className="font-bold text-black">{correctOption.label}</span>
                 </p>
               )}
               {current.answer && (
-                <div className="text-sm text-gray-300"><MathText text={current.answer} /></div>
+                <div className="text-sm text-black/55"><MathText text={current.answer} /></div>
               )}
             </div>
           )}
@@ -353,14 +349,14 @@ export default function DailyChallengePage() {
             <button
               onClick={handleSubmit}
               disabled={!selectedOption}
-              className="w-full py-4 bg-gh-overlay border border-gh-border hover:bg-gh-border disabled:opacity-30 disabled:cursor-not-allowed text-gh-text-primary font-semibold rounded-xl transition"
+              className="w-full py-4 bg-black hover:bg-black/85 disabled:opacity-30 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition"
             >
               Submit Answer
             </button>
           ) : (
             <button
               onClick={handleNext}
-              className="w-full py-4 bg-gh-overlay border border-gh-border hover:bg-gh-border text-gh-text-primary font-semibold rounded-xl transition flex items-center justify-center gap-2"
+              className="w-full py-4 bg-black hover:bg-black/85 text-white font-semibold rounded-xl transition flex items-center justify-center gap-2"
             >
               {currentIdx + 1 >= total ? 'See Results' : 'Next Question'}
               <ArrowRight size={18} />

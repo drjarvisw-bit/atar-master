@@ -41,7 +41,6 @@ export default function DashboardPage() {
   const sessions = progress.getRecentSessions();
   const weakCount = progress.getWeakQuestions().length;
 
-  // Skill tree progress
   const skillTreeProgress = useMemo(() => {
     const p = loadProgress();
     const completed = Object.values(p.nodes).filter(
@@ -50,7 +49,6 @@ export default function DashboardPage() {
     return completed;
   }, []);
 
-  // Profile
   const dailyState = useMemo(() => getDailyChallengeState(), []);
   const [profile, setProfile] = useState<ProfileData>(loadProfile);
   const [profileSaved, setProfileSaved] = useState(false);
@@ -76,7 +74,6 @@ export default function DashboardPage() {
   );
 
   const allExams = useMemo(() => getAllExams(), []);
-
   const avatarUrl = user?.user_metadata?.avatar_url;
 
   return (
@@ -84,17 +81,17 @@ export default function DashboardPage() {
       {/* Profile Header */}
       <div className="flex items-center gap-4 mb-8">
         {avatarUrl ? (
-          <img src={avatarUrl} alt="Avatar" className="w-16 h-16 rounded-full border-2 border-gh-border" />
+          <img src={avatarUrl} alt="Avatar" className="w-16 h-16 rounded-full border border-black/10" />
         ) : (
-          <div className="w-16 h-16 rounded-full bg-gh-surface border-2 border-gh-border flex items-center justify-center">
-            <UserIcon size={28} className="text-gh-text-secondary" />
+          <div className="w-16 h-16 rounded-full bg-black/[0.05] border border-black/10 flex items-center justify-center">
+            <UserIcon size={28} className="text-black/40" />
           </div>
         )}
         <div>
-          <h1 className="text-2xl font-bold">{user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Student'}</h1>
-          <p className="text-sm text-gh-text-secondary">{user?.email}</p>
+          <h1 className="text-2xl font-bold text-black">{user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Student'}</h1>
+          <p className="text-sm text-black/45">{user?.email}</p>
           {isPro && (
-            <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 text-xs font-bold bg-gh-accent-blue/20 text-gh-accent-blue rounded-full">
+            <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 text-xs font-bold bg-green-50 text-green-700 border border-green-200 rounded-full">
               <Crown size={12} /> PRO
             </span>
           )}
@@ -104,41 +101,37 @@ export default function DashboardPage() {
       {/* Stats row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {([
-          { icon: <CheckCircle2 size={20} className="text-green-400" />, value: `${overall.completed}/${overall.total}`, label: 'Questions Done' },
-          { icon: <Flame size={20} className="text-orange-400" />, value: `${streak}`, label: 'Day Streak' },
-          { icon: <Clock size={20} className="text-blue-400" />, value: `${Math.round(practiceTime)}m`, label: 'Practice Time' },
-          { icon: <TrendingUp size={20} className="text-purple-400" />, value: `${skillTreeProgress}/31`, label: 'Skills Completed' },
+          { icon: <CheckCircle2 size={20} className="text-green-500" />, value: `${overall.completed}/${overall.total}`, label: 'Questions Done' },
+          { icon: <Flame size={20} className="text-orange-500" />, value: `${streak}`, label: 'Day Streak' },
+          { icon: <Clock size={20} className="text-blue-500" />, value: `${Math.round(practiceTime)}m`, label: 'Practice Time' },
+          { icon: <TrendingUp size={20} className="text-purple-500" />, value: `${skillTreeProgress}/31`, label: 'Skills Completed' },
         ]).map((s, i) => (
-          <div key={i} className="bg-gh-surface border border-gh-border rounded-xl p-4 text-center">
+          <div key={i} className="bg-white border border-black/10 rounded-xl p-4 text-center">
             <div className="flex justify-center mb-2">{s.icon}</div>
-            <div className="text-2xl font-bold text-gh-text-primary">{s.value}</div>
-            <div className="text-xs text-gh-text-secondary">{s.label}</div>
+            <div className="text-2xl font-bold text-black">{s.value}</div>
+            <div className="text-xs text-black/40">{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* Daily Challenge Card */}
-      <div className="bg-gh-surface border border-gh-border rounded-xl p-6 mb-8">
+      <div className="bg-white border border-black/10 rounded-xl p-6 mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-semibold flex items-center gap-2 text-gh-text-primary">
-              <Flame size={16} /> Daily Challenge
+            <h2 className="text-lg font-semibold flex items-center gap-2 text-black">
+              <Flame size={16} className="text-orange-500" /> Daily Challenge
             </h2>
             {dailyState?.completed ? (
-              <p className="text-sm text-gray-400 mt-1">
-                Today's score: <span className="text-gh-text-primary font-bold">{dailyState.score}/{dailyState.total}</span> — Come back tomorrow!
+              <p className="text-sm text-black/45 mt-1">
+                Today's score: <span className="text-black font-bold">{dailyState.score}/{dailyState.total}</span> — Come back tomorrow!
               </p>
             ) : (
-              <p className="text-sm text-gray-400 mt-1">5 mixed-difficulty questions. New challenge every day!</p>
+              <p className="text-sm text-black/45 mt-1">5 mixed-difficulty questions. New challenge every day!</p>
             )}
           </div>
           <Link
             to="/daily"
-            className={`px-5 py-2.5 rounded-xl font-semibold text-sm transition border ${
-              dailyState?.completed
-                ? 'bg-gh-overlay border-gh-border text-gh-text-secondary hover:bg-gh-border'
-                : 'bg-gh-overlay border-gh-border text-gh-text-primary hover:bg-gh-border'
-            }`}
+            className="px-5 py-2.5 rounded-xl font-semibold text-sm transition border border-black/10 bg-black/[0.04] text-black hover:bg-black/[0.07]"
           >
             {dailyState?.completed ? 'View Results' : 'Start Challenge'}
           </Link>
@@ -147,36 +140,36 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* Profile Section */}
-        <div className="bg-gh-surface border border-gh-border rounded-xl p-6">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><UserIcon size={18} /> Profile</h2>
+        <div className="bg-white border border-black/10 rounded-xl p-6">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-black"><UserIcon size={18} /> Profile</h2>
           <div className="space-y-3">
             <div>
-              <label className="text-xs text-gh-text-secondary flex items-center gap-1 mb-1"><Mail size={12} /> Email</label>
-              <input disabled value={user?.email || ''} className="w-full px-3 py-2 bg-gh-canvas border border-gh-border rounded-lg text-sm text-gh-text-secondary" />
+              <label className="text-xs text-black/45 flex items-center gap-1 mb-1"><Mail size={12} /> Email</label>
+              <input disabled value={user?.email || ''} className="w-full px-3 py-2 bg-black/[0.03] border border-black/8 rounded-lg text-sm text-black/40" />
             </div>
             <div>
-              <label className="text-xs text-gh-text-secondary flex items-center gap-1 mb-1"><UserIcon size={12} /> Display Name</label>
+              <label className="text-xs text-black/45 flex items-center gap-1 mb-1"><UserIcon size={12} /> Display Name</label>
               <input
                 value={profile.displayName}
                 onChange={e => setProfile(p => ({ ...p, displayName: e.target.value }))}
-                className="w-full px-3 py-2 bg-gh-canvas border border-gh-border rounded-lg text-sm text-gh-text-primary focus:border-gh-accent-blue focus:outline-none"
+                className="w-full px-3 py-2 bg-white border border-black/10 rounded-lg text-sm text-black focus:border-black/30 focus:outline-none transition"
               />
             </div>
             <div>
-              <label className="text-xs text-gh-text-secondary flex items-center gap-1 mb-1"><School size={12} /> School</label>
+              <label className="text-xs text-black/45 flex items-center gap-1 mb-1"><School size={12} /> School</label>
               <input
                 value={profile.school}
                 onChange={e => setProfile(p => ({ ...p, school: e.target.value }))}
                 placeholder="Enter your school"
-                className="w-full px-3 py-2 bg-gh-canvas border border-gh-border rounded-lg text-sm text-gh-text-primary focus:border-gh-accent-blue focus:outline-none"
+                className="w-full px-3 py-2 bg-white border border-black/10 rounded-lg text-sm text-black placeholder-black/25 focus:border-black/30 focus:outline-none transition"
               />
             </div>
             <div>
-              <label className="text-xs text-gh-text-secondary flex items-center gap-1 mb-1"><GraduationCap size={12} /> Year Level</label>
+              <label className="text-xs text-black/45 flex items-center gap-1 mb-1"><GraduationCap size={12} /> Year Level</label>
               <select
                 value={profile.yearLevel}
                 onChange={e => setProfile(p => ({ ...p, yearLevel: e.target.value }))}
-                className="w-full px-3 py-2 bg-gh-canvas border border-gh-border rounded-lg text-sm text-gh-text-primary focus:border-gh-accent-blue focus:outline-none"
+                className="w-full px-3 py-2 bg-white border border-black/10 rounded-lg text-sm text-black focus:border-black/30 focus:outline-none transition"
               >
                 <option value="">Select year level</option>
                 {YEAR_LEVELS.map(y => <option key={y} value={y}>{y}</option>)}
@@ -184,46 +177,46 @@ export default function DashboardPage() {
             </div>
             <button
               onClick={handleSaveProfile}
-              className="flex items-center gap-2 px-4 py-2 bg-gh-overlay border border-gh-border text-gh-text-primary text-sm font-medium rounded-lg hover:bg-gh-border transition"
+              className="flex items-center gap-2 px-4 py-2 bg-black/[0.05] border border-black/10 text-black text-sm font-medium rounded-lg hover:bg-black/[0.08] transition"
             >
-              <Save size={14} /> {profileSaved ? 'Saved' : 'Save Profile'}
+              <Save size={14} /> {profileSaved ? 'Saved!' : 'Save Profile'}
             </button>
           </div>
         </div>
 
         {/* Subscription Section */}
-        <div className="bg-gh-surface border border-gh-border rounded-xl p-6">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><Crown size={18} /> Subscription</h2>
+        <div className="bg-white border border-black/10 rounded-xl p-6">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-black"><Crown size={18} /> Subscription</h2>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gh-text-secondary">Current Plan</span>
-              <span className={`px-3 py-1 rounded-full text-sm font-bold ${isPro ? 'bg-gh-accent-blue/20 text-gh-accent-blue' : 'bg-gray-700 text-gray-300'}`}>
+              <span className="text-sm text-black/50">Current Plan</span>
+              <span className={`px-3 py-1 rounded-full text-sm font-bold ${isPro ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-black/[0.05] text-black/50 border border-black/10'}`}>
                 {isPro ? 'Pro' : 'Free'}
               </span>
             </div>
             {isPro ? (
               <>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gh-text-secondary">Status</span>
-                  <span className="text-sm text-green-400">Active</span>
+                  <span className="text-sm text-black/50">Status</span>
+                  <span className="text-sm text-green-600">Active</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gh-text-secondary">Next billing</span>
-                  <span className="text-sm text-gh-text-secondary">—</span>
+                  <span className="text-sm text-black/50">Next billing</span>
+                  <span className="text-sm text-black/40">—</span>
                 </div>
                 <Link
                   to="/pricing"
-                  className="flex items-center gap-2 text-sm text-gh-accent-blue hover:underline"
+                  className="flex items-center gap-2 text-sm text-black/55 hover:text-black transition"
                 >
                   <ExternalLink size={14} /> Manage Subscription
                 </Link>
               </>
             ) : (
               <div>
-                <p className="text-sm text-gh-text-secondary mb-4">Upgrade to Pro for unlimited access to all exams, practice questions, and skill trees.</p>
+                <p className="text-sm text-black/50 mb-4">Upgrade to Pro for unlimited access to all exams, practice questions, and skill trees.</p>
                 <Link
                   to="/pricing"
-                  className="flex items-center justify-center gap-2 px-4 py-3 bg-gh-overlay border border-gh-border text-gh-text-primary font-semibold rounded-xl hover:bg-gh-border transition"
+                  className="flex items-center justify-center gap-2 px-4 py-3 bg-black text-white font-semibold rounded-xl hover:bg-black/85 transition"
                 >
                   <Crown size={16} /> Upgrade to Pro
                 </Link>
@@ -234,8 +227,8 @@ export default function DashboardPage() {
       </div>
 
       {/* Topic progress */}
-      <div className="bg-gh-surface border border-gh-border rounded-xl p-6 mb-8">
-        <h2 className="text-lg font-semibold mb-4">Topic Mastery</h2>
+      <div className="bg-white border border-black/10 rounded-xl p-6 mb-8">
+        <h2 className="text-lg font-semibold mb-4 text-black">Topic Mastery</h2>
         <div className="space-y-4">
           {topicData.map(({ topic, completed, total }) => {
             const pct = total ? Math.round((completed / total) * 100) : 0;
@@ -244,9 +237,9 @@ export default function DashboardPage() {
               <div key={topic}>
                 <div className="flex justify-between text-sm mb-1">
                   <span style={{ color: color?.primary }}>{topic}</span>
-                  <span className="text-gh-text-secondary">{completed}/{total} ({pct}%)</span>
+                  <span className="text-black/40">{completed}/{total} ({pct}%)</span>
                 </div>
-                <div className="w-full h-2 bg-gh-canvas rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-black/[0.06] rounded-full overflow-hidden">
                   <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: color?.primary }} />
                 </div>
               </div>
@@ -257,19 +250,19 @@ export default function DashboardPage() {
 
       {/* Recent sessions + recommendation */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div className="bg-gh-surface border border-gh-border rounded-xl p-6">
-          <h2 className="text-lg font-semibold mb-4">Recent Practice</h2>
+        <div className="bg-white border border-black/10 rounded-xl p-6">
+          <h2 className="text-lg font-semibold mb-4 text-black">Recent Practice</h2>
           {sessions.length === 0 ? (
-            <p className="text-sm text-gh-text-secondary">No practice sessions yet. Start one!</p>
+            <p className="text-sm text-black/40">No practice sessions yet. Start one!</p>
           ) : (
             <div className="space-y-3 max-h-64 overflow-y-auto">
               {sessions.slice(0, 5).map((s, i) => (
                 <div key={i} className="flex items-center justify-between text-sm">
                   <div>
-                    <span className="text-gh-text-primary capitalize">{s.mode}</span>
-                    <span className="text-gh-text-secondary ml-2">{new Date(s.date).toLocaleDateString()}</span>
+                    <span className="text-black capitalize">{s.mode}</span>
+                    <span className="text-black/40 ml-2">{new Date(s.date).toLocaleDateString()}</span>
                   </div>
-                  <span className={s.correct / s.total >= 0.7 ? 'text-green-400' : 'text-yellow-400'}>
+                  <span className={s.correct / s.total >= 0.7 ? 'text-green-600' : 'text-orange-500'}>
                     {s.correct}/{s.total}
                   </span>
                 </div>
@@ -278,9 +271,9 @@ export default function DashboardPage() {
           )}
         </div>
 
-        <div className="bg-gh-surface border border-gh-border rounded-xl p-6 flex flex-col">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><TrendingUp size={16} /> Recommended Next</h2>
-          <p className="text-gh-text-secondary text-sm mb-4 flex-1">
+        <div className="bg-white border border-black/10 rounded-xl p-6 flex flex-col">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-black"><TrendingUp size={16} /> Recommended Next</h2>
+          <p className="text-black/50 text-sm mb-4 flex-1">
             {weakCount > 0
               ? `You have ${weakCount} questions to revisit. Let's strengthen those weak spots!`
               : 'Keep practicing to improve your weakest topics!'
@@ -288,7 +281,7 @@ export default function DashboardPage() {
           </p>
           <Link
             to="/practice"
-            className="flex items-center justify-center gap-2 px-4 py-3 bg-gh-overlay border border-gh-border text-gh-text-primary font-semibold rounded-xl hover:bg-gh-border transition"
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-black text-white font-semibold rounded-xl hover:bg-black/85 transition"
           >
             <Play size={16} /> Start Practice
           </Link>
@@ -301,15 +294,15 @@ export default function DashboardPage() {
       </div>
 
       {/* Exam progress */}
-      <div className="bg-gh-surface border border-gh-border rounded-xl p-6">
-        <h2 className="text-lg font-semibold mb-4">Exam Completion</h2>
+      <div className="bg-white border border-black/10 rounded-xl p-6">
+        <h2 className="text-lg font-semibold mb-4 text-black">Exam Completion</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {allExams.map(exam => {
             const ep = progress.getExamProgress(exam.id);
             return (
-              <div key={exam.id} className="flex items-center justify-between p-3 bg-gh-canvas rounded-lg border border-gh-border">
-                <span className="text-sm text-gh-text-primary">{exam.title}</span>
-                <span className="text-xs text-gh-text-secondary">{ep.percentage}%</span>
+              <div key={exam.id} className="flex items-center justify-between p-3 bg-black/[0.03] rounded-lg border border-black/8">
+                <span className="text-sm text-black">{exam.title}</span>
+                <span className="text-xs text-black/40">{ep.percentage}%</span>
               </div>
             );
           })}

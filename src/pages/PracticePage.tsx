@@ -21,9 +21,7 @@ export default function PracticePage() {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [results, setResults] = useState<Record<string, 'correct' | 'weak'>>({});
 
-  // MC state
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  // SA state
   const [hintsShown, setHintsShown] = useState(0);
   const [answerShown, setAnswerShown] = useState(false);
 
@@ -96,11 +94,8 @@ export default function PracticePage() {
     }
   }
 
-  // ── Render helpers ──────────────────────────────────────────
-
   const isMC = currentQ?.options && currentQ.options.length > 0;
   const answered = isMC ? selectedOption !== null : answerShown;
-
   const correctCount = Object.values(results).filter(v => v === 'correct').length;
   const weakCount = Object.values(results).filter(v => v === 'weak').length;
 
@@ -108,8 +103,8 @@ export default function PracticePage() {
   if (phase === 'select') {
     return (
       <div className="mx-auto max-w-3xl px-6 py-10">
-        <h1 className="text-3xl font-bold mb-2 text-gh-text-primary">Practice Mode</h1>
-        <p className="text-gh-text-secondary mb-8">Choose how you want to practice</p>
+        <h1 className="text-3xl font-bold mb-2 text-black">Practice Mode</h1>
+        <p className="text-black/45 mb-8">Choose how you want to practice</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
           {([
@@ -121,17 +116,21 @@ export default function PracticePage() {
             <button
               key={m}
               onClick={() => setMode(m)}
-              className={`p-5 rounded-xl border text-left transition-all ${mode === m ? 'border-black/20 bg-black/[0.03]' : 'border-gh-border bg-gh-surface hover:border-black/20'}`}
+              className={`p-5 rounded-xl border text-left transition-all ${
+                mode === m
+                  ? 'border-black/20 bg-black/[0.03]'
+                  : 'border-black/10 bg-white hover:border-black/20'
+              }`}
             >
-              <div className="flex items-center gap-2 mb-1 text-gh-text-primary font-semibold">{icon} {label}</div>
-              <div className="text-sm text-gh-text-secondary">{desc}</div>
+              <div className="flex items-center gap-2 mb-1 text-black font-semibold">{icon} {label}</div>
+              <div className="text-sm text-black/45">{desc}</div>
             </button>
           ))}
         </div>
 
         {mode === 'topic' && (
           <div className="mb-8">
-            <label className="block text-sm font-medium text-gh-text-secondary mb-2">Select Topic</label>
+            <label className="block text-sm font-medium text-black/50 mb-2">Select Topic</label>
             <div className="flex flex-wrap gap-2">
               {TOPICS.map(t => {
                 const color = SKILL_TOPIC_COLORS[t];
@@ -141,9 +140,9 @@ export default function PracticePage() {
                     onClick={() => setSelectedTopic(t)}
                     className="px-3 py-1.5 rounded-full text-sm font-medium border transition-all"
                     style={{
-                      borderColor: selectedTopic === t ? color?.primary : 'var(--gh-border)',
+                      borderColor: selectedTopic === t ? color?.primary : 'rgba(0,0,0,0.10)',
                       background: selectedTopic === t ? color?.bg : 'transparent',
-                      color: selectedTopic === t ? color?.primary : 'var(--gh-text-secondary)',
+                      color: selectedTopic === t ? color?.primary : 'rgba(0,0,0,0.50)',
                     }}
                   >
                     {t}
@@ -156,9 +155,9 @@ export default function PracticePage() {
 
         {mode === 'exam' && (
           <div className="mb-8">
-            <label className="block text-sm font-medium text-gh-text-secondary mb-2">Select Exam</label>
+            <label className="block text-sm font-medium text-black/50 mb-2">Select Exam</label>
             <select
-              className="w-full bg-gh-surface border border-gh-border rounded-lg px-4 py-2 text-gh-text-primary"
+              className="w-full bg-white border border-black/10 rounded-lg px-4 py-2 text-black focus:outline-none focus:border-black/30"
               value={selectedExamId}
               onChange={e => setSelectedExamId(e.target.value)}
             >
@@ -173,7 +172,7 @@ export default function PracticePage() {
         <button
           onClick={startPractice}
           disabled={mode === 'exam' && !selectedExamId}
-          className="flex items-center gap-2 px-6 py-3 bg-gh-overlay border border-gh-border text-gh-text-primary font-semibold rounded-xl hover:bg-gh-border transition disabled:opacity-40"
+          className="flex items-center gap-2 px-6 py-3 bg-black text-white font-semibold rounded-xl hover:bg-black/85 transition disabled:opacity-40"
         >
           <Play size={18} /> Start Practice
         </button>
@@ -187,7 +186,7 @@ export default function PracticePage() {
       <div className="mx-auto max-w-3xl px-6 py-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <span className="text-sm text-gh-text-secondary">
+          <span className="text-sm text-black/45">
             Question {currentIdx + 1} / {questions.length}
           </span>
           <span className="text-xs px-2 py-1 rounded-full" style={{
@@ -199,20 +198,20 @@ export default function PracticePage() {
         </div>
 
         {/* Progress bar */}
-        <div className="w-full h-1.5 bg-gh-surface rounded-full mb-8 overflow-hidden">
+        <div className="w-full h-1.5 bg-black/[0.06] rounded-full mb-8 overflow-hidden">
           <div
-            className="h-full bg-gh-accent-blue rounded-full transition-all duration-300"
+            className="h-full bg-black rounded-full transition-all duration-300"
             style={{ width: `${((currentIdx) / questions.length) * 100}%` }}
           />
         </div>
 
         {/* Question */}
-        <div className="bg-gh-surface border border-gh-border rounded-xl p-6 mb-6">
+        <div className="bg-white border border-black/10 rounded-xl p-6 mb-6">
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-sm font-bold text-gh-text-secondary">Q{currentQ.number}</span>
-            <span className="text-xs text-gh-text-secondary">({currentQ.marks} mark{currentQ.marks > 1 ? 's' : ''})</span>
+            <span className="text-sm font-bold text-black/40">Q{currentQ.number}</span>
+            <span className="text-xs text-black/35">({currentQ.marks} mark{currentQ.marks > 1 ? 's' : ''})</span>
           </div>
-          <div className="text-gh-text-primary whitespace-pre-wrap leading-relaxed"><MathText text={currentQ.text} /></div>
+          <div className="text-black whitespace-pre-wrap leading-relaxed"><MathText text={currentQ.text} /></div>
         </div>
 
         {/* MC options */}
@@ -222,11 +221,11 @@ export default function PracticePage() {
               const isSelected = selectedOption === opt.label;
               const isCorrect = opt.label === currentQ.answer;
               const showResult = selectedOption !== null;
-              let borderColor = 'border-gh-border';
-              let bg = 'bg-gh-canvas';
-              if (showResult && isCorrect) { borderColor = 'border-green-500'; bg = 'bg-green-500/10'; }
-              else if (showResult && isSelected && !isCorrect) { borderColor = 'border-red-500'; bg = 'bg-red-500/10'; }
-              else if (isSelected) { borderColor = 'border-gh-accent-blue'; }
+              let borderColor = 'border-black/10';
+              let bg = 'bg-white';
+              if (showResult && isCorrect) { borderColor = 'border-green-200'; bg = 'bg-green-50'; }
+              else if (showResult && isSelected && !isCorrect) { borderColor = 'border-red-200'; bg = 'bg-red-50'; }
+              else if (isSelected) { borderColor = 'border-black/30'; bg = 'bg-black/[0.03]'; }
 
               return (
                 <button
@@ -235,10 +234,10 @@ export default function PracticePage() {
                   onClick={() => setSelectedOption(opt.label)}
                   className={`w-full text-left p-4 rounded-xl border transition-all ${borderColor} ${bg}`}
                 >
-                  <span className="font-bold mr-3 text-gh-text-secondary">{opt.label}.</span>
-                  <span className="text-gh-text-primary"><MathText text={opt.text} /></span>
-                  {showResult && isCorrect && <Check className="inline ml-2 text-green-400" size={16} />}
-                  {showResult && isSelected && !isCorrect && <X className="inline ml-2 text-red-400" size={16} />}
+                  <span className="font-bold mr-3 text-black/40">{opt.label}.</span>
+                  <span className="text-black"><MathText text={opt.text} /></span>
+                  {showResult && isCorrect && <Check className="inline ml-2 text-green-600" size={16} />}
+                  {showResult && isSelected && !isCorrect && <X className="inline ml-2 text-red-500" size={16} />}
                 </button>
               );
             })}
@@ -248,20 +247,19 @@ export default function PracticePage() {
         {/* SA controls */}
         {!isMC && (
           <div className="space-y-4 mb-6">
-            {/* Hints */}
             {currentQ.markingGuide && currentQ.markingGuide.length > 0 && hintsShown < currentQ.markingGuide.length && !answerShown && (
               <button
                 onClick={() => setHintsShown(h => h + 1)}
-                className="flex items-center gap-2 px-4 py-2 bg-gh-overlay text-gh-text-primary border border-gh-border rounded-lg hover:bg-gh-border transition"
+                className="flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 transition"
               >
                 <Lightbulb size={16} /> Show Hint ({hintsShown}/{currentQ.markingGuide.length})
               </button>
             )}
 
             {hintsShown > 0 && !answerShown && (
-              <div className="bg-gh-overlay border border-gh-border rounded-xl p-4 space-y-2">
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2">
                 {currentQ.markingGuide.slice(0, hintsShown).map((h, i) => (
-                  <div key={i} className="text-sm text-gh-text-secondary flex items-start gap-2"><Lightbulb size={14} className="mt-0.5 shrink-0" /> <MathText text={h} /></div>
+                  <div key={i} className="text-sm text-amber-700 flex items-start gap-2"><Lightbulb size={14} className="mt-0.5 shrink-0" /> <MathText text={h} /></div>
                 ))}
               </div>
             )}
@@ -269,21 +267,21 @@ export default function PracticePage() {
             {!answerShown && (
               <button
                 onClick={() => setAnswerShown(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-gh-overlay text-gh-text-primary border border-gh-border rounded-lg hover:bg-gh-border transition"
+                className="flex items-center gap-2 px-4 py-2 bg-black/[0.04] text-black/65 border border-black/10 rounded-lg hover:bg-black/[0.07] transition"
               >
                 <Eye size={16} /> Show Answer
               </button>
             )}
 
             {answerShown && (
-              <div className="bg-green-500/5 border border-green-500/20 rounded-xl p-4">
-                <div className="text-sm font-semibold text-green-400 mb-2">Answer:</div>
-                <div className="text-gh-text-primary whitespace-pre-wrap"><MathText text={currentQ.answer} /></div>
+              <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                <div className="text-sm font-semibold text-green-700 mb-2">Answer:</div>
+                <div className="text-black whitespace-pre-wrap"><MathText text={currentQ.answer} /></div>
                 {currentQ.markingGuide.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-gh-border">
-                    <div className="text-sm font-semibold text-gh-text-secondary mb-1">Marking Guide:</div>
+                  <div className="mt-3 pt-3 border-t border-black/8">
+                    <div className="text-sm font-semibold text-black/50 mb-1">Marking Guide:</div>
                     {currentQ.markingGuide.map((m, i) => (
-                      <div key={i} className="text-sm text-gh-text-secondary">• <MathText text={m} /></div>
+                      <div key={i} className="text-sm text-black/50">• <MathText text={m} /></div>
                     ))}
                   </div>
                 )}
@@ -295,10 +293,10 @@ export default function PracticePage() {
         {/* Self-assessment */}
         {answered && (
           <div className="flex gap-3">
-            <button onClick={handleGotIt} className="flex-1 flex items-center justify-center gap-2 py-3 bg-gh-overlay border border-gh-border hover:bg-gh-border text-gh-text-primary font-semibold rounded-xl transition">
+            <button onClick={handleGotIt} className="flex-1 flex items-center justify-center gap-2 py-3 bg-black text-white font-semibold rounded-xl hover:bg-black/85 transition">
               <Check size={18} /> Got it
             </button>
-            <button onClick={handleNeedMore} className="flex-1 flex items-center justify-center gap-2 py-3 bg-gh-overlay border border-gh-border hover:bg-gh-border text-gh-text-primary font-semibold rounded-xl transition">
+            <button onClick={handleNeedMore} className="flex-1 flex items-center justify-center gap-2 py-3 bg-black/[0.05] border border-black/10 text-black/65 font-semibold rounded-xl hover:bg-black/[0.08] transition">
               <X size={18} /> Need more practice
             </button>
           </div>
@@ -311,31 +309,31 @@ export default function PracticePage() {
   if (phase === 'summary') {
     return (
       <div className="mx-auto max-w-2xl px-6 py-16 text-center">
-        <div className="flex justify-center mb-4"><Sparkles className="h-10 w-10 text-gh-text-secondary" /></div>
-        <h2 className="text-2xl font-bold mb-2">Practice Complete!</h2>
-        <p className="text-gh-text-secondary mb-8">Here's how you did</p>
+        <div className="flex justify-center mb-4"><Sparkles className="h-10 w-10 text-black/30" /></div>
+        <h2 className="text-2xl font-bold mb-2 text-black">Practice Complete!</h2>
+        <p className="text-black/45 mb-8">Here's how you did</p>
 
         <div className="grid grid-cols-2 gap-4 mb-8">
-          <div className="bg-gh-surface border border-gh-border rounded-xl p-6">
-            <div className="text-3xl font-bold text-green-400">{correctCount}</div>
-            <div className="text-sm text-gh-text-secondary">Got it</div>
+          <div className="bg-white border border-black/10 rounded-xl p-6">
+            <div className="text-3xl font-bold text-green-600">{correctCount}</div>
+            <div className="text-sm text-black/45">Got it</div>
           </div>
-          <div className="bg-gh-surface border border-gh-border rounded-xl p-6">
-            <div className="text-3xl font-bold text-red-400">{weakCount}</div>
-            <div className="text-sm text-gh-text-secondary">Need practice</div>
+          <div className="bg-white border border-black/10 rounded-xl p-6">
+            <div className="text-3xl font-bold text-red-500">{weakCount}</div>
+            <div className="text-sm text-black/45">Need practice</div>
           </div>
         </div>
 
-        <div className="w-full bg-gh-surface rounded-full h-4 mb-2 overflow-hidden">
+        <div className="w-full bg-black/[0.06] rounded-full h-3 mb-2 overflow-hidden">
           <div className="h-full bg-green-500 rounded-full transition-all" style={{ width: `${questions.length ? (correctCount / questions.length) * 100 : 0}%` }} />
         </div>
-        <p className="text-sm text-gh-text-secondary mb-8">{questions.length ? Math.round((correctCount / questions.length) * 100) : 0}% mastery</p>
+        <p className="text-sm text-black/45 mb-8">{questions.length ? Math.round((correctCount / questions.length) * 100) : 0}% mastery</p>
 
         <div className="flex gap-3 justify-center">
-          <button onClick={() => { resetQState(); setPhase('select'); }} className="flex items-center gap-2 px-5 py-3 bg-gh-surface border border-gh-border rounded-xl hover:bg-gh-border/30 transition text-gh-text-primary font-medium">
+          <button onClick={() => { resetQState(); setPhase('select'); }} className="flex items-center gap-2 px-5 py-3 bg-black/[0.05] border border-black/10 rounded-xl hover:bg-black/[0.08] transition text-black font-medium">
             <RotateCcw size={16} /> New Practice
           </button>
-          <button onClick={() => { setCurrentIdx(0); resetQState(); setResults({}); setPhase('practice'); }} className="flex items-center gap-2 px-5 py-3 bg-gh-overlay border border-gh-border text-gh-text-primary rounded-xl hover:bg-gh-border transition font-medium">
+          <button onClick={() => { setCurrentIdx(0); resetQState(); setResults({}); setPhase('practice'); }} className="flex items-center gap-2 px-5 py-3 bg-black text-white rounded-xl hover:bg-black/85 transition font-medium">
             <RotateCcw size={16} /> Retry Same
           </button>
         </div>

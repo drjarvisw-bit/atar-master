@@ -45,38 +45,38 @@ export default function AuthPage() {
 
   if (confirmSent) {
     return (
-      <div className="min-h-screen bg-gh-canvas flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-gh-surface border border-gh-border rounded-2xl p-8 text-center">
-          <Mail className="mx-auto h-12 w-12 text-gh-accent-blue mb-4" />
-          <h2 className="text-xl font-semibold text-white mb-2">Check your email</h2>
-          <p className="text-gray-400">We sent a confirmation link to <span className="text-white">{email}</span></p>
+      <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-white border border-black/10 rounded-2xl p-8 text-center shadow-sm">
+          <Mail className="mx-auto h-12 w-12 text-black/40 mb-4" />
+          <h2 className="text-xl font-semibold text-black mb-2">Check your email</h2>
+          <p className="text-black/50">We sent a confirmation link to <span className="text-black font-medium">{email}</span></p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gh-canvas flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Brand */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-3">
-            <GraduationCap className="h-8 w-8 text-gh-accent-blue" />
-            <span className="text-2xl font-bold text-white tracking-tight">ATAR Master</span>
+            <GraduationCap className="h-8 w-8 text-black" />
+            <span className="text-2xl font-bold text-black tracking-tight">ATAR Master</span>
           </div>
-          <p className="text-gh-text-muted text-sm">VCE Methods exam practice, powered by AI</p>
+          <p className="text-black/45 text-sm">VCE Methods exam practice</p>
         </div>
 
         {/* Card */}
-        <div className="bg-gh-surface border border-gh-border rounded-2xl p-6 sm:p-8">
+        <div className="bg-white border border-black/10 rounded-2xl p-6 sm:p-8 shadow-sm">
           {/* Mode toggle */}
-          <div className="flex bg-gh-overlay rounded-lg p-1 mb-6">
+          <div className="flex bg-black/[0.04] rounded-lg p-1 mb-6">
             {([MODE.SIGN_IN, MODE.SIGN_UP] as const).map((m) => (
               <button
                 key={m}
                 onClick={() => { setMode(m); setError('') }}
                 className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
-                  mode === m ? 'bg-gh-border text-white' : 'text-gh-text-secondary hover:text-gh-text-primary'
+                  mode === m ? 'bg-white border border-black/10 text-black shadow-sm' : 'text-black/45 hover:text-black'
                 }`}
               >
                 {m === MODE.SIGN_IN ? 'Sign In' : 'Sign Up'}
@@ -86,7 +86,7 @@ export default function AuthPage() {
 
           {/* Error */}
           {error && (
-            <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-lg px-4 py-3 mb-4">
+            <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3 mb-4">
               <AlertCircle className="h-4 w-4 shrink-0" />
               {error}
             </div>
@@ -95,31 +95,31 @@ export default function AuthPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gh-text-secondary mb-1.5">Email</label>
+              <label className="block text-sm font-medium text-black/50 mb-1.5">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gh-text-muted" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-black/35" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-gh-overlay border border-gh-border rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-gh-text-muted focus:outline-none focus:ring-2 focus:ring-gh-accent-blue/50 focus:border-gh-accent-blue transition"
+                  className="w-full bg-white border border-black/10 rounded-lg pl-10 pr-4 py-2.5 text-black placeholder-black/30 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black/30 transition"
                   placeholder="you@example.com"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gh-text-secondary mb-1.5">Password</label>
+              <label className="block text-sm font-medium text-black/50 mb-1.5">Password</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gh-text-muted" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-black/35" />
                 <input
                   type="password"
                   required
                   minLength={6}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-gh-overlay border border-gh-border rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-gh-text-muted focus:outline-none focus:ring-2 focus:ring-gh-accent-blue/50 focus:border-gh-accent-blue transition"
+                  className="w-full bg-white border border-black/10 rounded-lg pl-10 pr-4 py-2.5 text-black placeholder-black/30 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black/30 transition"
                   placeholder="••••••••"
                 />
               </div>
@@ -128,7 +128,7 @@ export default function AuthPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg transition"
+              className="w-full flex items-center justify-center gap-2 bg-black hover:bg-black/85 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg transition"
             >
               {isSignIn ? <LogIn className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
               {submitting ? 'Please wait…' : isSignIn ? 'Sign In' : 'Create Account'}
@@ -137,15 +137,15 @@ export default function AuthPage() {
 
           {/* Divider */}
           <div className="flex items-center gap-3 my-6">
-            <div className="flex-1 h-px bg-gh-border" />
-            <span className="text-xs text-gh-text-muted uppercase">or</span>
-            <div className="flex-1 h-px bg-gh-border" />
+            <div className="flex-1 h-px bg-black/8" />
+            <span className="text-xs text-black/30 uppercase">or</span>
+            <div className="flex-1 h-px bg-black/8" />
           </div>
 
           {/* Google */}
           <button
             onClick={handleGoogle}
-            className="w-full flex items-center justify-center gap-3 bg-gh-overlay hover:bg-gh-border border border-gh-border text-gh-text-secondary hover:text-white font-medium py-2.5 rounded-lg transition"
+            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-black/[0.03] border border-black/10 text-black/65 hover:text-black font-medium py-2.5 rounded-lg transition"
           >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
@@ -157,7 +157,7 @@ export default function AuthPage() {
           </button>
         </div>
 
-        <p className="text-center text-xs text-gh-text-muted mt-6">
+        <p className="text-center text-xs text-black/30 mt-6">
           By continuing, you agree to our Terms of Service and Privacy Policy.
         </p>
       </div>

@@ -21,21 +21,21 @@ export default function SuccessPage() {
   }, [navigate])
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="text-center max-w-md">
-        <CheckCircle className="w-16 h-16 text-emerald-400 mx-auto mb-6" />
-        <h1 className="text-3xl font-bold text-white mb-3">Welcome to Pro!</h1>
-        <p className="text-gray-400 mb-8">
+        <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
+        <h1 className="text-3xl font-bold text-black mb-3">Welcome to Pro!</h1>
+        <p className="text-black/50 mb-8">
           Thank you for upgrading. You now have full access to all exam papers, topic mastery
           analytics, and priority support.
         </p>
         <a
           href="/dashboard"
-          className="inline-block px-6 py-3 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-500 transition"
+          className="inline-block px-6 py-3 rounded-xl bg-black text-white font-medium hover:bg-black/85 transition"
         >
           Go to Dashboard
         </a>
-        <p className="text-gray-500 text-sm mt-4">
+        <p className="text-black/35 text-sm mt-4">
           Redirecting in {countdown} second{countdown !== 1 && 's'}…
         </p>
       </div>

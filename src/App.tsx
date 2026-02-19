@@ -38,7 +38,7 @@ function AppLayout() {
   const showFooter = FOOTER_PAGES.includes(location.pathname) || location.pathname.startsWith('/topics/');
 
   return (
-    <div className="min-h-screen bg-gh-canvas text-gh-text-primary font-sans flex flex-col">
+    <div className="min-h-screen bg-[#FAFAFA] text-black font-sans flex flex-col">
       {!isLanding && <Navbar />}
       {/* Spacer for fixed navbar */}
       {!isLanding && <div className="h-[57px]" />}
