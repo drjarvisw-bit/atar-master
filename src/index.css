@@ -26,16 +26,16 @@
 /* ===== Theme system ===== */
 :root,
 [data-theme="midnight"] {
-  /* OpenAI dark theme - clean & minimal */
-  --bg-primary: #0a0a0a;
-  --bg-secondary: #141414;
-  --card-bg: #1a1a1a;
-  --card-border: #2a2a2a;
-  --text-primary: #ffffff;
-  --text-secondary: #a1a1a1;
-  --accent: #10a37f;
-  --nav-bg: rgba(10,10,10,0.85);
-  --nav-border: #262626;
+  /* White/minimal theme */
+  --bg-primary: #fafafa;
+  --bg-secondary: #ffffff;
+  --card-bg: #ffffff;
+  --card-border: rgba(0,0,0,0.10);
+  --text-primary: #000000;
+  --text-secondary: rgba(0,0,0,0.50);
+  --accent: #000000;
+  --nav-bg: rgba(255,255,255,0.92);
+  --nav-border: rgba(0,0,0,0.10);
 }
 
 [data-theme="aurora"] {
@@ -154,23 +154,9 @@ body {
   outline-offset: 2px;
 }
 
-/* Input fields */
-input, textarea, select {
-  background: var(--bg-secondary);
-  border: 1px solid var(--card-border);
-  border-radius: 8px;
-  padding: 10px 14px;
-  color: var(--text-primary);
-  transition: border-color 0.15s ease;
-}
-
-input:focus, textarea:focus, select:focus {
-  border-color: #10a37f;
-  outline: none;
-}
-
+/* Input fields — minimal overrides, let Tailwind handle the rest */
 input::placeholder {
-  color: var(--text-muted);
+  color: rgba(0,0,0,0.30);
 }
 
 /* ===== Animations ===== */
