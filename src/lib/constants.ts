@@ -2,7 +2,7 @@
  * Application constants
  */
 
-import type { User } from '@supabase/supabase-js';
+import type { User } from 'firebase/auth';
 
 /** Years available on the free tier (older, less exam-relevant papers). */
 export const FREE_YEARS = new Set([2018, 2019, 2020]);
@@ -22,11 +22,9 @@ export function isAdminEmail(email?: string | null): boolean {
 }
 
 /**
- * Prefer server-issued role claim; keep email fallback for backward compatibility.
+ * Check admin status by email.
  */
 export function isAdminUser(user?: User | null): boolean {
   if (!user) return false;
-  const appRole = (user.app_metadata as Record<string, unknown> | undefined)?.role;
-  if (appRole === 'admin') return true;
   return isAdminEmail(user.email);
 }

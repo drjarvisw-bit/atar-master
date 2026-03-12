@@ -29,7 +29,7 @@ export default function TeacherDashboardPage() {
 
   const quickLinks = [
     { label: 'Stripe Dashboard', url: 'https://dashboard.stripe.com', icon: <Crown size={16} /> },
-    { label: 'Supabase Dashboard', url: 'https://supabase.com/dashboard', icon: <Shield size={16} /> },
+    { label: 'Firebase Console', url: 'https://console.firebase.google.com', icon: <Shield size={16} /> },
     { label: 'Vercel Dashboard', url: 'https://vercel.com/dashboard', icon: <ExternalLink size={16} /> },
   ];
 

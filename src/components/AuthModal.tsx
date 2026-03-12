@@ -14,7 +14,7 @@ export default function AuthModal({ onClose, onSuccess, message = 'Sign in to co
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const [confirmSent, setConfirmSent] = useState(false)
+  const [confirmSent] = useState(false)
   const { signIn, signUp, signInWithGoogle } = useAuth()
 
   const isSignIn = mode === 'sign_in'
@@ -31,7 +31,7 @@ export default function AuthModal({ onClose, onSuccess, message = 'Sign in to co
       } else {
         const { error: err } = await signUp(email, password)
         if (err) { setError(err.message); return }
-        setConfirmSent(true)
+        onSuccess?.()
       }
     } finally {
       setSubmitting(false)

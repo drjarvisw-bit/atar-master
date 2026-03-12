@@ -1,5 +1,5 @@
 /**
- * Cloud sync: localStorage progress ↔ Supabase user_progress table.
+ * Cloud sync: localStorage progress ↔ Firestore atar_user_progress collection.
  *
  * Data synced:
  *  - progress_data: completed questions, weak questions, practice minutes, recent sessions
@@ -7,7 +7,8 @@
  *  - achievements_data: skill-tree node progress (from progress.ts)
  */
 
-import { supabase } from './supabase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from '../services/firebaseClient';
 
 // ── localStorage keys (mirrors useProgress.ts + streak.ts + progress.ts) ──
 
@@ -18,8 +19,8 @@ const KEYS = {
   lastPracticeDate: 'atar-last-practice-date',
   practiceMinutes: 'atar-practice-minutes',
   recentSessions: 'atar-recent-sessions',
-  streakV2: 'atar_streak',        // streak.ts uses this key
-  skillTree: 'atar-master-progress', // progress.ts skill tree
+  streakV2: 'atar_streak',
+  skillTree: 'atar-master-progress',
 } as const;
 
 // ── Types ─────────────────────────────────────────────────────
@@ -35,7 +36,6 @@ interface ProgressData {
 interface StreakCloudData {
   streak: number;
   lastPracticeDate: string | null;
-  // streak.ts StreakData fields
   currentStreak: number;
   longestStreak: number;
   lastActiveDate: string;
@@ -109,13 +109,11 @@ function gatherAchievementsData(): AchievementsData {
 // ── Merge logic ───────────────────────────────────────────────
 
 function mergeProgress(local: ProgressData, cloud: ProgressData): ProgressData {
-  // Union of completed & weak (take more)
   const completed = Array.from(new Set([...local.completed, ...cloud.completed]));
   const weak = Array.from(new Set([...local.weak, ...cloud.weak]))
-    .filter((id) => !completed.includes(id)); // completed beats weak
+    .filter((id) => !completed.includes(id));
   const practiceMinutes = Math.max(local.practiceMinutes, cloud.practiceMinutes);
 
-  // Merge recent sessions — deduplicate by date+mode, keep latest 20
   const sessionKey = (s: Record<string, unknown>) => `${s.date}|${s.mode}`;
   const sessionMap = new Map<string, unknown>();
   for (const s of [...(cloud.recentSessions as Record<string, unknown>[]),
@@ -146,7 +144,6 @@ function mergeStreak(local: StreakCloudData, cloud: StreakCloudData): StreakClou
 }
 
 function mergeAchievements(local: AchievementsData, cloud: AchievementsData): AchievementsData {
-  // Merge skill tree nodes — keep highest score / best status per node
   const STATUS_RANK: Record<string, number> = {
     locked: 0, unlocked: 1, 'in-progress': 2, completed: 3, mastered: 4,
   };
@@ -161,13 +158,10 @@ function mergeAchievements(local: AchievementsData, cloud: AchievementsData): Ac
     const c = cloudTree[key] as Record<string, unknown> | undefined;
     if (!l) { nodes[key] = c; continue; }
     if (!c) { nodes[key] = l; continue; }
-    // Take higher status
     const lRank = STATUS_RANK[l.status as string] ?? 0;
     const cRank = STATUS_RANK[c.status as string] ?? 0;
     const best = lRank >= cRank ? { ...l } : { ...c };
-    // Take higher score
     best.score = Math.max((l.score as number) ?? 0, (c.score as number) ?? 0);
-    // Union levelsCompleted
     best.levelsCompleted = Array.from(
       new Set([...((l.levelsCompleted as number[]) ?? []), ...((c.levelsCompleted as number[]) ?? [])]),
     ).sort((a, b) => a - b);
@@ -205,20 +199,16 @@ function applyAchievementsToLocal(data: AchievementsData) {
 // ── Public API ────────────────────────────────────────────────
 
 export async function syncToCloud(userId: string): Promise<void> {
+  if (!db) return;
+
   const localProgress = gatherProgressData();
   const localStreak = gatherStreakData();
   const localAchievements = gatherAchievementsData();
 
-  // Read latest cloud snapshot first to avoid overwrite on multi-device sessions.
-  const { data: existing, error: readError } = await supabase
-    .from('user_progress')
-    .select('progress_data, streak_data, achievements_data')
-    .eq('user_id', userId)
-    .maybeSingle();
-
-  if (readError) {
-    console.error('[cloudSync] syncToCloud pre-read failed:', readError);
-  }
+  // Read latest cloud snapshot first to avoid overwrite on multi-device sessions
+  const docRef = doc(db, 'atar_user_progress', userId);
+  const snapshot = await getDoc(docRef);
+  const existing = snapshot.exists() ? snapshot.data() : null;
 
   const progress_data = existing
     ? mergeProgress(localProgress, existing.progress_data as ProgressData)
@@ -230,39 +220,27 @@ export async function syncToCloud(userId: string): Promise<void> {
     ? mergeAchievements(localAchievements, existing.achievements_data as AchievementsData)
     : localAchievements;
 
-  const { error } = await supabase.from('user_progress').upsert(
-    {
-      user_id: userId,
-      progress_data,
-      streak_data,
-      achievements_data,
-      updated_at: now(),
-    },
-    { onConflict: 'user_id' },
-  );
-
-  if (error) {
-    console.error('[cloudSync] syncToCloud failed:', error);
-  }
+  await setDoc(docRef, {
+    progress_data,
+    streak_data,
+    achievements_data,
+    updated_at: now(),
+  }, { merge: true });
 }
 
 export async function syncFromCloud(userId: string): Promise<void> {
-  const { data, error } = await supabase
-    .from('user_progress')
-    .select('progress_data, streak_data, achievements_data')
-    .eq('user_id', userId)
-    .maybeSingle();
+  if (!db) return;
 
-  if (error) {
-    console.error('[cloudSync] syncFromCloud failed:', error);
-    return;
-  }
+  const docRef = doc(db, 'atar_user_progress', userId);
+  const snapshot = await getDoc(docRef);
 
-  if (!data) {
+  if (!snapshot.exists()) {
     // No cloud data yet — push local to cloud
     await syncToCloud(userId);
     return;
   }
+
+  const data = snapshot.data();
 
   // Merge and apply
   const localProgress = gatherProgressData();

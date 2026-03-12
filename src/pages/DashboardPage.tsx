@@ -57,7 +57,7 @@ export default function DashboardPage() {
     if (user && !profile.displayName) {
       setProfile(prev => ({
         ...prev,
-        displayName: user.user_metadata?.full_name || user.email?.split('@')[0] || '',
+        displayName: user.displayName || user.email?.split('@')[0] || '',
       }));
     }
   }, [user, profile.displayName]);
@@ -74,7 +74,7 @@ export default function DashboardPage() {
   );
 
   const allExams = useMemo(() => getAllExams(), []);
-  const avatarUrl = user?.user_metadata?.avatar_url;
+  const avatarUrl = user?.photoURL;
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-10">
@@ -88,7 +88,7 @@ export default function DashboardPage() {
           </div>
         )}
         <div>
-          <h1 className="text-2xl font-bold text-black">{user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Student'}</h1>
+          <h1 className="text-2xl font-bold text-black">{user?.displayName || user?.email?.split('@')[0] || 'Student'}</h1>
           <p className="text-sm text-black/45">{user?.email}</p>
           {isPro && (
             <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 text-xs font-bold bg-green-50 text-green-700 border border-green-200 rounded-full">

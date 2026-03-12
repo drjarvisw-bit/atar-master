@@ -1,4 +1,5 @@
-import { supabase } from './supabase'
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { app } from '../services/firebaseClient';
 
 // Stripe publishable key from environment variables
 export const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string | undefined;
@@ -17,18 +18,16 @@ export type Plan = (typeof PLANS)[keyof typeof PLANS]
 export async function createCheckoutSession(
   priceId: string,
 ): Promise<{ url: string }> {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  if (!session) {
-    throw new Error('You must be logged in to subscribe')
+  if (!app) {
+    throw new Error('Firebase not configured')
   }
 
-  const { data, error } = await supabase.functions.invoke('create-checkout', {
-    body: { priceId },
-  })
+  const functions = getFunctions(app);
+  const createSession = httpsCallable<{ priceId: string }, { url: string }>(
+    functions,
+    'atarCreateCheckoutSession'
+  );
 
-  if (error) throw error
-  return data as { url: string }
+  const result = await createSession({ priceId });
+  return result.data;
 }
