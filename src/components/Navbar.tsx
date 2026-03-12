@@ -26,7 +26,7 @@ function UserDropdown() {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isAdmin = isAdminUser(user);
-  const avatarUrl = user?.user_metadata?.avatar_url;
+  const avatarUrl = user?.photoURL;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -54,7 +54,7 @@ function UserDropdown() {
         )}
 
         <span className="hidden max-w-[120px] truncate sm:inline">
-          {user?.user_metadata?.full_name || user?.email?.split('@')[0]}
+          {user?.displayName || user?.email?.split('@')[0]}
         </span>
 
         {isPro && <span className="quiet-pill">Pro</span>}
